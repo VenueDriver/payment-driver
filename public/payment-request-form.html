@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bootstrap 101 Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+  <link href="assets/css/styles.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+
+  <div class="container">
+    <img alt="Payment Driver" src="assets/img/Payment-Driver-logo.png" class="logo" />
+
+    <form method="post" action="/payment-requests">
+      <fieldset>
+        <legend>Send a new payment request</legend>
+
+        <label for="firstname" class="cols-sm-2 control-label">Customer First Name</label>
+        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="first name" />
+
+        <label for="lastname" class="cols-sm-2 control-label">Customer Last Name</label>
+        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="last name" />
+
+        <label for="email" class="cols-sm-2 control-label">Customer Email</label>
+        <input type="text" class="form-control" name="email" id="email" placeholder="email" />
+
+        <label for="venue" class="cols-sm-2 control-label">Account to allocate payment</label>
+        <input type="text" class="form-control" name="venue" id="venue" placeholder="account" />
+
+        <label for="payment" class="cols-sm-2 control-label">Payment Amount</label>
+        <input type="text" class="form-control" name="payment" id="payment" placeholder="Payment amount" />
+
+        <br/>
+
+        <button class="btn btn-large btn-primary" type="submit">send payment request</button>
+      </fieldset>
+    </form>
+  </div>
+  </div>
+
+
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+</body>
+
+</html>
