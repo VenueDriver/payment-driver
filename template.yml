@@ -9,11 +9,11 @@ Parameters:
     Description: AWS CodeStar projectID used to associate new resources to team members
 
 Resources:
-  GetHelloWorld:
+  PaymentRequests:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.get
-      Runtime: nodejs4.3
+      Runtime: nodejs6.10
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -23,3 +23,37 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: get
+  PaymentForm:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payments.get
+      Runtime: nodejs6.10
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payments
+            Method: get
+      Environment:
+        Variables:
+          STRIPE_PUBLISHABLE_KEY: publishable
+  ProcessPayment:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payments.post
+      Runtime: nodejs6.10
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payments
+            Method: post
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY: secret

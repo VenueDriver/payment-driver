@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bootstrap 101 Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+  <link href="assets/css/styles.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+
+  <div class="container">
+    <img alt="Payment Driver" src="assets/img/Payment-Driver-logo.png" class="logo" />
+
+    <form method="post" action="/payments">
+      <fieldset>
+        <legend>Send a new payment request</legend>
+
+        <label for="firstname" class="cols-sm-2 control-label">First name</label>
+        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First" />
+
+        <label for="lastname" class="cols-sm-2 control-label">Last name</label>
+        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Last" />
+
+        <label for="payment" class="cols-sm-2 control-label">Payment Amount</label>
+        <input type="text" class="form-control" name="amount" id="amount" value="{{amount}}" readonly />
+
+        <br/>
+
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k" data-amount="42000" data-name="Demo Site" data-description="2 widgets" data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-locale="auto">
+        </script>
+      </fieldset>
+    </form>
+  </div>
+  </div>
+
+
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="assets/js/bootstrap.min.js"></script>
+</body>
+
+</html>

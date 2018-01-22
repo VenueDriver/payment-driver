@@ -1,0 +1,25 @@
+{
+  "name": "payment-driver",
+  "version": "1.0.0",
+  "description": "Serverless payment request micro service.",
+  "main": "payment-requests.js",
+  "dependencies": {
+    "mustache": "^2.3.0",
+    "querystring": "^0.2.0",
+    "stripe": "^5.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VenueDriver/payment-driver.git"
+  },
+  "author": "Ryan Alyn Porter",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VenueDriver/payment-driver/issues"
+  },
+  "homepage": "https://github.com/VenueDriver/payment-driver#readme"
+}
