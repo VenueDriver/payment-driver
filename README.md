@@ -16,27 +16,73 @@ This sample includes:
   by AWS Cloudformation to deploy your application to AWS Lambda and Amazon API
   Gateway.
 
+User stories
+------------
 
-What Do I Do Next?
-------------------
+### Employee sends payment request
 
-If you have checked out a local copy of your repository you can start making
-changes to the sample code.  We suggest making a small change to index.js first,
-so you can see how changes pushed to your project's repository are automatically
-picked up by your project pipeline and deployed to AWS Lambda and Amazon API Gateway.
-(You can watch the pipeline progress on your AWS CodeStar project dashboard.)
-Once you've seen how that works, start developing your own code, and have fun!
+    Scenario: As an employee, I want to send a payment request email to a customer, so that they can pay us
+    
+    Given that I an an employee with a valid user account in the system,
+    When I log into the employee dashboard,
+    Then I should see an option to send a payment request,
+    And when I follow that option,
+    Then I should see a form for making a payment,
+    And the form should include First, Last, Email, venue, event date,
+    And the form should include a currency amount in USD,
+    And when I fill out the form and submit it,
+    Then a notification should be sent to the customer,
+    And the notification should include a link to a payment form,
+    And a record of the payment request should be written to the database,
+    And then I should see a confirmation page in the dashboard.
 
-Learn more about Serverless Application Model (SAM) and how it works here:
-https://github.com/awslabs/serverless-application-model/blob/master/HOWTO.md
+#### Implementation
 
-AWS Lambda Developer Guide:
-http://docs.aws.amazon.com/lambda/latest/dg/deploying-lambda-apps.html
+The ```/public/payment-form.html``` file is sent to S3 by AWS CodeBuild using the buildspec.yml file.  The build uses the ```sed``` utility to replace ```assets``` with the URL to the S3 bucket where the assets are stored.
 
-Learn more about AWS CodeStar by reading the user guide, and post questions and
-comments about AWS CodeStar on our forum.
+This will need an authentication system.
 
-AWS CodeStar User Guide:
-http://docs.aws.amazon.com/codestar/latest/userguide/welcome.html
+### Employee wants to cancel payment request
 
-AWS CodeStar Forum: https://forums.aws.amazon.com/forum.jspa?forumID=248
+    Scenario: As an employee, I want to cancel a payment request which was already sent to a customer but not filled out and submitted yet
+    
+    Given that I an an employee with a valid user account in the system,
+    When I log into the employee dashboard,
+    Assuming I have previously generated at least one payment request,
+    Then I should see a list of requests,
+    And each request should have a status (sent/pending/closed),
+    And each request should have a CANCEL option,
+    So when I click CANCEL,
+    The customer receives and email explaining that the request was canceled
+
+#### Implementation
+
+Not yet implemented.
+
+### Customer makes payment
+
+  Scenario: As a customer, I want to follow a payment request link and submit my information, so that I can make a payment
+  
+  The first release would only include those two user stories.
+  The second release could include payment request management.
+  Probably need to tweak the stories to include details like: The payment request record should be tagged to the user and venue.
+  There is another issue that's not really a user story.  User stories are super useful but you can't use them for everything.
+  We want the venue list to use some standard venue list, rather than this thing having its own list of venues that we have to maintain.
+  The cleanest thing would be to get that from Vault.
+  But Vault has no API.  And that's kind of a touchy thing in terms of security to add one.
+  We could set this up to use Venue Driver venue IDs, but it doesn't know venue IDs for restaurants.
+  We might actually have to have a venues table in this thing.  And it might be called "accounts" instead of "venues".
+  
+#### Implementation
+
+The ```payments``` REST resource is powered by the ```payments.js``` Lambda functions.
+
+The REST resource supports these HTTP verbs:
+
+##### GET
+
+Loads the file ```views/payment-form.html```, processes it with Moustache to add details from the payment request and the Stripe key, and serves the HTML.
+
+##### POST
+
+Processes a payment with Stripe.
