@@ -16,6 +16,25 @@ This sample includes:
   by AWS Cloudformation to deploy your application to AWS Lambda and Amazon API
   Gateway.
 
+Development
+-----------
+
+Use SAM Local for development:
+
+    sam local start-api -p 8080
+
+(Port 8080 is important if you're using AWS Cloud9.)
+
+Be sure to set the Stripe keys as environment variables:
+
+    STRIPE_PUBLISHABLE_KEY
+    STRIPE_SECRET_KEY
+
+Example ~/.bash_profile code:
+
+    export STRIPE_PUBLISHABLE_KEY="pk_..."
+    export STRIPE_SECRET_KEY="sk_..."
+
 User stories
 ------------
 

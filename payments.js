@@ -10,7 +10,6 @@ const stripe = require("stripe")(keySecret);
 
 // Send the form.
 exports.get = function (event, context) {
-  console.log('helo?')
   var payment_request = {
     'stripe_publishable_key': keyPublishable,
     'amount': '420'
@@ -27,28 +26,42 @@ exports.get = function (event, context) {
 };
 
 // Process a payment.
-exports.post = function (event, context) {
+exports.post = function (event, context, callback) {
   const body = querystring.parse(event.body);
   var amount = body.amount
   var stripeToken = body.stripeToken
 
   console.log('stripeToken: ' + stripeToken)
 
-  stripe.charges.create({
+  return stripe.charges.create({
       amount: body.amount,
       description: "Sample Charge",
       currency: "usd",
       source: stripeToken
     })
-    .then(
-      context.fail({
-        statusCode: 418,
-        headers: { 'Content-Type': 'text/html' },
-        body: "I'm a teapot."
-      }),
-      context.succeed({
+    .then((charge) => { // Success response
+      const response = {
         statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: "SUCCESS!"
-      }))
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          message: `Charge processed succesfully!`,
+          charge,
+        }),
+      };
+      callback(null, response);
+    })
+    .catch((err) => { // Error response
+      const response = {
+        statusCode: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          error: err.message,
+        }),
+      };
+      callback(null, response);
+    })
 };
