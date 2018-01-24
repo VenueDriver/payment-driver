@@ -40,15 +40,12 @@ exports.post = function (event, context, callback) {
       source: stripeToken
     })
     .then((charge) => { // Success response
+      var html = fs.readFileSync('views/payment-confirmation.html', 'utf8');
+
       const response = {
         statusCode: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({
-          message: `Charge processed succesfully!`,
-          charge,
-        }),
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
       };
       callback(null, response);
     })
