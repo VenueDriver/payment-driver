@@ -25,6 +25,12 @@ Use SAM Local for development:
 
 (Port 8080 is important if you're using AWS Cloud9.)
 
+To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
+
+To do a test Stripe transaction, ensure that your Stripe keys are set as described below.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
+
+### Set up Stripe keys
+
 Be sure to set the Stripe keys as environment variables:
 
     STRIPE_PUBLISHABLE_KEY
@@ -34,6 +40,8 @@ Example ~/.bash_profile code:
 
     export STRIPE_PUBLISHABLE_KEY="pk_..."
     export STRIPE_SECRET_KEY="sk_..."
+
+Get the keys from the Stripe dashboard.
 
 User stories
 ------------
