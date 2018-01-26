@@ -8,11 +8,8 @@ const keyPublishable = process.env.STRIPE_PUBLISHABLE_KEY;
 const keySecret = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(keySecret);
 
-// var nock = require('nock')
-// nock.recorder.rec();
-
 // Send the form.
-exports.get = function (event, context) {
+exports.get = function (event, context, callback) {
   var payment_request = {
     'stripe_publishable_key': keyPublishable,
     'amount': '420'
@@ -21,11 +18,12 @@ exports.get = function (event, context) {
   var template = fs.readFileSync('views/payment-form.html', 'utf8');
   var html = mustache.to_html(template, payment_request);
 
-  context.succeed({
+  const response = {
     statusCode: 200,
     headers: { 'Content-Type': 'text/html' },
     body: html.toString()
-  });
+  };
+  callback(null, response);
 };
 
 // Process a payment.
@@ -33,8 +31,6 @@ exports.post = function (event, context, callback) {
   const body = querystring.parse(event.body);
   var amount = body.amount
   var stripeToken = body.stripeToken
-
-  console.log('stripeToken: ' + stripeToken)
 
   return stripe.charges.create({
       amount: body.amount,
@@ -52,15 +48,16 @@ exports.post = function (event, context, callback) {
       };
       callback(null, response);
     })
-    .catch((err) => { // Error response
+    .catch((error) => { // Error response
+      var parameters = { 'error': error.message }
+
+      var template = fs.readFileSync('views/payment-error.html', 'utf8');
+      var html = mustache.to_html(template, parameters);
+
       const response = {
-        statusCode: 500,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({
-          error: err.message,
-        }),
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
       };
       callback(null, response);
     })
