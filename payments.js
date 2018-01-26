@@ -8,9 +8,6 @@ const keyPublishable = process.env.STRIPE_PUBLISHABLE_KEY;
 const keySecret = process.env.STRIPE_SECRET_KEY;
 const stripe = require("stripe")(keySecret);
 
-// var nock = require('nock')
-// nock.recorder.rec();
-
 // Send the form.
 exports.get = function (event, context) {
   var payment_request = {
@@ -33,8 +30,6 @@ exports.post = function (event, context, callback) {
   const body = querystring.parse(event.body);
   var amount = body.amount
   var stripeToken = body.stripeToken
-
-  console.log('stripeToken: ' + stripeToken)
 
   return stripe.charges.create({
       amount: body.amount,

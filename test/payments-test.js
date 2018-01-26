@@ -2,7 +2,6 @@ var sinon = require('sinon')
 var assert = require('assert')
 var expect = require('chai').expect;
 var nock = require('nock')
-// nock.recorder.rec();
 
 var payments = require('../payments');
 
@@ -34,7 +33,7 @@ describe('Payment Driver', function () {
         }
       });
     });
-    
+
     it('should process a payment with Stripe when the payment form is posted', function (done) {
 
       nock('https://api.stripe.com:443', { "encodedQueryParams": true })
@@ -75,6 +74,6 @@ describe('Payment Driver', function () {
       });
 
     });
-    
+
   })
 })
