@@ -1,11 +1,6 @@
-var sinon = require('sinon')
-var assert = require('assert')
-
 var chai = require('chai')
 var expect = chai.expect;
 const cheerio = require('cheerio')
-
-var nock = require('nock')
 
 var paymentRequests = require('../payment-requests');
 
