@@ -34,7 +34,7 @@ describe('Payment Driver', function () {
         }
       });
     });
-    
+
     it('should process a payment with Stripe when the payment form is posted', function (done) {
 
       nock('https://api.stripe.com:443', { "encodedQueryParams": true })
@@ -57,6 +57,7 @@ describe('Payment Driver', function () {
     });
 
     it('should return an error when there is an error response from Stripe', function (done) {
+
       nock('https://api.stripe.com:443', { "encodedQueryParams": true })
         .post('/v1/charges', "description=Sample%20Charge&currency=usd")
         .reply(400, { "error": { "type": "invalid_request_error", "message": "Test error message." } }, []);
@@ -66,6 +67,7 @@ describe('Payment Driver', function () {
           expect(error).to.not.exist;
           expect(result).to.exist;
           expect(result.statusCode).to.equal(500);
+          expect(result.headers['Content-Type']).to.equal('text/html');
           expect(result.body).to.equal('{"error":"Test error message."}')
           done();
         }
@@ -75,6 +77,6 @@ describe('Payment Driver', function () {
       });
 
     });
-    
+
   })
 })
