@@ -1,3 +1,6 @@
 .c9
 lambda-payloads.json
 node_modules
+.coveralls.yml
+.nyc_output
+coverage.txt
