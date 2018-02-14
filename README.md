@@ -19,16 +19,6 @@ This sample includes:
 Development
 -----------
 
-Use SAM Local for development:
-
-    sam local start-api -p 8080
-
-(Port 8080 is important if you're using AWS Cloud9.)
-
-To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
-
-To do a test Stripe transaction, ensure that your Stripe keys are set as described below.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
-
 ### Set up Stripe keys
 
 Be sure to set the Stripe keys as environment variables:
@@ -42,6 +32,42 @@ Example ~/.bash_profile code:
     export STRIPE_SECRET_KEY="sk_..."
 
 Get the keys from the Stripe dashboard.
+
+### Set up local DynamoDB tables
+
+At the time that this was written, SAM Local cannot manage local DynamoDB tables for development.  You have to set them up manually.
+
+First, you will need DynamoDB Local:
+
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html
+
+First, create a network for SAM Local to reach your local DynamoDB:
+
+    docker network create sam-local
+
+Then install and run DynamoDB Local, on that Docker network:
+
+    docker run -d -v "$PWD":/dynamodb_local_db -p 8000:8000 --network sam-local --name dynamodb cnadiminti/dynamodb-local
+
+Once you have DynamoDB running on port 8000, create some tables:
+
+    npm run create-tables
+
+If you need to drop those tables and re-create them, then do this:
+
+    npm run delete-tables
+
+### Start an HTTP server with SAM Local
+
+Use SAM Local for development:
+
+    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local
+
+(Port 8080 is important if you're using AWS Cloud9.)
+
+To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
+
+To do a test Stripe transaction, ensure that your Stripe keys are set as described above.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
 
 User stories
 ------------

@@ -9,11 +9,20 @@ Parameters:
     Description: AWS CodeStar projectID used to associate new resources to team members
 
 Resources:
+
+  PaymentRequestsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+         Name: id
+         Type: String
+
   PaymentRequests:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.get
       Runtime: nodejs6.10
+      Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -23,11 +32,36 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: get
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
+  PostPaymentRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.post
+      Runtime: nodejs6.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payment-requests
+            Method: post
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+          STRIPE_SECRET_KEY: secret
+
   PaymentForm:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payments.get
       Runtime: nodejs6.10
+      Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -39,12 +73,15 @@ Resources:
             Method: get
       Environment:
         Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
           STRIPE_PUBLISHABLE_KEY: publishable
+
   ProcessPayment:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payments.post
       Runtime: nodejs6.10
+      Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
           !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
@@ -56,4 +93,5 @@ Resources:
             Method: post
       Environment:
         Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
           STRIPE_SECRET_KEY: secret
