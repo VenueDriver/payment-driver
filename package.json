@@ -6,7 +6,6 @@
   "dependencies": {
     "mustache": "^2.3.0",
     "querystring": "^0.2.0",
-    "npdynamodb": "^0.2.15",
     "stripe": "^5.4.0",
     "uuid": "3.2.1"
   },
@@ -21,7 +20,8 @@
     "nock": "^9.1.6",
     "nyc": "^11.2.1",
     "sinon": "^4.0.1",
-    "watch-run": "^1.2.5"
+    "watch-run": "^1.2.5",
+    "aws-sdk-mock": "^1.7.0"
   },
   "scripts": {
     "create-tables": "aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name payment_requests --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1; aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name payment_requests_test --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1",
