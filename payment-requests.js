@@ -3,20 +3,22 @@ const fs = require('fs')
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1');
 const mustache = require('mustache')
+require('dotenv-extended').load();
 require('./partial-html-templates')
+const PaymentRequestEmail = require('./lib/payment-request-email.js').PaymentRequestEmail;
 
 // DynamoDB.
 const AWS = require('aws-sdk')
 var dynamoConfig = {
-  region: process.env.AWS_REGION || 'us-east-1',
+  region: process.env.AWS_REGION,
   maxRetries: 1
 }
 if (process.env.AWS_SAM_LOCAL) dynamoConfig['endpoint'] = "http://dynamodb:8000"
-if (process.env.DYNAMODB_ENDPOINT) dynamoConfig['endpoint'] = process.env.DYNAMODB_ENDPOINT;
-const paymentRequestsTableName = process.env.PAYMENT_REQUESTS_TABLE_NAME || 'payment_requests'
+if (process.env.DYNAMODB_ENDPOINT) dynamoConfig['endpoint'] = process.env.DYNAMODB_ENDPOINT
+const paymentRequestsTableName = process.env.PAYMENT_REQUESTS_TABLE_NAME
 
 exports.get = function (event, context, callback) {
-  var template = fs.readFileSync('views/payment-request-form.mustache', 'utf8')
+  var template = fs.readFileSync('templates/payment-request-form.mustache', 'utf8')
   var html = mustache.render(template, {}, partials())
 
   const response = {
@@ -28,6 +30,9 @@ exports.get = function (event, context, callback) {
 };
 
 exports.post = function (event, context, callback) {
+
+  console.log("POST:")
+  console.log(JSON.stringify(event))
 
   const dynamo = new AWS.DynamoDB.DocumentClient(dynamoConfig)
 
@@ -42,7 +47,7 @@ exports.post = function (event, context, callback) {
     if (error) {
       var parameters = { 'error': error }
 
-      var template = fs.readFileSync('views/payment-request-error.mustache', 'utf8')
+      var template = fs.readFileSync('templates/payment-request-error.mustache', 'utf8')
       var html = mustache.render(template, parameters, partials())
 
       const response = {
@@ -53,10 +58,25 @@ exports.post = function (event, context, callback) {
       callback(null, response)
     }
     else {
-      var parameters = { 'id': paymentRequest['id'] }
 
-      var template = fs.readFileSync('views/payment-request-confirmation.mustache', 'utf8')
-      var html = mustache.render(template, parameters, partials())
+      // Add 'Origin' from API Gateway so that the email can include a URL
+      // back to this same instance of the web app.
+      var paymentRequestParameters = Object.assign(paymentRequest, {
+        'origin': event['headers']['Origin']
+      })
+
+      PaymentRequestEmail.sendEmail(paymentRequestParameters, function (error, data) {
+        // If something goes wrong, print an error message.
+        if (error) {
+          console.log(error.message);
+        }
+        else {
+          console.log("Email sent! Message ID: ", data.MessageId);
+        }
+      })
+
+      var template = fs.readFileSync('templates/payment-request-confirmation.mustache', 'utf8')
+      var html = mustache.render(template, paymentRequest, partials())
 
       const response = {
         statusCode: 200,

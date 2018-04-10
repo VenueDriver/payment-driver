@@ -49,6 +49,10 @@ Then install and run DynamoDB Local, on that Docker network:
 
     docker run -d -v "$PWD":/dynamodb_local_db -p 8000:8000 --network sam-local --name dynamodb cnadiminti/dynamodb-local
 
+If you have already done that once and downloaded the DynamoDB container before, then you can run the existing container with:
+
+    docker start dynamodb
+
 Once you have DynamoDB running on port 8000, create some tables:
 
     npm run create-tables
@@ -56,6 +60,10 @@ Once you have DynamoDB running on port 8000, create some tables:
 If you need to drop those tables and re-create them, then do this:
 
     npm run delete-tables
+
+To scan the current contents of your ```payment_requests``` table:
+
+    aws dynamodb scan --endpoint-url http://localhost:8000 --table-name payment_requests
 
 ### Start an HTTP server with SAM Local
 

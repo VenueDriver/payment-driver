@@ -4,3 +4,5 @@ node_modules
 .coveralls.yml
 .nyc_output
 coverage.txt
+.env
+*.db

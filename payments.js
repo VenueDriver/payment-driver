@@ -16,7 +16,7 @@ exports.get = function (event, context, callback) {
     'amount': '420'
   }
 
-  var template = fs.readFileSync('views/payment-form.mustache', 'utf8')
+  var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
   var html = mustache.render(template, payment_request, partials())
 
   const response = {
@@ -40,7 +40,7 @@ exports.post = function (event, context, callback) {
       source: stripeToken
     })
     .then((charge) => { // Success response
-      var html = fs.readFileSync('views/payment-confirmation.mustache', 'utf8')
+      var html = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
 
       const response = {
         statusCode: 200,
@@ -52,7 +52,7 @@ exports.post = function (event, context, callback) {
     .catch((error) => { // Error response
       var parameters = { 'error': error.message }
 
-      var template = fs.readFileSync('views/payment-error.mustache', 'utf8')
+      var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
       var html = mustache.render(template, parameters, partials())
 
       const response = {

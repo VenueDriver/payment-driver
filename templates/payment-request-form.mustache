@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Send Payment Request - Payment Driver</title>
+  {{> head }}
+</head>
+
+<body>
+
+  <div class="container">
+    {{> header }}
+
+    <form method="post" action="/payment-requests">
+      <fieldset>
+        <legend>Send a new payment request</legend>
+
+        <label for="firstname" class="cols-sm-2 control-label">Customer first name</label>
+        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="first name" />
+
+        <label for="lastname" class="cols-sm-2 control-label">Customer last name</label>
+        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="last name" />
+
+        <label for="email" class="cols-sm-2 control-label">Customer email</label>
+        <input type="text" class="form-control" name="email" id="email" placeholder="customer@example.com" />
+
+        <label for="account" class="cols-sm-2 control-label">Account to allocate payment</label>
+        <input type="text" class="form-control" name="account" id="account" placeholder="account" />
+
+        <label for="amount" class="cols-sm-2 control-label">Payment amount</label>
+        <input type="text" class="form-control" name="amount" id="amount" placeholder="amount" />
+
+        <label for="requestor" class="cols-sm-2 control-label">Requestor (your) email</label>
+        <input type="text" class="form-control" name="requestor" id="requestor" placeholder="you@example.com" />
+
+        <label for="requestor" class="cols-sm-2 control-label">Description</label>
+        <textarea class="form-control" name="description" id="requestor" placeholder="What is this payment for?"></textarea>
+
+        <br/>
+
+        <button class="btn btn-large btn-primary" type="submit">send payment request</button>
+      </fieldset>
+    </form>
+
+    {{> footer }}
+  </div>
+
+  {{> scripts }}
+</body>
+
+</html>
