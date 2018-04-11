@@ -3,7 +3,7 @@ const fs = require('fs')
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1');
 const mustache = require('mustache')
-require('dotenv-extended').load();
+require('dotenv').load();
 require('./partial-html-templates')
 const PaymentRequestEmail = require('./lib/payment-request-email.js').PaymentRequestEmail;
 
