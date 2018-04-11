@@ -4,7 +4,7 @@
   "description": "Serverless payment request micro service.",
   "main": "payment-requests.js",
   "dependencies": {
-    "dotenv-extended": "^2.0.1",
+    "dotenv": "^5.0.1",
     "mustache": "^2.3.0",
     "querystring": "^0.2.0",
     "stripe": "^5.4.0",
