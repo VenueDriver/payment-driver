@@ -7,8 +7,8 @@ require('dotenv').load();
 require('./partial-html-templates')
 const PaymentRequestEmail = require('./lib/payment-request-email.js').PaymentRequestEmail;
 
-// DynamoDB.
-const AWS = require('aws-sdk')
+// DynamoDB
+// TODO: DRY this.
 var dynamoConfig = {
   region: process.env.AWS_REGION,
   maxRetries: 1
@@ -30,9 +30,6 @@ exports.get = function (event, context, callback) {
 };
 
 exports.post = function (event, context, callback) {
-
-  console.log("POST:")
-  console.log(JSON.stringify(event))
 
   const dynamo = new AWS.DynamoDB.DocumentClient(dynamoConfig)
 

@@ -2,7 +2,18 @@
 var fs = require('fs')
 var querystring = require('querystring')
 var mustache = require('mustache')
+const AWS = require('aws-sdk')
 require('./partial-html-templates')
+
+// DynamoDB
+// TODO: DRY this.
+var dynamoConfig = {
+  region: process.env.AWS_REGION,
+  maxRetries: 1
+}
+if (process.env.AWS_SAM_LOCAL) dynamoConfig['endpoint'] = "http://dynamodb:8000"
+if (process.env.DYNAMODB_ENDPOINT) dynamoConfig['endpoint'] = process.env.DYNAMODB_ENDPOINT
+const paymentRequestsTableName = process.env.PAYMENT_REQUESTS_TABLE_NAME
 
 // Stripe for payments.
 const keyPublishable = process.env.STRIPE_PUBLISHABLE_KEY
@@ -11,20 +22,45 @@ const stripe = require("stripe")(keySecret)
 
 // Send the form.
 exports.get = function (event, context, callback) {
-  var payment_request = {
-    'stripe_publishable_key': keyPublishable,
-    'amount': '420'
-  }
 
-  var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
-  var html = mustache.render(template, payment_request, partials())
+  const dynamo = new AWS.DynamoDB.DocumentClient(dynamoConfig)
+  var payment_request_id = event['queryStringParameters']['id']
+  dynamo.get({
+    TableName: paymentRequestsTableName,
+    Key: { 'id': payment_request_id }
+  }, function (error, data) {
+    if (error) {
+      var parameters = { 'error': error }
 
-  const response = {
-    statusCode: 200,
-    headers: { 'Content-Type': 'text/html' },
-    body: html.toString()
-  }
-  callback(null, response)
+      var template = fs.readFileSync('templates/error.mustache', 'utf8')
+      var html = mustache.render(template, parameters, partials())
+
+      const response = {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
+      }
+      callback(null, response)
+    }
+    else {
+      var payment_request = {
+        'stripe_publishable_key': keyPublishable,
+        'amount': data.Item.amount,
+        'stripe_amount': data.Item.amount * 100
+      }
+
+      var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
+      var html = mustache.render(template, payment_request, partials())
+
+      const response = {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
+      }
+      callback(null, response)
+
+    }
+  })
 }
 
 // Process a payment.
