@@ -11,27 +11,41 @@
   <div class="container">
     {{> header }}
 
-    <form method="post" action="/payment-requests">
+    <form method="post" action="/payment-requests" data-toggle="validator">
       <fieldset>
-        <legend>Send a new payment request</legend>
+        <legend>New payment request</legend>
 
+<div class="form-group has-feedback">
+  <label for="amount" class="cols-sm-2 control-label">Payment amount</label>
+  <div class="input-prepend">
+    <span class="add-on">$</span>
+    <input type="text" class="form-control" name="amount" id="amount" placeholder="00.00" pattern="[0-9]+\.[0-9]*$" required />
+  </div>
+</div>
         <label for="firstname" class="cols-sm-2 control-label">Customer first name</label>
-        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="first name" />
+        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="first name" required />
 
         <label for="lastname" class="cols-sm-2 control-label">Customer last name</label>
-        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="last name" />
+        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="last name" required />
 
         <label for="email" class="cols-sm-2 control-label">Customer email</label>
-        <input type="text" class="form-control" name="email" id="email" placeholder="customer@example.com" />
+        <input type="email" class="form-control" name="email" id="email" placeholder="customer@example.com" required />
 
-        <label for="account" class="cols-sm-2 control-label">Account to allocate payment</label>
-        <input type="text" class="form-control" name="account" id="account" placeholder="account" />
-
-        <label for="amount" class="cols-sm-2 control-label">Payment amount</label>
-        <input type="text" class="form-control" name="amount" id="amount" placeholder="amount" />
+        <div class="form-group">
+          <label for="account" class="cols-sm-2 control-label">Account to allocate payment</label>
+          <select class="selectpicker form-control" name="account" id="account" required>
+            <option value="">pick an account...</option>
+            <option value="hakkasanlv">Hakkasan Las Vegas</option>
+            <option value="omnialv">OMNIA Las Vegas</option>
+            <option value="jewel">Jewel Nightclub</option>
+            <option value="omniabali">OMNIA Bali</option>
+            <option>etc</option>
+            <option>etc</option>
+          </select>
+        </div>
 
         <label for="requestor" class="cols-sm-2 control-label">Requestor (your) email</label>
-        <input type="text" class="form-control" name="requestor" id="requestor" placeholder="you@example.com" />
+        <input type="email" class="form-control" name="requestor" id="requestor" placeholder="you@example.com" required />
 
         <label for="requestor" class="cols-sm-2 control-label">Description</label>
         <textarea class="form-control" name="description" id="requestor" placeholder="What is this payment for?"></textarea>
