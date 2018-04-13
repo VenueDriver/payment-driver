@@ -21,7 +21,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.get
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
@@ -40,7 +40,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.post
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
@@ -60,7 +60,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payments.get
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
@@ -80,7 +80,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payments.post
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
       Role:
         Fn::ImportValue:
