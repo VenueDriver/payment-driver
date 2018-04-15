@@ -1,9 +1,10 @@
 'use strict'
-var fs = require('fs')
-var querystring = require('querystring')
-var mustache = require('mustache')
+const fs = require('fs')
+const querystring = require('querystring')
+const mustache = require('mustache')
 const AWS = require('aws-sdk')
-require('./partial-html-templates')
+const partials = require('./partial-html-templates')
+const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 
 // DynamoDB
 // TODO: DRY this.
@@ -21,81 +22,77 @@ const keySecret = process.env.STRIPE_SECRET_KEY
 const stripe = require("stripe")(keySecret)
 
 // Send the form.
-exports.get = function (event, context, callback) {
+exports.get = async function (event, context) {
 
-  const dynamo = new AWS.DynamoDB.DocumentClient(dynamoConfig)
-  var payment_request_id = event['queryStringParameters']['id']
-  dynamo.get({
-    TableName: paymentRequestsTableName,
-    Key: { 'id': payment_request_id }
-  }, function (error, data) {
-    if (error) {
-      var parameters = { 'error': error }
+  try {
+    var paymentRequest = await PaymentRequest.get(event['queryStringParameters']['id'])
 
-      var template = fs.readFileSync('templates/error.mustache', 'utf8')
-      var html = mustache.render(template, parameters, partials())
-
-      const response = {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-      callback(null, response)
+    var templateParameters = {
+      'stripe_publishable_key': keyPublishable,
+      'amount': paymentRequest.amount,
+      'integer_amount': paymentRequest.amount * 100,
+      'description': paymentRequest.description,
     }
-    else {
-      var payment_request = {
-        'stripe_publishable_key': keyPublishable,
-        'amount': data.Item.amount,
-        'stripe_amount': data.Item.amount * 100
-      }
 
-      var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
-      var html = mustache.render(template, payment_request, partials())
+    var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
+    var html = mustache.render(template, templateParameters, partials())
 
-      const response = {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-      callback(null, response)
-
+    return {
+      statusCode: 500,
+      contentType: 'text/html',
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
     }
-  })
+  }
+  catch (error) {
+    var parameters = { 'error': error }
+
+    var template = fs.readFileSync('templates/error.mustache', 'utf8')
+    var html = mustache.render(template, parameters, partials())
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
 }
 
 // Process a payment.
-exports.post = function (event, context, callback) {
+exports.post = async function (event, context) {
   const body = querystring.parse(event.body)
   var amount = body.amount
   var stripeToken = body.stripeToken
 
-  return stripe.charges.create({
+  try {
+    var charge = await stripe.charges.create({
       amount: body.amount,
       description: "Sample Charge",
       currency: "usd",
       source: stripeToken
     })
-    .then((charge) => { // Success response
-      var html = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
 
-      const response = {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-      callback(null, response)
-    })
-    .catch((error) => { // Error response
-      var parameters = { 'error': error.message }
+    console.log("CHARGE:")
+    console.log(JSON.stringify(charge))
 
-      var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
-      var html = mustache.render(template, parameters, partials())
+    var html = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
 
-      const response = {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-      callback(null, response)
-    })
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
+  catch (error) {
+    var parameters = { 'error': error.message }
+
+    var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
+    var html = mustache.render(template, parameters, partials())
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
 }

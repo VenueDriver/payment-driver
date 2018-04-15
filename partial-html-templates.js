@@ -1,5 +1,6 @@
 var fs = require('fs')
-partials = function () {
+
+module.exports = function () {
   return {
     head: fs.readFileSync('templates/head.mustache', 'utf8'),
     header: fs.readFileSync('templates/header.mustache', 'utf8'),

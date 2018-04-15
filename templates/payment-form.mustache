@@ -19,18 +19,18 @@
       <fieldset>
         <legend>Please provide payment</legend>
 
-        <label for="firstname" class="cols-sm-2 control-label">First name</label>
-        <input type="text" class="form-control" name="firstname" id="firstname" placeholder="First" />
+        <label for="display_amount" class="cols-sm-2 control-label">Payment Amount</label>
+        <input type="text" class="form-control" name="display_amount" id="display_amount" value="{{amount}}" readonly />
+        <input type="hidden" name="amount" id="amount" value="{{integer_amount}}" readonly />
 
-        <label for="lastname" class="cols-sm-2 control-label">Last name</label>
-        <input type="text" class="form-control" name="lastname" id="lastname" placeholder="Last" />
-
-        <label for="amount" class="cols-sm-2 control-label">Payment Amount</label>
-        <input type="text" class="form-control" name="amount" id="amount" value="{{amount}}" readonly />
+        <label for="description" class="cols-sm-2 control-label">Description</label>
+        <textarea class="form-control" name="description" id="description" readonly>{{description}}</textarea>
 
         <br/>
 
-        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k" data-amount="{{stripe_amount}}" data-name="Demo Site" data-description="2 widgets" data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+        <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+          data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
           data-locale="auto">
         </script>
       </fieldset>
