@@ -6,16 +6,6 @@ const AWS = require('aws-sdk')
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 
-// DynamoDB
-// TODO: DRY this.
-var dynamoConfig = {
-  region: process.env.AWS_REGION,
-  maxRetries: 1
-}
-if (process.env.AWS_SAM_LOCAL) dynamoConfig['endpoint'] = "http://dynamodb:8000"
-if (process.env.DYNAMODB_ENDPOINT) dynamoConfig['endpoint'] = process.env.DYNAMODB_ENDPOINT
-const paymentRequestsTableName = process.env.PAYMENT_REQUESTS_TABLE_NAME
-
 // Stripe for payments.
 const keyPublishable = process.env.STRIPE_PUBLISHABLE_KEY
 const keySecret = process.env.STRIPE_SECRET_KEY
