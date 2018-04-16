@@ -58,15 +58,33 @@ exports.post = async function (event, context) {
   var stripeToken = params.stripeToken
 
   try {
-    var charge = await stripe.charges.create({
+    var payment = await stripe.charges.create({
       amount: params.amount,
       description: "Sample Charge",
       currency: "usd",
       source: stripeToken
     })
 
-    console.log("CHARGE:")
-    console.log(JSON.stringify(charge))
+    console.log("Payment, from Stripe:")
+    console.log(JSON.stringify(payment))
+
+    try {
+      paymentRequest = await PaymentRequest.recordPayment(
+        params.payment_request_id, payment)
+    }
+    // TODO: DRY THIS
+    catch (error) {
+      var parameters = { 'error': error }
+
+      var template = fs.readFileSync('templates/error.mustache', 'utf8')
+      var html = mustache.render(template, parameters, partials())
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
+      }
+    }
 
     var paymentRequest;
     try {

@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 const fs = require('fs')
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
 const moment = require('moment')
 const AWS = require('aws-sdk')
-require('dotenv').load();
+require('dotenv').load()
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 const EmailNotification = require('./lib/email-notification.js').EmailNotification
@@ -14,17 +14,35 @@ const EmailNotification = require('./lib/email-notification.js').EmailNotificati
 const company = process.env.COMPANY_NAME
 
 exports.index = async function (event, context) {
-  try {
-    var paymentRequests = await PaymentRequest.index()
+  var templateParameters
+  var template
 
-    var templateParameters = {
-      'paymentRequests': paymentRequests,
-      "created_at_moment": function () {
-        return moment(this.created_at).fromNow()
+  try {
+    // If a payment request ID was provided as a parameter, then show that
+    // payment request instead of the list.
+    var id = event.queryStringParameters.id
+    if (id) {
+      templateParameters = await PaymentRequest.get(event['queryStringParameters']['id'])
+      console.log("templateParamemters: " + JSON.stringify(templateParameters))
+      templateParameters.payment_id = templateParameters.payment.id
+      templateParameters.paid_at_moment = function () {
+        return moment(this.paid_at).fromNow()
       }
+
+      var template = fs.readFileSync('templates/payment-request.mustache', 'utf8')
+    }
+    else {
+      var paymentRequests = await PaymentRequest.index()
+
+      templateParameters = {
+        'paymentRequests': paymentRequests,
+        "created_at_moment": function () {
+          return moment(this.created_at).fromNow()
+        }
+      }
+      template = fs.readFileSync('templates/payment-requests.mustache', 'utf8')
     }
 
-    var template = fs.readFileSync('templates/payment-requests.mustache', 'utf8')
     var html = mustache.render(template, templateParameters, partials())
 
     return {

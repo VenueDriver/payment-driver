@@ -28,9 +28,9 @@
             </div>
             <p class="mb-1">{{description}}</p>
             <small>${{amount}}</small>
-            <!--
+            {{#paid}}
             <span class="badge badge-success badge-pill">PAID</span>
-            -->
+            {{/paid}}
           </a>
         {{/paymentRequests}}
         </ul>
