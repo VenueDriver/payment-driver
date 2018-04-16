@@ -67,16 +67,16 @@ exports.post = async function (event, context) {
   try {
     await PaymentRequest.put(paymentRequest)
 
+    var templateParameters = paymentRequest
+
+    // Add 'Origin' from API Gateway so that the email can include a URL
+    // back to this same instance of the web app.
+    templateParameters.origin = event['headers']['Origin']
+
+    // This notification goes to the customer.
+    templateParameters.subject = "Payment request from " + company
+    templateParameters.to = paymentRequest.email
     var templateName = 'payment-request-email-to-customer'
-
-    var templateParameters = Object.assign(paymentRequest, {
-      // Add 'Origin' from API Gateway so that the email can include a URL
-      // back to this same instance of the web app.
-      'origin': event['headers']['Origin'],
-      // The subject line for the email.
-      'subject': "Payment request from " + company
-    })
-
     EmailNotification.sendEmail(templateName, templateParameters,
       function (error, data) {
         // If something goes wrong, print an error message.
@@ -84,7 +84,22 @@ exports.post = async function (event, context) {
           console.log(error.message);
         }
         else {
-          console.log("Email sent! Message ID: ", data.MessageId);
+          console.log("Email sent to customer. Message ID: ", data.MessageId);
+        }
+      })
+
+    // This notification goes to the requestor.
+    templateParameters.subject = "Payment request to " + paymentRequest.email
+    templateParameters.to = paymentRequest.requestor
+    templateName = 'payment-request-email-to-requestor'
+    EmailNotification.sendEmail(templateName, templateParameters,
+      function (error, data) {
+        // If something goes wrong, print an error message.
+        if (error) {
+          console.log(error.message);
+        }
+        else {
+          console.log("Email sent to requestor. Message ID: ", data.MessageId);
         }
       })
 
