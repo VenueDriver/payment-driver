@@ -2,6 +2,7 @@
 const fs = require('fs')
 const querystring = require('querystring')
 const mustache = require('mustache')
+const moment = require('moment')
 const AWS = require('aws-sdk')
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
@@ -26,6 +27,9 @@ exports.get = async function (event, context) {
     templateParameters.amount = paymentRequest.amount
     templateParameters.integer_amount = paymentRequest.amount * 100
     templateParameters.description = paymentRequest.description
+    templateParameters.paid_at_moment = function () {
+      return moment(this.paid_at).fromNow()
+    }
 
     var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
     var html = mustache.render(template, templateParameters, partials())
@@ -54,55 +58,41 @@ exports.get = async function (event, context) {
 // Process a payment.
 exports.post = async function (event, context) {
   const params = querystring.parse(event.body)
+
+  // Look up the payment request record in DynamoDB.
+  var paymentRequest;
+  try {
+    paymentRequest = await PaymentRequest.get(params.payment_request_id)
+  }
+  // TODO: DRY THIS
+  catch (error) {
+    var templateParameters = { 'error': error }
+
+    var template = fs.readFileSync('templates/error.mustache', 'utf8')
+    var html = mustache.render(template, templateParameters, partials())
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
+
+  // Create the payment at Stripe.
   var amount = params.amount
   var stripeToken = params.stripeToken
 
   try {
     var payment = await stripe.charges.create({
       amount: params.amount,
-      description: "Sample Charge",
+      description: paymentRequest.description,
+      metadata: { payment_request_id: paymentRequest.id },
       currency: "usd",
       source: stripeToken
     })
 
     console.log("Payment, from Stripe:")
     console.log(JSON.stringify(payment))
-
-    try {
-      paymentRequest = await PaymentRequest.recordPayment(
-        params.payment_request_id, payment)
-    }
-    // TODO: DRY THIS
-    catch (error) {
-      var parameters = { 'error': error }
-
-      var template = fs.readFileSync('templates/error.mustache', 'utf8')
-      var html = mustache.render(template, parameters, partials())
-
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-    }
-
-    var paymentRequest;
-    try {
-      paymentRequest = await PaymentRequest.get(params.payment_request_id)
-    }
-    // TODO: DRY THIS
-    catch (error) {
-      var parameters = { 'error': error }
-
-      var template = fs.readFileSync('templates/error.mustache', 'utf8')
-      var html = mustache.render(template, parameters, partials())
-
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/html' },
-        body: html.toString()
-      }
-    }
 
     var templateParameters = paymentRequest
 

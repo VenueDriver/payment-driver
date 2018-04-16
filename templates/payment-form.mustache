@@ -15,22 +15,42 @@
     <form method="post" action="payments">
       <input type="hidden" name="payment_request_id" id="payment_request_id" value="{{id}}" />
       <fieldset>
-        <legend>Please provide payment</legend>
+        <div class="d-flex w-100 justify-content-between">
+          {{^paid}}
+          <legend>Please provide payment</legend>
+          {{/paid}}
+          {{#paid}}
+          <legend>Payment request</legend>
+          {{/paid}}
+          {{#paid}}
+            <div>
+              <span class="badge badge-success badge-pill">PAID</span>
+            </div>
+          {{/paid}}
+        </div>
+
+        {{#paid}}
+        <p>Paid {{paid_at_moment}}</p>
+        {{/paid}}
 
         <label for="display_amount" class="cols-sm-2 control-label">Payment Amount</label>
-        <input type="text" class="form-control" name="display_amount" id="display_amount" value="{{amount}}" readonly />
-        <input type="hidden" name="amount" id="amount" value="{{integer_amount}}" />
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" name="display_amount" id="display_amount" value="{{amount}}" readonly />
+          <input type="hidden" name="amount" id="amount" value="{{integer_amount}}" />
+        </div>
 
         <label for="description" class="cols-sm-2 control-label">Description</label>
-        <textarea class="form-control" name="description" id="description" readonly>{{description}}</textarea>
+        <div class="input-group mb-3">
+          <textarea class="form-control" name="description" id="description" readonly>{{description}}</textarea>
+        </div>
 
-        <br/>
-
+        {{^paid}}
         <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
           data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k"
           data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
           data-locale="auto">
         </script>
+        {{/paid}}
       </fieldset>
     </form>
   </div>
