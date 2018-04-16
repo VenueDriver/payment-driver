@@ -8,7 +8,10 @@ const AWS = require('aws-sdk')
 require('dotenv').load();
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
-const PaymentRequestEmail = require('./lib/payment-request-email.js').PaymentRequestEmail
+const EmailNotification = require('./lib/email-notification.js').EmailNotification
+
+// The company name from the settings, for the email notifications.
+const company = process.env.COMPANY_NAME
 
 exports.index = async function (event, context) {
   try {
@@ -64,21 +67,26 @@ exports.post = async function (event, context) {
   try {
     await PaymentRequest.put(paymentRequest)
 
-    // Add 'Origin' from API Gateway so that the email can include a URL
-    // back to this same instance of the web app.
+    var templateName = 'payment-request-email-to-customer'
+
     var templateParameters = Object.assign(paymentRequest, {
-      'origin': event['headers']['Origin']
+      // Add 'Origin' from API Gateway so that the email can include a URL
+      // back to this same instance of the web app.
+      'origin': event['headers']['Origin'],
+      // The subject line for the email.
+      'subject': "Payment request from " + company
     })
 
-    PaymentRequestEmail.sendEmail(templateParameters, function (error, data) {
-      // If something goes wrong, print an error message.
-      if (error) {
-        console.log(error.message);
-      }
-      else {
-        console.log("Email sent! Message ID: ", data.MessageId);
-      }
-    })
+    EmailNotification.sendEmail(templateName, templateParameters,
+      function (error, data) {
+        // If something goes wrong, print an error message.
+        if (error) {
+          console.log(error.message);
+        }
+        else {
+          console.log("Email sent! Message ID: ", data.MessageId);
+        }
+      })
 
     var template = fs.readFileSync('templates/payment-request-confirmation.mustache', 'utf8')
     var html = mustache.render(template, paymentRequest, partials())
@@ -92,7 +100,7 @@ exports.post = async function (event, context) {
   catch (error) {
     var parameters = { 'error': error }
 
-    var template = fs.readFileSync('templates/payment-request-error.mustache', 'utf8')
+    var template = fs.readFileSync('templates/error.mustache', 'utf8')
     var html = mustache.render(template, parameters, partials())
 
     return {
