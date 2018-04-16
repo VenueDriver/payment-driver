@@ -1,30 +1,25 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <title>Payment Error - Payment Driver</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
-  <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
-  <link href="assets/css/styles.css" rel="stylesheet" media="screen">
-</head>
+  <head>
+    <title>Payment Error - Payment Driver</title>
+    {{> head }}
+  </head>
 
-<body>
+  <body>
 
-  <div class="container">
-    <img alt="Payment Driver" src="assets/img/Payment-Driver-logo.png" class="logo" />
+    <div class="container">
+      <img alt="Payment Driver" src="assets/img/Payment-Driver-logo.png" class="logo" />
 
-    <div class="jumbotron">
-      <h1>Error</h1>
-      <p class="lead">There was an error processing your payment:</p>
-      <p id="error">{{ error }}</p>
-      <a id="try-again" class="btn btn-primary" href="#" role="button" onclick="history.back()">Try again</a>
+      <div class="jumbotron">
+        <h1>Error</h1>
+        <p class="lead">There was an error processing your payment:</p>
+        <p id="error">{{ error }}</p>
+        <a id="try-again" class="btn btn-primary" href="#" role="button" onclick="history.back()">Try again</a>
+      </div>
     </div>
-  </div>
 
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="assets/js/bootstrap.min.js"></script>
-</body>
+    {{> scripts }}
+  </body>
 
 </html>

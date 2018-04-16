@@ -20,7 +20,7 @@ Resources:
   PaymentRequests:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: payment-requests.get
+      Handler: payment-requests.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
       Role:
@@ -31,6 +31,25 @@ Resources:
           Type: Api
           Properties:
             Path: /payment-requests
+            Method: get
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
+  PaymentRequestsNew:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.new
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payment-requests-new
             Method: get
       Environment:
         Variables:

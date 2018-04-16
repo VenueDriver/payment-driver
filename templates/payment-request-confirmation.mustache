@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <title>Payment Processed - Payment Driver</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap -->
-  <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
-  <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
-  <link href="assets/css/styles.css" rel="stylesheet" media="screen">
-</head>
+  <head>
+    <title>Payment Processed - Payment Driver</title>
+    {{> head }}
+  </head>
 
-<body>
+  <body>
 
-  <div class="container">
-    <img alt="Payment Driver" src="assets/img/Payment-Driver-logo.png" class="logo" />
+    <div class="container">
+      {{> header }}
 
-    <div class="jumbotron">
-      <h1>Requested</h1>
-      <p class="lead">Your payment request was sent successfully.</p>
+      <div class="jumbotron">
+        <h1>Requested</h1>
+        <p class="lead">Your payment request was sent successfully.</p>
+
+        <p>
+          <a class="btn btn-primary" href="/payment-requests" role="button">continue</a>
+        </p>
+
+      </div>
     </div>
-  </div>
 
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="assets/js/bootstrap.min.js"></script>
-</body>
+    {{> scripts }}
+  </body>
 
 </html>

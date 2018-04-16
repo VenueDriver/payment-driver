@@ -1,15 +1,50 @@
 'use strict';
 const fs = require('fs')
 const querystring = require('querystring')
-const uuidv1 = require('uuid/v1');
+const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
+const moment = require('moment')
 const AWS = require('aws-sdk')
 require('dotenv').load();
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 const PaymentRequestEmail = require('./lib/payment-request-email.js').PaymentRequestEmail
 
-exports.get = async function (event, context) {
+exports.index = async function (event, context) {
+  try {
+    var paymentRequests = await PaymentRequest.index()
+
+    var templateParameters = {
+      'paymentRequests': paymentRequests,
+      "created_at_moment": function () {
+        return moment(this.created_at).fromNow()
+      }
+    }
+
+    var template = fs.readFileSync('templates/payment-requests.mustache', 'utf8')
+    var html = mustache.render(template, templateParameters, partials())
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
+  catch (error) {
+    var parameters = { 'error': error }
+
+    var template = fs.readFileSync('templates/error.mustache', 'utf8')
+    var html = mustache.render(template, parameters, partials())
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
+}
+
+exports.new = async function (event, context) {
   var template = fs.readFileSync('templates/payment-request-form.mustache', 'utf8')
   var html = mustache.render(template, {}, partials())
 

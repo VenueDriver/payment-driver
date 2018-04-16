@@ -65,7 +65,8 @@ exports.post = async function (event, context) {
     console.log("CHARGE:")
     console.log(JSON.stringify(charge))
 
-    var html = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
+    var template = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
+    var html = mustache.render(template, parameters, partials())
 
     return {
       statusCode: 200,

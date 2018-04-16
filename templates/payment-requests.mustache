@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Send Payment Request - Payment Driver</title>
+    {{> head }}
+  </head>
+
+  <body>
+
+    <div class="container">
+      {{> header }}
+
+      <div class="d-flex w-100 justify-content-between">
+        <h2 class="mb-1">Payment requests</h2>
+        <a class="btn btn-primary" href="/payment-requests-new" role="button">create new</a>
+      </div>
+
+      <p>
+        <ul class="list-group">
+        {{#paymentRequests}}
+          <a href="/payment-requests?id={{id}}" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{email}}</h5>
+              <small>{{created_at_moment}}</small>
+            </div>
+            <p class="mb-1">{{description}}</p>
+            <small>${{amount}}</small>
+            <!--
+            <span class="badge badge-success badge-pill">PAID</span>
+            -->
+          </a>
+        {{/paymentRequests}}
+        </ul>
+        {{^paymentRequests}}
+          No payment requests found.
+        {{/paymentRequests}}
+      </p>
+
+      {{> footer }}
+    </div>
+
+    {{> scripts }}
+  </body>
+
+</html>
