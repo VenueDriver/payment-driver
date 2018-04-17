@@ -135,33 +135,33 @@ exports.post = async function (event, context) {
 
 exports.resend = async function (event, context) {
   try {
-  var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
-  var templateParameters = paymentRequest
+    var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
+    var templateParameters = paymentRequest
 
-  // Add 'Origin' from API Gateway so that the email can include a URL
-  // back to this same instance of the web app.
-  templateParameters.origin = event['headers']['Origin']
-  if (process.env.BASE_URL) {
-    templateParameters.base_url = process.env.BASE_URL
-  }
-  else {
-    templateParameters.base_url = templateParameters.origin
-  }
+    // Add 'Origin' from API Gateway so that the email can include a URL
+    // back to this same instance of the web app.
+    templateParameters.origin = event['headers']['Origin']
+    if (process.env.BASE_URL) {
+      templateParameters.base_url = process.env.BASE_URL
+    }
+    else {
+      templateParameters.base_url = templateParameters.origin
+    }
 
-  // This notification goes to the customer.
-  templateParameters.subject = "Payment request from " + company
-  templateParameters.to = paymentRequest.email
-  var templateName = 'payment-request-email-to-customer'
-  await EmailNotification.sendEmail(templateName, templateParameters)
+    // This notification goes to the customer.
+    templateParameters.subject = "Payment request from " + company
+    templateParameters.to = paymentRequest.email
+    var templateName = 'payment-request-email-to-customer'
+    await EmailNotification.sendEmail(templateName, templateParameters)
 
-  var template = fs.readFileSync('templates/payment-request-resent.mustache', 'utf8')
-  var html = mustache.render(template, paymentRequest, partials())
+    var template = fs.readFileSync('templates/payment-request-resent.mustache', 'utf8')
+    var html = mustache.render(template, paymentRequest, partials())
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'text/html' },
-    body: html.toString()
-  }
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
   }
   catch (error) {
     var parameters = { 'error': error }
@@ -175,4 +175,4 @@ exports.resend = async function (event, context) {
       body: html.toString()
     }
   }
-  }
+}
