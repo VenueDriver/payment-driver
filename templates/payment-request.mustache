@@ -2,7 +2,7 @@
 <html>
 
   <head>
-    <title>Send Payment Request - Payment Driver</title>
+    <title>Payment Request - Payment Driver</title>
     {{> head }}
   </head>
 
@@ -91,9 +91,7 @@
 
           <a class="btn btn-secondary" href="/payment-requests" role="button">cancel</a>
           {{^paid}}
-          <!-- not yet implemented.
-          <button class="btn btn-large btn-primary" type="submit">re-send payment request</button>
-          -->
+          <a class="btn btn-primary" href="/payment-requests-resend?id={{id}}" role="button">re-send</a>
           {{/paid}}
         </fieldset>
       </form>

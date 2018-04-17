@@ -75,6 +75,25 @@ Resources:
           PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
           STRIPE_SECRET_KEY: secret
 
+  ResendPaymentRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.resend
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payment-requests-resend
+            Method: get
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
   PaymentForm:
     Type: AWS::Serverless::Function
     Properties:
