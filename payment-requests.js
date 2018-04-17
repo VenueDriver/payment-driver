@@ -97,6 +97,7 @@ exports.post = async function (event, context) {
     var templateName = 'payment-request-email-to-customer'
     EmailNotification.sendEmail(templateName, templateParameters,
       function (error, data) {
+        console.log("sendEmail callback.")
         // If something goes wrong, print an error message.
         if (error) {
           console.log(error.message);
@@ -112,6 +113,7 @@ exports.post = async function (event, context) {
     templateName = 'payment-request-email-to-requestor'
     EmailNotification.sendEmail(templateName, templateParameters,
       function (error, data) {
+        console.log("sendEmail callback.")
         // If something goes wrong, print an error message.
         if (error) {
           console.log("Error sending email: " + error.message);
