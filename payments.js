@@ -7,6 +7,7 @@ const AWS = require('aws-sdk')
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 const EmailNotification = require('./lib/email-notification.js').EmailNotification
+const BigNumber = require('bignumber.js');
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -25,11 +26,18 @@ exports.get = async function (event, context) {
     var templateParameters = paymentRequest
     templateParameters.stripe_publishable_key = keyPublishable
     templateParameters.amount = paymentRequest.amount
-    templateParameters.integer_amount = paymentRequest.amount * 100
     templateParameters.description = paymentRequest.description
     templateParameters.paid_at_moment = function () {
       return moment(this.paid_at).fromNow()
     }
+
+    // Stripe only accepts payment amounts as integers.
+    // You can't simply mulitply the amount by 100 because it's a floating-point number.
+    // Example: Try entering the expression "32.12 * 100" into the Node REPL.
+    // You will get: 32.12 * 100 = 3211.9999999999995
+    templateParameters.integer_amount =
+      // The solution is to use fixed-point arithmetic.
+      (new BigNumber(32.12)).times(100).toString()
 
     var template = fs.readFileSync('templates/payment-form.mustache', 'utf8')
     var html = mustache.render(template, templateParameters, partials())
