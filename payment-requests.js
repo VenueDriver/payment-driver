@@ -95,33 +95,13 @@ exports.post = async function (event, context) {
     templateParameters.subject = "Payment request from " + company
     templateParameters.to = paymentRequest.email
     var templateName = 'payment-request-email-to-customer'
-    EmailNotification.sendEmail(templateName, templateParameters,
-      function (error, data) {
-        console.log("sendEmail callback.")
-        // If something goes wrong, print an error message.
-        if (error) {
-          console.log(error.message);
-        }
-        else {
-          console.log("Email sent to customer. Message ID: ", data.MessageId);
-        }
-      })
+    await EmailNotification.sendEmail(templateName, templateParameters)
 
     // This notification goes to the requestor.
     templateParameters.subject = "Payment request to " + paymentRequest.email
     templateParameters.to = paymentRequest.requestor
     templateName = 'payment-request-email-to-requestor'
-    EmailNotification.sendEmail(templateName, templateParameters,
-      function (error, data) {
-        console.log("sendEmail callback.")
-        // If something goes wrong, print an error message.
-        if (error) {
-          console.log("Error sending email: " + error.message);
-        }
-        else {
-          console.log("Email sent to requestor. Message ID: ", data.MessageId);
-        }
-      })
+    await EmailNotification.sendEmail(templateName, templateParameters)
 
     var template = fs.readFileSync('templates/payment-request-confirmation.mustache', 'utf8')
     var html = mustache.render(template, paymentRequest, partials())
