@@ -114,7 +114,7 @@ exports.post = async function (event, context) {
       function (error, data) {
         // If something goes wrong, print an error message.
         if (error) {
-          console.log(error.message);
+          console.log("Error sending email: " + error.message);
         }
         else {
           console.log("Email sent to requestor. Message ID: ", data.MessageId);
