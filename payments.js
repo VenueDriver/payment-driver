@@ -91,7 +91,7 @@ exports.post = async function (event, context) {
   var amount = params.amount
   var stripeToken = params.stripeToken
 
-  // try {
+  try {
   var payment = await stripe.charges.create({
     amount: params.amount,
     description: paymentRequest.description,
@@ -155,17 +155,17 @@ exports.post = async function (event, context) {
     headers: { 'Content-Type': 'text/html' },
     body: html.toString()
   }
-  // }
-  // catch (error) {
-  //   var parameters = { 'error': error.message }
+  }
+  catch (error) {
+    var parameters = { 'error': error.message }
 
-  //   var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
-  //   var html = mustache.render(template, parameters, partials())
+    var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
+    var html = mustache.render(template, parameters, partials())
 
-  //   return {
-  //     statusCode: 200,
-  //     headers: { 'Content-Type': 'text/html' },
-  //     body: html.toString()
-  //   }
-  // }
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: html.toString()
+    }
+  }
 }
