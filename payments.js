@@ -36,7 +36,6 @@ exports.get = async function (event, context) {
 
     return {
       statusCode: 200,
-      contentType: 'text/html',
       headers: { 'Content-Type': 'text/html' },
       body: html.toString()
     }
