@@ -35,7 +35,7 @@ exports.get = async function (event, context) {
     var html = mustache.render(template, templateParameters, partials())
 
     return {
-      statusCode: 500,
+      statusCode: 200,
       contentType: 'text/html',
       headers: { 'Content-Type': 'text/html' },
       body: html.toString()
