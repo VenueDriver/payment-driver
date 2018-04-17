@@ -93,6 +93,24 @@ exports.post = async function (event, context) {
     console.log("Payment, from Stripe:")
     console.log(JSON.stringify(payment))
 
+    try {
+      await PaymentRequest.recordPayment(
+        params.payment_request_id, payment)
+    }
+    // TODO: DRY THIS
+    catch (error) {
+      var parameters = { 'error': error }
+
+      var template = fs.readFileSync('templates/error.mustache', 'utf8')
+      var html = mustache.render(template, parameters, partials())
+
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/html' },
+        body: html.toString()
+      }
+    }
+
     var templateParameters = paymentRequest
 
     // Add 'Origin' from API Gateway so that the email can include a URL
