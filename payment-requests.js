@@ -20,8 +20,8 @@ exports.index = async function (event, context) {
   try {
     // If a payment request ID was provided as a parameter, then show that
     // payment request instead of the list.
-    var id = event.queryStringParameters.id
-    if (id) {
+    if (event.queryStringParameters && event.queryStringParameters.id) {
+      var id = event.queryStringParameters.id
       templateParameters = await PaymentRequest.get(event['queryStringParameters']['id'])
       console.log("templateParamemters: " + JSON.stringify(templateParameters))
       templateParameters.payment_id = templateParameters.payment.id
