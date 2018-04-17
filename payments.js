@@ -145,6 +145,8 @@ exports.post = async function (event, context) {
   templateName = 'payment-email-to-requestor'
   await EmailNotification.sendEmail(templateName, templateParameters)
 
+  console.log("After EmailNotification.sendEmail")
+
   var template = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
   var html = mustache.render(template, parameters, partials())
 
