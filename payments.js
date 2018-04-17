@@ -66,6 +66,8 @@ exports.get = async function (event, context) {
 exports.post = async function (event, context) {
   const params = querystring.parse(event.body)
 
+  console.log("params: " + JSON.stringify(params))
+
   // Look up the payment request record in DynamoDB.
   var paymentRequest;
   try {
