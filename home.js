@@ -15,8 +15,12 @@ const EmailNotification = require('./lib/email-notification.js').EmailNotificati
 const company = process.env.COMPANY_NAME
 
 exports.index = async function (event, context) {
+
+  var templateParamemters = {
+    'assets_host': '//' + event.headers.Host + ':8081'
+  }
   var template = fs.readFileSync('templates/home.mustache', 'utf8')
-  var html = mustache.render(template, {}, partials())
+  var html = mustache.render(template, templateParamemters, partials())
 
   return {
     statusCode: 200,

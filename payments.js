@@ -24,6 +24,7 @@ exports.get = async function (event, context) {
     var paymentRequest = await PaymentRequest.get(event['queryStringParameters']['id'])
 
     var templateParameters = paymentRequest
+    templateParameters.assets_host = '//' + event.headers.Host + ':8081'
     templateParameters.stripe_publishable_key = keyPublishable
     templateParameters.amount = paymentRequest.amount
     templateParameters.description = paymentRequest.description
@@ -122,6 +123,7 @@ exports.post = async function (event, context) {
     }
 
     var templateParameters = paymentRequest
+    templateParameters.assets_host = '//' + event.headers.Host + ':8081'
 
     // Add 'Origin' from API Gateway so that the email can include a URL
     // back to this same instance of the web app.

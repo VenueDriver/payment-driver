@@ -25,7 +25,8 @@
     "nyc": "^11.2.1",
     "sinon": "^4.0.1",
     "watch-run": "^1.2.5",
-    "aws-sdk-mock": "^1.7.0"
+    "aws-sdk-mock": "^1.7.0",
+    "http-server": "^0.11.1"
   },
   "scripts": {
     "postinstall": "cp node_modules/bootstrap-validator/dist/validator.min.js public/assets/js",

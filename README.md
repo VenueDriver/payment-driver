@@ -65,6 +65,12 @@ To scan the current contents of your ```payment_requests``` table:
 
     aws dynamodb scan --endpoint-url http://localhost:8000 --table-name payment_requests
 
+### Start an asset server
+
+Run this:
+
+    http-server -p :8081
+
 ### Start an HTTP server with SAM Local
 
 Use SAM Local for development:

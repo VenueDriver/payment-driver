@@ -29,6 +29,7 @@ exports.index = async function (event, context) {
       templateParameters.paid_at_moment = function () {
         return moment(this.paid_at).fromNow()
       }
+      templateParameters.assets_host = '//' + event.headers.Host + ':8081'
 
       var template = fs.readFileSync('templates/payment-request.mustache', 'utf8')
     }
@@ -39,7 +40,8 @@ exports.index = async function (event, context) {
         'paymentRequests': paymentRequests,
         "created_at_moment": function () {
           return moment(this.created_at).fromNow()
-        }
+        },
+        'assets_host': '//' + event.headers.Host + ':8081'
       }
       template = fs.readFileSync('templates/payment-requests.mustache', 'utf8')
     }
@@ -67,8 +69,11 @@ exports.index = async function (event, context) {
 }
 
 exports.new = async function (event, context) {
+  var templateParamemters = {
+    'assets_host': '//' + event.headers.Host + ':8081'
+  }
   var template = fs.readFileSync('templates/payment-request-form.mustache', 'utf8')
-  var html = mustache.render(template, {}, partials())
+  var html = mustache.render(template, templateParamemters, partials())
 
   return {
     statusCode: 200,
@@ -87,6 +92,7 @@ exports.post = async function (event, context) {
     await PaymentRequest.put(paymentRequest)
 
     var templateParameters = paymentRequest
+    templateParameters.assets_host = '//' + event.headers.Host + ':8081'
 
     // Add 'Origin' from API Gateway so that the email can include a URL
     // back to this same instance of the web app.
@@ -137,6 +143,7 @@ exports.resend = async function (event, context) {
   try {
     var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
     var templateParameters = paymentRequest
+    templateParameters.assets_host = '//' + event.headers.Host + ':8081'
 
     // Add 'Origin' from API Gateway so that the email can include a URL
     // back to this same instance of the web app.

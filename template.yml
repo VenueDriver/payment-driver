@@ -17,7 +17,7 @@ Resources:
          Name: id
          Type: String
 
-  HelloWorld:
+  Home:
     Type: AWS::Serverless::Function
     Properties:
       Handler: home.index

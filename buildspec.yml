@@ -8,7 +8,7 @@ phases:
   build:
     commands:
       - aws s3 cp --recursive public/ s3://$WEBSITE_S3_BUCKET/public/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
-      - find templates/ ! -type d -exec sed -i -e "s|assets/|$WEBSITE_S3_PREFIX/public/assets/|g" {} \;
+      - find templates/ ! -type d -exec sed -i -e "s|{{assets_host}}/assets/|$WEBSITE_S3_PREFIX/public/assets/|g" {} \;
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-export.yml
 
 artifacts:
