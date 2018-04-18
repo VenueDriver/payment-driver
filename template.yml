@@ -17,6 +17,25 @@ Resources:
          Name: id
          Type: String
 
+  HelloWorld:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: home.index
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
   PaymentRequests:
     Type: AWS::Serverless::Function
     Properties:
