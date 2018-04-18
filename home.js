@@ -16,8 +16,10 @@ const company = process.env.COMPANY_NAME
 
 exports.index = async function (event, context) {
 
+  console.log('SDK Version is ' + AWS.VERSION)
+
   var templateParamemters = {
-    'assets_host': '//' + event.headers.Host + ':8081'
+    'assets_host': '//' + event.headers.Host + ':8181'
   }
   var template = fs.readFileSync('templates/home.mustache', 'utf8')
   var html = mustache.render(template, templateParamemters, partials())
