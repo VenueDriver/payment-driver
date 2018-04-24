@@ -8,8 +8,8 @@ const AWS = require('aws-sdk')
 require('dotenv').load()
 console.log("After dotenv: " + JSON.stringify(process.env))
 const partials = require('./partial-html-templates')
-const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
-const EmailNotification = require('./lib/email-notification.js').EmailNotification
+const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
+const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME

@@ -36,6 +36,44 @@ Resources:
         Variables:
           PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
+  Login:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: home.login
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: post
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
+  Logout:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: home.logout
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /logout
+            Method: get
+      Environment:
+        Variables:
+          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+
   PaymentRequests:
     Type: AWS::Serverless::Function
     Properties:

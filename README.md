@@ -69,19 +69,34 @@ To scan the current contents of your ```payment_requests``` table:
 
 Run this:
 
-    http-server -p :8081
+    node-http-server root=public port=8081 verbose=true
 
 ### Start an HTTP server with SAM Local
 
 Use SAM Local for development:
 
-    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local
+    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local --static-dir ""
 
-(Port 8080 is important if you're using AWS Cloud9.)
+Port 8080 is important if you're using AWS Cloud9.
+
+The ```--env-vars``` parameter loads environment variables from the ```env.json``` file.
+
+The ```-docker-network``` parameter enables it to connect to the DynamoDB container.  SAM Local runs in a container, so without this you can't connect to the database.
+
+The ```--static-dir ""``` parameter stops SAM Local from mounting the ```public``` folder on ```/``` on the HTTP server.  This project has a dynamic response on that URL path.  That's why you need to run the HTTP server for assets, when normally you could use SAM Local for that.
+
+### Go to the app in a web browser
 
 To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
 
 To do a test Stripe transaction, ensure that your Stripe keys are set as described above.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
+
+Development
+-----------
+
+### Generate documentation
+
+    documentation build lib/** -f html -o documentation/
 
 User stories
 ------------
@@ -89,7 +104,7 @@ User stories
 ### Employee sends payment request
 
     Scenario: As an employee, I want to send a payment request email to a customer, so that they can pay us
-    
+
     Given that I an an employee with a valid user account in the system,
     When I log into the employee dashboard,
     Then I should see an option to send a payment request,
@@ -112,7 +127,7 @@ This will need an authentication system.
 ### Employee wants to cancel payment request
 
     Scenario: As an employee, I want to cancel a payment request which was already sent to a customer but not filled out and submitted yet
-    
+
     Given that I an an employee with a valid user account in the system,
     When I log into the employee dashboard,
     Assuming I have previously generated at least one payment request,
@@ -129,7 +144,7 @@ Not yet implemented.
 ### Customer makes payment
 
   Scenario: As a customer, I want to follow a payment request link and submit my information, so that I can make a payment
-  
+
   The first release would only include those two user stories.
   The second release could include payment request management.
   Probably need to tweak the stories to include details like: The payment request record should be tagged to the user and venue.
@@ -139,7 +154,7 @@ Not yet implemented.
   But Vault has no API.  And that's kind of a touchy thing in terms of security to add one.
   We could set this up to use Venue Driver venue IDs, but it doesn't know venue IDs for restaurants.
   We might actually have to have a venues table in this thing.  And it might be called "accounts" instead of "venues".
-  
+
 #### Implementation
 
 The ```payments``` REST resource is powered by the ```payments.js``` Lambda functions.

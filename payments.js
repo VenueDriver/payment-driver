@@ -5,8 +5,8 @@ const mustache = require('mustache')
 const moment = require('moment')
 const AWS = require('aws-sdk')
 const partials = require('./partial-html-templates')
-const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
-const EmailNotification = require('./lib/email-notification.js').EmailNotification
+const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
+const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
 
 // The company name from the settings, for the email notifications.
@@ -66,8 +66,6 @@ exports.get = async function (event, context) {
 // Process a payment.
 exports.post = async function (event, context) {
   const params = querystring.parse(event.body)
-
-  console.log("params: " + JSON.stringify(params))
 
   // Look up the payment request record in DynamoDB.
   var paymentRequest;

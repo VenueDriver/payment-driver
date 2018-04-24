@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Send Payment Request - Payment Driver</title>
+    {{> head }}
+  </head>
+
+  <body>
+
+    <div class="container">
+      {{> header }}
+
+      <form method="post" action="/login" data-toggle="validator">
+        <fieldset>
+          {{^ message }}
+          <legend>Please log in</legend>
+          {{/ message }}
+          {{# message }}
+          <div class="alert alert-danger" role="alert">
+            {{ message }}
+          </div>
+          {{/ message }}
+
+          <label for="firstname" class="cols-sm-2 control-label">Username</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" name="username" id="username" required />
+          </div>
+
+          <label for="lastname" class="cols-sm-2 control-label">Password</label>
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" name="password" id="password" required />
+          </div>
+
+          <button class="btn btn-large btn-primary" type="submit">log in</button>
+        </fieldset>
+      </form>
+
+      {{> footer }}
+    </div>
+
+    {{> scripts }}
+  </body>
+
+</html>
