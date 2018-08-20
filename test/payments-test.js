@@ -1,6 +1,7 @@
 var chai = require('chai')
 var expect = chai.expect;
 const cheerio = require('cheerio')
+var AWS = require('aws-sdk-mock')
 
 var nock = require('nock')
 
@@ -10,78 +11,79 @@ const stripe = require("stripe")('test');
 
 describe('Payment Driver', function () {
 
+  afterEach(function () {
+    AWS.restore()
+  })
+
   describe('payments REST resource', function () {
 
-    it('should send a payment form when the index is requested', function (done) {
+    it('should send a payment form when the index is requested', async() => {
+      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
+        callback(null, { 'Item': {} })
+      })
 
-      payments.get({}, {}, (error, result) => {
-        try {
-          expect(error).to.not.exist;
-          expect(result.statusCode).to.equal(200);
-          expect(result.headers['Content-Type']).to.equal('text/html');
+      const result = await payments.get({ 'queryStringParameters': { 'id': '1234' } }, {})
 
-          const $ = cheerio.load(result.body)
-          expect($('legend').text()).to.have.string('Please provide payment')
+      expect(result.statusCode).to.equal(200);
+      expect(result.headers['Content-Type']).to.equal('text/html');
+      const $ = cheerio.load(result.body)
+      expect($('legend').text()).to.have.string('Please provide payment')
+    })
 
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
-    });
+    it('should process a payment with Stripe when the payment form is posted', async() => {
 
-    it('should process a payment with Stripe when the payment form is posted', function (done) {
+      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
+        callback(null, { 'Item': {} })
+      })
+      AWS.mock('DynamoDB.DocumentClient', 'update', function (params, callback) {
+        callback(null, { 'Item': {} })
+      })
+      AWS.mock('SES', 'sendEmail', function (params, callback) {
+        callback(null, 'Success!')
+      })
 
-      nock('https://api.stripe.com:443', { "encodedQueryParams": true })
-        .post('/v1/charges', "description=Sample%20Charge&currency=usd")
-        .reply(200, {}, []);
+      nock('https://api.stripe.com/v1')
+        .post('/charges')
+        .reply(200, { success: true }, []);
 
-      payments.post({}, {}, (error, result) => {
-        try {
-          expect(error).to.not.exist;
-          expect(result.statusCode).to.equal(200);
-          expect(result.headers['Content-Type']).to.equal('text/html');
+      const result = await payments.post({ 'headers': { 'Origin': 'https://paymentdriver.engineering' } }, {})
 
-          const $ = cheerio.load(result.body)
-          expect($('H1').text()).to.have.string('Thank you')
-          expect($('p.lead').text()).to.have.string('Your payment was processed successfully.')
+      expect(result.statusCode).to.equal(200);
+      expect(result.headers['Content-Type']).to.equal('text/html');
 
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
+      const $ = cheerio.load(result.body)
+      expect($('H1').text()).to.have.string('Thank you')
+      expect($('p.lead').text()).to.have.string('Your payment was processed successfully.')
 
-    });
+    })
 
-    it('should return an error when there is an error response from Stripe', function (done) {
+    it('should return an error when there is an error response from Stripe', async() => {
 
-      nock('https://api.stripe.com:443', { "encodedQueryParams": true })
-        .post('/v1/charges', "description=Sample%20Charge&currency=usd")
+      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
+        callback(null, { 'Item': {} })
+      })
+      AWS.mock('DynamoDB.DocumentClient', 'update', function (params, callback) {
+        callback(null, { 'Item': {} })
+      })
+      AWS.mock('SES', 'sendEmail', function (params, callback) {
+        callback(null, 'Success!')
+      })
+
+      nock('https://api.stripe.com/v1')
+        .post('/charges')
         .reply(400, { "error": { "type": "invalid_request_error", "message": "Test error message." } }, []);
 
-      payments.post({}, {}, (error, result) => {
-        try {
-          expect(error).to.not.exist;
-          expect(result.statusCode).to.equal(200);
-          expect(result.headers['Content-Type']).to.equal('text/html');
+      const result = await payments.post({}, {})
 
-          const $ = cheerio.load(result.body)
-          expect($('H1').text()).to.have.string('Error')
-          expect($('p.lead').text()).to.have.string('There was an error processing your payment:')
-          expect($('p#error').text()).to.have.string('Test error message.')
-          expect($('#try-again').text()).to.have.string('Try again')
+      expect(result.statusCode).to.equal(200);
+      expect(result.headers['Content-Type']).to.equal('text/html');
 
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
-
-    });
+      const $ = cheerio.load(result.body)
+      expect($('H1').text()).to.have.string('Error')
+      expect($('p.lead').text()).to.have.string('There was an error processing your payment:')
+      expect($('p#error').text()).to.have.string('Test error message.')
+      expect($('#try-again').text()).to.have.string('Try again')
+    })
 
   })
 })

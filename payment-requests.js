@@ -6,7 +6,6 @@ const mustache = require('mustache')
 const moment = require('moment')
 const AWS = require('aws-sdk')
 require('dotenv').load()
-console.log("After dotenv: " + JSON.stringify(process.env))
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/payment-request.js').PaymentRequest
 const EmailNotification = require('./lib/email-notification.js').EmailNotification
