@@ -99,9 +99,6 @@ exports.post = async function (event, context) {
       source: stripeToken
     })
 
-    console.log("Payment, from Stripe:")
-    console.log(JSON.stringify(payment))
-
     try {
       await PaymentRequest.recordPayment(
         params.payment_request_id, payment)
@@ -146,7 +143,7 @@ exports.post = async function (event, context) {
     await EmailNotification.sendEmail(templateName, templateParameters)
 
     var template = fs.readFileSync('templates/payment-confirmation.mustache', 'utf8')
-    var html = mustache.render(template, parameters, partials())
+    var html = mustache.render(template, templateParameters, partials())
 
     return {
       statusCode: 200,
@@ -155,8 +152,6 @@ exports.post = async function (event, context) {
     }
   }
   catch (error) {
-    console.log("ERROR: " + error)
-
     var parameters = { 'error': error.message }
 
     var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
