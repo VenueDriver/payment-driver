@@ -150,8 +150,6 @@ exports.post = async function (event, context) {
     }
   }
   catch (error) {
-    console.log("ERROR: " + error)
-
     var parameters = { 'error': error.message }
 
     var template = fs.readFileSync('templates/payment-error.mustache', 'utf8')
