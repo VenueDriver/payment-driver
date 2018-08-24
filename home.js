@@ -36,84 +36,71 @@ exports.index = async function (event, context) {
   if (!accessToken) {
     // Respond with the login form so that the user can provide their
     // authentication credentials.
-    return loginFormResponse(event)
+    return loginFormResponse(event, {})
   }
 
-  return redirectToPaymentRequestsResponse()
+  return redirectToPaymentRequestsResponse(event)
 }
 
 exports.login = async function (event, context) {
   const params = querystring.parse(event.body)
 
+  var authResponse
   try {
-    var accessToken = await authenticator.authenticate({
+    authResponse = await authenticator.authenticate({
       username: params.username,
       password: params.password
     })
 
     console.log("Successful Authentication.")
-    console.log("Verifying access token: " + accessToken)
-    await authenticator.verifyCognitoToken(accessToken)
+
+    if (authResponse.ChallengeName == 'NEW_PASSWORD_REQUIRED') {
+      if (params.new_password) {
+        console.log("last response: " + JSON.stringify(authResponse))
+        authResponse = await authenticator.respondToAuthChallenge(authResponse, params.username, params.new_password)
+        console.log("response: " + JSON.stringify(authResponse))
+      }
+      else {
+        return loginFormResponse(event, {
+          'message': 'Please change your password to proceed.',
+          'new_password': true, // Show the 'new password' field.
+          'username': params.username,
+          'password': params.password
+        })
+      }
+    }
+
+    console.log("Verifying access token: " + authResponse.AuthenticationResult.AccessToken)
+    await authenticator.verifyCognitoToken(authResponse.AuthenticationResult.AccessToken)
+    return redirectToPaymentRequestsResponse(event, authResponse.AuthenticationResult.AccessToken)
   }
   catch (error) {
-    // if (authResponse.ChallengeName == 'NEW_PASSWORD_REQUIRED') {
-    //   try {
-    //     var challengeResponses = {}
-
-    //     console.log("Changing password.")
-    //     challengeResponses = {
-    //       USERNAME: authResponse.ChallengeParameters.USER_ID_FOR_SRP,
-    //       NEW_PASSWORD: 'Paytest008!'
-    //     }
-
-    //     var challengeResponseResponse = await cognitoIdentityServiceProvider.adminRespondToAuthChallenge({
-    //       ChallengeName: authResponse.ChallengeName,
-    //       ClientId: '2b9n452rcn41c8a11qrqfkkv78',
-    //       UserPoolId: 'us-east-1_1HqV6hXBb',
-    //       ChallengeResponses: challengeResponses,
-    //       Session: authResponse.Session
-    //     }).promise()
-
-    //     console.log("Challenge response success:")
-    //     console.log(JSON.stringify(challengeResponseResponse))
-    //   }
-    //   catch (error) {
-    //     console.log("Challenge response error:")
-    //     console.log(error, error.stack);
-    //   }
-
-    //   accessToken = challengeResponseResponse.AuthenticationResult.AccessToken
-    // }
-    // else {
-    //   accessToken = authResponse.AuthenticationResult.AccessToken
-    // }
-
-    return loginFormResponse(event, "Invalid login.  Please try again.")
+    return loginFormResponse(event, {
+      'message': error,
+      'username': params.username,
+      'password': params.password
+    })
   }
-
-  return redirectToPaymentRequestsResponse(accessToken)
 }
 
 exports.logout = async function (event, context) {
   return {
     statusCode: 302,
     headers: {
-      location: '/',
+      location: 'https://' + event.headers.Host + '/',
       // Remove the access token cookie.
       'Set-Cookie': 'access_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
     }
   }
 }
 
-function loginFormResponse(event, message) {
-  // Respond with the login form so that the user can provide their
-  // authentication credentials.
-  var templateParameters = {
+// Respond with the login form so that the user can provide their
+// authentication credentials.
+function loginFormResponse(event, templateParameters) {
+  var templateParameters = Object.assign(templateParameters, {
     'assets_host': '//' + event.headers.Host + ':8081'
-  }
-  if (message) {
-    templateParameters.message = message
-  }
+  })
+
   var template = fs.readFileSync('templates/login.mustache', 'utf8')
   var html = mustache.render(template, templateParameters, partials())
 
@@ -124,13 +111,14 @@ function loginFormResponse(event, message) {
   }
 }
 
-function redirectToPaymentRequestsResponse(accessToken) {
-  var headers = { location: '/payment-requests' }
+function redirectToPaymentRequestsResponse(event, accessToken) {
+  var headers = { location: 'https://' + event.headers.Host + '/payment-requests' }
   if (accessToken) {
     // This is a session cookie, since it has no expiration set.
     headers['Set-Cookie'] =
       'access_token = ' + accessToken + "; Secure; SameSite=Strict"
   }
+  console.log("Redirecting: " + JSON.stringify(headers))
   return {
     statusCode: 302,
     headers: headers

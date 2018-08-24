@@ -71,6 +71,8 @@ Run this:
 
     node-http-server root=public port=8081 verbose=true
 
+(or you can run: ```npm run assets```)
+
 ### Start an HTTP server with SAM Local
 
 Use SAM Local for development:

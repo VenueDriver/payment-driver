@@ -41,7 +41,8 @@
     "delete-tables": "aws dynamodb delete-table --endpoint-url http://localhost:8000 --table-name payment_requests",
     "test": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/.bin/nyc ./node_modules/mocha/bin/mocha",
     "test-watch": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/mocha/bin/mocha -R min --watch --watch-extensions yml,csv",
-    "coverage": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/.bin/nyc npm test && ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js -v"
+    "coverage": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/.bin/nyc npm test && ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/coveralls/bin/coveralls.js -v",
+    "assets": "node-http-server root=public port=8081 verbose=true"
   },
   "repository": {
     "type": "git",

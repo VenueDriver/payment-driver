@@ -26,6 +26,17 @@ form,
 .logo {
   width: 125px;
   display: block;
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.navlogo {
+  height: 2em;
+}
+
+.brand {
+  text-align: center;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 2em;
