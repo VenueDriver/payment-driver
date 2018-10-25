@@ -1,14 +1,13 @@
-Welcome to the AWS CodeStar sample web application
-==================================================
+Payment Driver
+==============
 
-This sample code helps get you started with a simple Node.js web service deployed by AWS CloudFormation to AWS Lambda and Amazon API Gateway.
+A general payment service for sending payment requests that customers can pay, without our employees ever seeing the credit card information.
 
 What's Here
 -----------
 
-This sample includes:
+This app includes:
 
-* README.md - this file
 * buildspec.yml - this file is used by AWS CodeBuild to package your
   application for deployment to AWS Lambda
 * index.js - this file contains the sample Node.js code for the web service
@@ -16,10 +15,10 @@ This sample includes:
   by AWS Cloudformation to deploy your application to AWS Lambda and Amazon API
   Gateway.
 
-Development
------------
+Development Setup
+-----------------
 
-### Set up Stripe keys
+#### Set up Stripe keys
 
 Be sure to set the Stripe keys as environment variables:
 
@@ -33,7 +32,7 @@ Example ~/.bash_profile code:
 
 Get the keys from the Stripe dashboard.
 
-### Set up local DynamoDB tables
+#### Set up local DynamoDB tables
 
 At the time that this was written, SAM Local cannot manage local DynamoDB tables for development.  You have to set them up manually.
 
@@ -65,7 +64,7 @@ To scan the current contents of your ```payment_requests``` table:
 
     aws dynamodb scan --endpoint-url http://localhost:8000 --table-name payment_requests
 
-### Start an asset server
+#### Start an asset server
 
 Run this:
 
@@ -73,7 +72,7 @@ Run this:
 
 (or you can run: ```npm run assets```)
 
-### Start an HTTP server with SAM Local
+#### Start an HTTP server with SAM Local
 
 Use SAM Local for development:
 
@@ -87,23 +86,37 @@ The ```-docker-network``` parameter enables it to connect to the DynamoDB contai
 
 The ```--static-dir ""``` parameter stops SAM Local from mounting the ```public``` folder on ```/``` on the HTTP server.  This project has a dynamic response on that URL path.  That's why you need to run the HTTP server for assets, when normally you could use SAM Local for that.
 
-### Go to the app in a web browser
+#### Go to the app in a web browser
 
 To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
 
 To do a test Stripe transaction, ensure that your Stripe keys are set as described above.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
 
-Development
------------
-
-### Generate documentation
+#### Generate documentation
 
     documentation build lib/** -f html -o documentation/
+
+Ongoing Development
+-------------------
+
+Each subsequent time that you want to spin up a development environment, do this:
+
+#### Start your local DynamoDB service
+
+    docker start dynamodb
+
+#### Start an asset server
+
+    npm run assets
+
+#### Start an HTTP server with SAM Local
+
+    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local --static-dir ""
 
 User stories
 ------------
 
-### Employee sends payment request
+#### Employee sends payment request
 
     Scenario: As an employee, I want to send a payment request email to a customer, so that they can pay us
 
@@ -120,13 +133,13 @@ User stories
     And a record of the payment request should be written to the database,
     And then I should see a confirmation page in the dashboard.
 
-#### Implementation
+##### Implementation
 
 The ```/public/payment-form.html``` file is sent to S3 by AWS CodeBuild using the buildspec.yml file.  The build uses the ```sed``` utility to replace ```assets``` with the URL to the S3 bucket where the assets are stored.
 
 This will need an authentication system.
 
-### Employee wants to cancel payment request
+#### Employee wants to cancel payment request
 
     Scenario: As an employee, I want to cancel a payment request which was already sent to a customer but not filled out and submitted yet
 
@@ -139,11 +152,11 @@ This will need an authentication system.
     So when I click CANCEL,
     The customer receives and email explaining that the request was canceled
 
-#### Implementation
+##### Implementation
 
 Not yet implemented.
 
-### Customer makes payment
+#### Customer makes payment
 
   Scenario: As a customer, I want to follow a payment request link and submit my information, so that I can make a payment
 
@@ -157,16 +170,16 @@ Not yet implemented.
   We could set this up to use Venue Driver venue IDs, but it doesn't know venue IDs for restaurants.
   We might actually have to have a venues table in this thing.  And it might be called "accounts" instead of "venues".
 
-#### Implementation
+##### Implementation
 
 The ```payments``` REST resource is powered by the ```payments.js``` Lambda functions.
 
 The REST resource supports these HTTP verbs:
 
-##### GET
+###### GET
 
 Loads the file ```views/payment-form.html```, processes it with Moustache to add details from the payment request and the Stripe key, and serves the HTML.
 
-##### POST
+###### POST
 
 Processes a payment with Stripe.
