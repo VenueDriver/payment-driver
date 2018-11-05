@@ -15,7 +15,6 @@ Globals:
     Handler: index.handler
     Environment:
       Variables:
-        AWS_REGION: us-east-1
         COMPANY_NAME: Payment Driver
         SENDER_EMAIL: Payment Driver <payments@example.com>
         BASE_URL: http://example.com
