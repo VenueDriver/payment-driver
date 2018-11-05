@@ -54,10 +54,13 @@ exports.index = async function (event, context) {
     }
   }
   catch (error) {
-    var parameters = { 'error': error }
+    var templateParamemters = {
+      'assets_host': '//' + event.headers.Host + ':8081',
+      'error': error
+    }
 
     var template = fs.readFileSync('templates/error.mustache', 'utf8')
-    var html = mustache.render(template, parameters, partials())
+    var html = mustache.render(template, templateParamemters, partials())
 
     return {
       statusCode: 200,
