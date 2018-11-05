@@ -8,6 +8,24 @@ Parameters:
     Type: String
     Description: AWS CodeStar projectID used to associate new resources to team members
 
+Globals:
+  Function:
+    Runtime: nodejs6.10
+    Timeout: 180
+    Handler: index.handler
+    Environment:
+      Variables:
+        AWS_REGION: us-east-1
+        COMPANY_NAME: Payment Driver
+        PAYMENT_REQUESTS_TABLE_NAME:
+        SENDER_EMAIL: Payment Driver <payments@example.com>
+        BASE_URL: http://example.com
+        CLIENT_ID: client_id
+        USER_POOL_ID: user_pool_id
+        REGION: us-east-1
+        STRIPE_SECRET_KEY: stripe_secret
+        STRIPE_PUBLISHABLE_KEY: stripe_publishable
+
 Resources:
 
   PaymentRequestsTable:
@@ -32,9 +50,6 @@ Resources:
           Properties:
             Path: /
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   Login:
     Type: AWS::Serverless::Function
@@ -51,9 +66,6 @@ Resources:
           Properties:
             Path: /login
             Method: post
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   Logout:
     Type: AWS::Serverless::Function
@@ -70,9 +82,6 @@ Resources:
           Properties:
             Path: /logout
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PaymentRequests:
     Type: AWS::Serverless::Function
@@ -89,9 +98,6 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PaymentRequestsNew:
     Type: AWS::Serverless::Function
@@ -108,9 +114,6 @@ Resources:
           Properties:
             Path: /payment-requests-new
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PostPaymentRequest:
     Type: AWS::Serverless::Function
@@ -127,10 +130,6 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: post
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
-          STRIPE_SECRET_KEY: secret
 
   ResendPaymentRequest:
     Type: AWS::Serverless::Function
@@ -147,9 +146,6 @@ Resources:
           Properties:
             Path: /payment-requests-resend
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PaymentForm:
     Type: AWS::Serverless::Function
@@ -166,10 +162,6 @@ Resources:
           Properties:
             Path: /payments
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
-          STRIPE_PUBLISHABLE_KEY: publishable
 
   ProcessPayment:
     Type: AWS::Serverless::Function
@@ -186,7 +178,3 @@ Resources:
           Properties:
             Path: /payments
             Method: post
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
-          STRIPE_SECRET_KEY: secret

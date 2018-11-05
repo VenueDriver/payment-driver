@@ -4,7 +4,13 @@ const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
 const moment = require('moment')
-require('dotenv').load()
+
+// Load environment variables and override anything already set.
+const dotenv = require('dotenv')
+const envConfig = dotenv.parse(fs.readFileSync('.env'))
+for (var k in envConfig) { process.env[k] = envConfig[k] }
+console.log("After load table name: '" + process.env.PAYMENT_REQUESTS_TABLE_NAME + "'")
+
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification

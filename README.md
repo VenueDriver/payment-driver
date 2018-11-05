@@ -3,6 +3,10 @@ Payment Driver
 
 A general payment service for sending payment requests that customers can pay, without our employees ever seeing the credit card information.
 
+This project creates a serverless payment system using AWS Lambda, AWS API Gateway, AWS DynamoDB, and AWS Cognito,
+with management users configured in AWS IAM.  This setup ensures a low operation cost (virtually free)
+and high availability.
+
 What's Here
 -----------
 
@@ -76,7 +80,7 @@ Run this:
 
 Use SAM Local for development:
 
-    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local --static-dir ""
+    sam local start-api -p 8080 --docker-network sam-local --static-dir ""
 
 Port 8080 is important if you're using AWS Cloud9.
 
@@ -111,7 +115,12 @@ Each subsequent time that you want to spin up a development environment, do this
 
 #### Start an HTTP server with SAM Local
 
-    sam local start-api -p 8080 --env-vars env.json --docker-network sam-local --static-dir ""
+    sam local start-api -p 8080 --docker-network sam-local --static-dir ""
+
+Payment management users
+------------------------
+
+Only authorized users can send payment requests and review payment records.  The users are managed by AWS IAM.  The web app uses the AWS Cognito [server-side flow](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow.html#amazon-cognito-user-pools-server-side-authentication-flow).
 
 User stories
 ------------
