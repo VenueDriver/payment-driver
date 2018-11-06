@@ -7,9 +7,14 @@ const moment = require('moment')
 
 // Load environment variables and override anything already set.
 const dotenv = require('dotenv')
-const envConfig = dotenv.parse(fs.readFileSync('.env'))
-for (var k in envConfig) { process.env[k] = envConfig[k] }
-console.log("After load table name: '" + process.env.PAYMENT_REQUESTS_TABLE_NAME + "'")
+try {
+  const envConfig = dotenv.parse(fs.readFileSync('.env'))
+  for (var k in envConfig) { process.env[k] = envConfig[k] }
+  console.log("Environment variables: '" + process.env.PAYMENT_REQUESTS_TABLE_NAME + "'")
+}
+catch (err) {
+  // There will not be a .env file in production.
+}
 
 const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
@@ -21,7 +26,7 @@ const company = process.env.COMPANY_NAME
 
 const CognitoAuthenticator = require('./lib/CognitoAuthenticator.js')
 const userPoolId = process.env.USER_POOL_ID
-const region = process.env.REGION
+const region = process.env.AWS_REGION
 const clientId = process.env.CLIENT_ID
 const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
 const authorizer = new APIGatewayAuthorizer()
