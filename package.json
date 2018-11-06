@@ -8,17 +8,17 @@
     "bignumber.js": "^6.0.0",
     "bootstrap-validator": "^0.11.9",
     "dotenv": "^5.0.1",
+    "escape-html": "1.0.3",
     "jsonwebtoken": "^8.2.1",
     "jwk-to-pem": "^2.0.0",
     "lodash": "^4.17.5",
     "moment": "^2.22.1",
     "mustache": "^2.3.0",
     "querystring": "^0.2.0",
-    "request": "^2.85.0",
+    "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "request-promise-native": "^1.0.5",
-    "stripe": "^5.8.0",
-    "uuid": "3.2.1"
+    "stripe": "^5.8.0"
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.7.0",
@@ -38,7 +38,7 @@
   },
   "scripts": {
     "postinstall": "cp node_modules/bootstrap-validator/dist/validator.min.js public/assets/js",
-    "create-tables": "aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name payment_requests --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1",
+    "create-tables": "aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name payment_requests --attribute-definitions AttributeName=id,AttributeType=S AttributeName=created_at,AttributeType=S --key-schema AttributeName=id,KeyType=HASH AttributeName=created_at,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1",
     "delete-tables": "aws dynamodb delete-table --endpoint-url http://localhost:8000 --table-name payment_requests",
     "test": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/.bin/nyc ./node_modules/mocha/bin/mocha",
     "test-watch": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests ./node_modules/mocha/bin/mocha -R min --watch --watch-extensions yml,csv",

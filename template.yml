@@ -28,11 +28,22 @@ Globals:
 Resources:
 
   PaymentRequestsTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
-      PrimaryKey:
-         Name: id
-         Type: String
+      AttributeDefinitions:
+        -
+          AttributeName: "id"
+          AttributeType: "S"
+        -
+          AttributeName: "created_at"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "id"
+          KeyType: "HASH"
+        -
+          AttributeName: "created_at"
+          KeyType: "RANGE"
 
   Home:
     Type: AWS::Serverless::Function
