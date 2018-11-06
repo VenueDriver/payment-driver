@@ -15,6 +15,7 @@ Globals:
     Handler: index.handler
     Environment:
       Variables:
+        PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
         COMPANY_NAME: Payment Driver
         SENDER_EMAIL: Payment Driver <payments@example.com>
         BASE_URL: http://example.com
@@ -96,9 +97,6 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PaymentRequestsNew:
     Type: AWS::Serverless::Function
@@ -115,9 +113,6 @@ Resources:
           Properties:
             Path: /payment-requests-new
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PostPaymentRequest:
     Type: AWS::Serverless::Function
@@ -134,9 +129,6 @@ Resources:
           Properties:
             Path: /payment-requests
             Method: post
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   ResendPaymentRequest:
     Type: AWS::Serverless::Function
@@ -153,9 +145,6 @@ Resources:
           Properties:
             Path: /payment-requests-resend
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   PaymentForm:
     Type: AWS::Serverless::Function
@@ -172,9 +161,6 @@ Resources:
           Properties:
             Path: /payments
             Method: get
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
 
   ProcessPayment:
     Type: AWS::Serverless::Function
@@ -191,6 +177,3 @@ Resources:
           Properties:
             Path: /payments
             Method: post
-      Environment:
-        Variables:
-          PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
