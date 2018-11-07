@@ -22,8 +22,8 @@ Globals:
         CLIENT_ID: client_id
         USER_POOL_ID: user_pool_id
         REGION: us-east-1
-        STRIPE_SECRET_KEY: stripe_secret
-        STRIPE_PUBLISHABLE_KEY: stripe_publishable
+        STRIPE_SECRET_KEY:
+        STRIPE_PUBLISHABLE_KEY:
 
 Resources:
 
