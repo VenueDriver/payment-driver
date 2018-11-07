@@ -9,10 +9,7 @@ Parameters:
     Description: AWS CodeStar projectID used to associate new resources to team members
 
 Globals:
-  Function:
-    Runtime: nodejs6.10
-    Timeout: 180
-    Handler: index.handler
+  Function
     Environment:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
