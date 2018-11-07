@@ -9,7 +9,7 @@ Parameters:
     Description: AWS CodeStar projectID used to associate new resources to team members
 
 Globals:
-  Function
+  Function:
     Environment:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
