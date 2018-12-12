@@ -10,7 +10,6 @@ const dotenv = require('dotenv')
 try {
   const envConfig = dotenv.parse(fs.readFileSync('.env'))
   for (var k in envConfig) { process.env[k] = envConfig[k] }
-  console.log("Environment variables: '" + process.env.PAYMENT_REQUESTS_TABLE_NAME + "'")
 }
 catch (err) {
   // There will not be a .env file in production.

@@ -11,7 +11,6 @@ const dotenv = require('dotenv')
 try {
   const envConfig = dotenv.parse(fs.readFileSync('.env'))
   for (var k in envConfig) { process.env[k] = envConfig[k] }
-  console.log("Environment variables: '" + process.env.PAYMENT_REQUESTS_TABLE_NAME + "'")
 }
 catch (err) {
   // There will not be a .env file in production.
@@ -29,12 +28,14 @@ exports.index = async function (event, context) {
   var template
 
   try {
-    // If a payment request ID was provided as a parameter, then show that
-    // payment request instead of the list.
-    if (event.queryStringParameters && event.queryStringParameters.id) {
+    // If a payment request ID and created_at time stamp was provided as
+    // parameters, then show that payment request instead of the list.
+    if (event.queryStringParameters &&
+      event.queryStringParameters.id &&
+      event.queryStringParameters.created_at) {
       var id = event.queryStringParameters.id
-      templateParameters = await PaymentRequest.get(event['queryStringParameters']['id'])
-      console.log("templateParamemters: " + JSON.stringify(templateParameters))
+      var created_at = event.queryStringParameters.created_at
+      templateParameters = await PaymentRequest.get(id, created_at)
       templateParameters.payment_id = templateParameters.payment.id
       templateParameters.paid_at_moment = function () {
         return moment(this.paid_at).fromNow()
@@ -48,6 +49,9 @@ exports.index = async function (event, context) {
 
       templateParameters = {
         'paymentRequests': paymentRequests,
+        'created_at_escaped': function () {
+          return encodeURIComponent(this.created_at)
+        },
         "created_at_moment": function () {
           return moment(this.created_at).fromNow()
         },
