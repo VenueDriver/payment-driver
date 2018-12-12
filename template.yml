@@ -16,11 +16,7 @@ Globals:
         COMPANY_NAME: Payment Driver
         SENDER_EMAIL: Payment Driver <payments@example.com>
         BASE_URL: http://example.com
-        CLIENT_ID: client_id
-        USER_POOL_ID: user_pool_id
         REGION: us-east-1
-        STRIPE_SECRET_KEY:
-        STRIPE_PUBLISHABLE_KEY:
 
 Resources:
 
