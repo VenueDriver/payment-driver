@@ -12,7 +12,7 @@ Globals:
   Function:
     Environment:
       Variables:
-        PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
+        PAYMENT_REQUESTS_TABLE_NAME: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
         COMPANY_NAME: Payment Driver
         SENDER_EMAIL: Payment Driver <payments@example.com>
         BASE_URL: http://example.com
@@ -23,20 +23,20 @@ Resources:
   PaymentRequestsTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      TableName: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
       AttributeDefinitions:
-        -
-          AttributeName: "id"
-          AttributeType: "S"
-        -
-          AttributeName: "created_at"
-          AttributeType: "S"
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: created_at
+        AttributeType: S
       KeySchema:
-        -
-          AttributeName: "id"
-          KeyType: "HASH"
-        -
-          AttributeName: "created_at"
-          KeyType: "RANGE"
+      - AttributeName: id
+        KeyType: HASH
+      - AttributeName: created_at
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
   Home:
     Type: AWS::Serverless::Function
