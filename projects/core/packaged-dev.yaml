@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: 2010-09-09
+Globals:
+  Function:
+    Environment:
+      Variables:
+        BASE_URL: http://example.com
+        COMPANY_NAME: Payment Driver
+        PAYMENT_REQUESTS_TABLE_NAME:
+          Fn::Join:
+          - '-'
+          - - Ref: ProjectId
+            - Ref: AWS::Region
+        REGION: us-east-1
+        SENDER_EMAIL: Payment Driver <payments@example.com>
+Parameters:
+  ProjectId:
+    Description: AWS CodeStar projectID used to associate new resources to team members
+    Type: String
+Resources:
+  Home:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /
+          Type: Api
+      Handler: home.index
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  Login:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: post
+            Path: /login
+          Type: Api
+      Handler: home.login
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  Logout:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /logout
+          Type: Api
+      Handler: home.logout
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  PaymentForm:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /payments
+          Type: Api
+      Handler: payments.get
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  PaymentRequests:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /payment-requests
+          Type: Api
+      Handler: payment-requests.index
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  PaymentRequestsNew:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /payment-requests-new
+          Type: Api
+      Handler: payment-requests.new
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  PaymentRequestsTable:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: created_at
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      - AttributeName: created_at
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName:
+        Fn::Join:
+        - '-'
+        - - Ref: ProjectId
+          - Ref: AWS::Region
+    Type: AWS::DynamoDB::Table
+  PostPaymentRequest:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: post
+            Path: /payment-requests
+          Type: Api
+      Handler: payment-requests.post
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  ProcessPayment:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: post
+            Path: /payments
+          Type: Api
+      Handler: payments.post
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  ResendPaymentRequest:
+    Properties:
+      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      Events:
+        GetEvent:
+          Properties:
+            Method: get
+            Path: /payment-requests-resend
+          Type: Api
+      Handler: payment-requests.resend
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+Transform:
+- AWS::Serverless-2016-10-31

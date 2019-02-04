@@ -40,13 +40,18 @@ exports.index = async function (event, context) {
   catch (error) {
     // Check for new-password
     console.log("NEW PASSWORD FORM")
-    return;
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: "OK"
+    };
   }
+
 
   if (!accessToken) {
     // Respond with the login form so that the user can provide their
     // authentication credentials.
-    return loginFormResponse(event, {})
+    return loginFormResponse(event, {});
   }
 
   return redirectToPaymentRequestsResponse(event)
