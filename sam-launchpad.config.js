@@ -1,5 +1,6 @@
 // sam-launchpad.config.js
 const join = require('path').join;
+const afterDeployHook = require('./sam-hooks/after-deploy');
 
 module.exports = {
   "project_name" : "tmp-payment-driver",
@@ -10,5 +11,10 @@ module.exports = {
   "commands" : {
     "build" : "npm i && npm run build",
     "test" : "exit 0"
+  },
+  "hooks" : {
+    "after-deploy" : [
+      afterDeployHook
+    ]
   }
 }

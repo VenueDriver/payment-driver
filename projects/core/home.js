@@ -40,11 +40,7 @@ exports.index = async function (event, context) {
   catch (error) {
     // Check for new-password
     console.log("NEW PASSWORD FORM")
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: "OK"
-    };
+    return loginFormResponse(event, {});
   }
 
 
@@ -113,7 +109,7 @@ exports.logout = async function (event, context) {
 // authentication credentials.
 function loginFormResponse(event, templateParameters) {
   var templateParameters = Object.assign(templateParameters, {
-    'assets_host': '//' + event.headers.Host + ':8081'
+    'assets_host': process.env.ASSETS_HOST
   })
 
   var template = fs.readFileSync('templates/login.mustache', 'utf8')

@@ -3,6 +3,13 @@ Globals:
   Function:
     Environment:
       Variables:
+        ASSETS_HOST:
+          Fn::Join:
+          - /
+          - - https://s3.amazonaws.com
+            - Ref: S3AssetsBucket
+            - core
+            - Ref: Environment
         BASE_URL: http://example.com
         COMPANY_NAME: Payment Driver
         PAYMENT_REQUESTS_TABLE_NAME:
@@ -12,14 +19,29 @@ Globals:
             - Ref: AWS::Region
         REGION: us-east-1
         SENDER_EMAIL: Payment Driver <payments@example.com>
+Outputs:
+  AssetsLogicAddress:
+    Description: URL for the S3 bucket.
+    Value:
+      Ref: S3AssetsBucket
+  AssetsUrl:
+    Description: URL for the S3 bucket.
+    Value:
+      Fn::GetAtt:
+      - S3AssetsBucket
+      - WebsiteURL
 Parameters:
+  Environment:
+    Type: String
   ProjectId:
     Description: AWS CodeStar projectID used to associate new resources to team members
+    Type: String
+  ProjectName:
     Type: String
 Resources:
   Home:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -32,7 +54,7 @@ Resources:
     Type: AWS::Serverless::Function
   Login:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -45,7 +67,7 @@ Resources:
     Type: AWS::Serverless::Function
   Logout:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -58,7 +80,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentForm:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -71,7 +93,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentRequests:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -84,7 +106,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentRequestsNew:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -118,7 +140,7 @@ Resources:
     Type: AWS::DynamoDB::Table
   PostPaymentRequest:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -131,7 +153,7 @@ Resources:
     Type: AWS::Serverless::Function
   ProcessPayment:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -144,7 +166,7 @@ Resources:
     Type: AWS::Serverless::Function
   ResendPaymentRequest:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/cebd2e89e8467a240c8fd650e1f37be2
+      CodeUri: s3://tmp-payment-driver/dev/core/f249441c91f11f48183a58405375791f
       Events:
         GetEvent:
           Properties:
@@ -155,5 +177,11 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Runtime: nodejs8.10
     Type: AWS::Serverless::Function
+  S3AssetsBucket:
+    Properties:
+      AccessControl: PublicRead
+      BucketName:
+        Fn::Sub: assets.${ProjectName}
+    Type: AWS::S3::Bucket
 Transform:
 - AWS::Serverless-2016-10-31

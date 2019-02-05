@@ -4,6 +4,10 @@ Transform:
 # - AWS::CodeStar
 
 Parameters:
+  Environment:
+    Type: String
+  ProjectName:
+    Type: String
   ProjectId:
     Type: String
     Description: AWS CodeStar projectID used to associate new resources to team members
@@ -17,26 +21,15 @@ Globals:
         SENDER_EMAIL: Payment Driver <payments@example.com>
         BASE_URL: http://example.com
         REGION: us-east-1
+        ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket', 'core', !Ref 'Environment'] ]
 
 Resources:
 
-  # ConfigLambdaPermission:
-  #   Type: "AWS::Lambda::Permission"
-  #   DependsOn:
-  #   - PaymentRequestsTable
-  #   - Home
-  #   - Login
-  #   - Logout
-  #   - PaymentRequests
-  #   - PaymentRequestsNew
-  #   - PostPaymentRequest
-  #   - ResendPaymentRequest
-  #   - PaymentForm
-  #   - ProcessPayment
-    # Properties:
-    #   Action: lambda:InvokeFunction
-    #   FunctionName: !Ref GetEventsFunction
-    #   Principal: apigateway.amazonaws.com
+  S3AssetsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: !Sub assets.${ProjectName}
 
   PaymentRequestsTable:
     Type: AWS::DynamoDB::Table
@@ -199,3 +192,11 @@ Resources:
           Properties:
             Path: /payments
             Method: post
+
+Outputs:
+  AssetsUrl:
+    Value: !GetAtt S3AssetsBucket.WebsiteURL
+    Description: URL for the S3 bucket.
+  AssetsLogicAddress:
+    Value: !Ref S3AssetsBucket
+    Description: URL for the S3 bucket.
