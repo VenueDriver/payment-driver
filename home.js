@@ -28,8 +28,7 @@ exports.index = async function (event, context) {
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
   }
   catch (error) {
-    // Check for new-password
-    console.log("NEW PASSWORD FORM")
+    console.log("Error getting access token from cookie: " + error)
     return;
   }
 
