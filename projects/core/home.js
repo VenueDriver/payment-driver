@@ -109,7 +109,7 @@ exports.logout = async function (event, context) {
 // authentication credentials.
 function loginFormResponse(event, templateParameters) {
   var templateParameters = Object.assign(templateParameters, {
-    'assets_host': process.env.ASSETS_HOST
+    'assets_host': process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
   })
 
   var template = fs.readFileSync('templates/login.mustache', 'utf8')
