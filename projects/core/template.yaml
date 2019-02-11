@@ -28,7 +28,7 @@ Globals:
   Function:
     Environment:
       Variables:
-        PAYMENT_REQUESTS_TABLE_NAME: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
+        PAYMENT_REQUESTS_TABLE_NAME: !GetAtt PaymentRequestsTable.logicalNameOfResource
         COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SenderEmail'
         BASE_URL: http://example.com
@@ -46,7 +46,7 @@ Resources:
   PaymentRequestsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
+      TableName: !Join ['-', [!Ref 'ProjectName', !Ref 'Environment']]
       AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
