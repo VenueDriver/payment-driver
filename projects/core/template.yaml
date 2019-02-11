@@ -4,11 +4,9 @@ Transform:
 # - AWS::CodeStar
 
 Parameters:
-  COMPANY_NAME:
+  CompanyName:
     Type: String
   SENDER_EMAIL:
-    Type: String
-  CLIENT_ID:
     Type: String
   USER_POOL_ID:
     Type: String
@@ -20,6 +18,8 @@ Parameters:
     Type: String
   ProjectName:
     Type: String
+  CLIENT_ID:
+    Type: String
   ProjectId:
     Type: String
     Description: AWS CodeStar projectID used to associate new resources to team members
@@ -29,7 +29,7 @@ Globals:
     Environment:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
-        COMPANY_NAME: !Ref 'COMPANY_NAME'
+        COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SENDER_EMAIL'
         BASE_URL: http://example.com
         REGION: us-east-1
