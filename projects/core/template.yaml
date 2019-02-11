@@ -6,19 +6,19 @@ Transform:
 Parameters:
   CompanyName:
     Type: String
-  SENDER_EMAIL:
+  SenderEmail:
     Type: String
-  USER_POOL_ID:
+  UserPoolId:
     Type: String
-  STRIPE_SECRET_KEY:
+  StripeSecretKey:
     Type: String
-  STRIPE_PUBLISHABLE_KEY:
+  StripePublishableKey:
+    Type: String
+  ClientId:
     Type: String
   Environment:
     Type: String
   ProjectName:
-    Type: String
-  CLIENT_ID:
     Type: String
   ProjectId:
     Type: String
@@ -30,7 +30,7 @@ Globals:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
         COMPANY_NAME: !Ref 'CompanyName'
-        SENDER_EMAIL: !Ref 'SENDER_EMAIL'
+        SENDER_EMAIL: !Ref 'SenderEmail'
         BASE_URL: http://example.com
         REGION: us-east-1
         ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket', 'core', !Ref 'Environment'] ]

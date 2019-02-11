@@ -12,7 +12,7 @@ Globals:
             - Ref: Environment
         BASE_URL: http://example.com
         COMPANY_NAME:
-          Ref: COMPANY_NAME
+          Ref: CompanyName
         PAYMENT_REQUESTS_TABLE_NAME:
           Fn::Join:
           - '-'
@@ -20,7 +20,7 @@ Globals:
             - Ref: AWS::Region
         REGION: us-east-1
         SENDER_EMAIL:
-          Ref: SENDER_EMAIL
+          Ref: SenderEmail
 Outputs:
   AssetsLogicAddress:
     Description: URL for the S3 bucket.
@@ -33,7 +33,9 @@ Outputs:
       - S3AssetsBucket
       - WebsiteURL
 Parameters:
-  COMPANY_NAME:
+  ClientId:
+    Type: String
+  CompanyName:
     Type: String
   Environment:
     Type: String
@@ -42,18 +44,18 @@ Parameters:
     Type: String
   ProjectName:
     Type: String
-  SENDER_EMAIL:
+  SenderEmail:
     Type: String
-  STRIPE_PUBLISHABLE_KEY:
+  StripePublishableKey:
     Type: String
-  STRIPE_SECRET_KEY:
+  StripeSecretKey:
     Type: String
-  USER_POOL_ID:
+  UserPoolId:
     Type: String
 Resources:
   Home:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -66,7 +68,7 @@ Resources:
     Type: AWS::Serverless::Function
   Login:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -79,7 +81,7 @@ Resources:
     Type: AWS::Serverless::Function
   Logout:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -92,7 +94,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentForm:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -105,7 +107,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentRequests:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -118,7 +120,7 @@ Resources:
     Type: AWS::Serverless::Function
   PaymentRequestsNew:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -152,7 +154,7 @@ Resources:
     Type: AWS::DynamoDB::Table
   PostPaymentRequest:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -165,7 +167,7 @@ Resources:
     Type: AWS::Serverless::Function
   ProcessPayment:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
@@ -178,7 +180,7 @@ Resources:
     Type: AWS::Serverless::Function
   ResendPaymentRequest:
     Properties:
-      CodeUri: s3://tmp-payment-driver/dev/core/b99d1de3a2468ace3fe85fa23c631cd9
+      CodeUri: s3://tmp-payment-driver/dev/core/1d90c8de6861784f0457b2796ce081d8
       Events:
         GetEvent:
           Properties:
