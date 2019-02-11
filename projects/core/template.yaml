@@ -4,6 +4,18 @@ Transform:
 # - AWS::CodeStar
 
 Parameters:
+  COMPANY_NAME:
+    Type: String
+  SENDER_EMAIL:
+    Type: String
+  CLIENT_ID:
+    Type: String
+  USER_POOL_ID:
+    Type: String
+  STRIPE_SECRET_KEY:
+    Type: String
+  STRIPE_PUBLISHABLE_KEY:
+    Type: String
   Environment:
     Type: String
   ProjectName:
@@ -17,8 +29,8 @@ Globals:
     Environment:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region']]
-        COMPANY_NAME: Payment Driver
-        SENDER_EMAIL: Payment Driver <payments@example.com>
+        COMPANY_NAME: !Ref 'COMPANY_NAME'
+        SENDER_EMAIL: !Ref 'SENDER_EMAIL'
         BASE_URL: http://example.com
         REGION: us-east-1
         ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket', 'core', !Ref 'Environment'] ]
