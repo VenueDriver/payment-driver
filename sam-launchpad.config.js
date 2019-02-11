@@ -3,7 +3,7 @@ const join = require('path').join;
 const afterDeployHook = require('./sam-hooks/after-deploy');
 
 module.exports = {
-  "project_name" : "tmp-payment-driver",
+  "project_name" : "payment-driver",
   "projects" : join( __dirname , "./projects" ),
   "template_parameters" : {
     "ProjectId" : "1234abc",
