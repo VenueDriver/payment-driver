@@ -28,7 +28,7 @@ Globals:
   Function:
     Environment:
       Variables:
-        PAYMENT_REQUESTS_TABLE_NAME: !GetAtt PaymentRequestsTable.logicalNameOfResource
+        PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
         COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SenderEmail'
         BASE_URL: http://example.com
