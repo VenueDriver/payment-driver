@@ -39,6 +39,10 @@ Globals:
         BASE_URL: http://example.com
         REGION: us-east-1
         ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket', 'core', !Ref 'Environment'] ]
+        CLIENT_ID:
+        USER_POOL_ID:
+        STRIPE_SECRET_KEY:
+        STRIPE_PUBLISHABLE_KEY:
 
 Resources:
 
