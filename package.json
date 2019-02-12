@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/VenueDriver/payment-driver#readme",
   "devDependencies": {
-    "sam-launchpad": "^1.1.16"
+    "sam-launchpad": "^1.1.19"
   }
 }
