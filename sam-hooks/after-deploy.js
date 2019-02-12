@@ -16,7 +16,7 @@ const syncAssets = (options)=>{
     const bucketName = stack.Outputs
                             .find(data => data.OutputKey == "AssetsLogicAddress")
                             .OutputValue;
-    exec(`aws s3 sync ${publicDir} s3://${bucketName}/${appName}/${args.environment}/ --acl public-read`,
+    exec(`aws s3 sync ${publicDir} s3://${bucketName}/${appName}/ --acl public-read`,
       (error, stdout, stderr) => {
         if(error){
           console.log(stderr);

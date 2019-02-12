@@ -41,7 +41,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: PublicRead
-      BucketName: !Sub assets.${ProjectName}
+      BucketName: !Sub ${Environment}.assets.${ProjectName}
 
   PaymentRequestsTable:
     Type: AWS::DynamoDB::Table
