@@ -18,7 +18,7 @@
     "assets": "cd lib; node-http-server root=public port=8081 verbose=true &",
     "dynamodb": "docker start dynamodb",
     "start": "cd lib; sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
-    "development": "npm run dynamodb; npm run assets; npm run server",
+    "development": "npm run dynamodb; npm run assets; npm run start",
     "stop": "killall sam; killall node",
     "restart": "npm run stop; npm run development"
   },
