@@ -47,7 +47,8 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "request-promise-native": "^1.0.5",
-    "stripe": "^5.8.0"
+    "stripe": "^5.8.0",
+    "url-join": "^4.0.0"
   },
   "devDependencies": {
     "sam-launchpad": "^1.1.23",

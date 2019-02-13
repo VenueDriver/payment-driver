@@ -4,6 +4,7 @@ const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
 const moment = require('moment')
+const urljoin = require('url-join')
 
 // Load environment variables and override anything already set.
 const dotenv = require('dotenv')
@@ -107,7 +108,11 @@ exports.logout = async function (event, context) {
 // authentication credentials.
 function loginFormResponse(event, templateParameters) {
   var templateParameters = Object.assign(templateParameters, {
-    'base_url_path': event.requestContext.path,
+    'base_url_path': function () {
+      return function (text, render) {
+        return urljoin(event.requestContext.path, render(text));
+      }
+    },
     'assets_host': process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
   })
 
