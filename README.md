@@ -119,7 +119,7 @@ This will run a static HTTP server and it will continue running in your terminal
 
 Open another terminal window / tab / screen, and run:
 
-    npm run server
+    npm run start
 
 ### Shortcut
 
@@ -135,7 +135,7 @@ That will run:
 
 * `npm run dynamodb`
 * `npm run assets`
-* `npm run server`
+* `npm run start`
 
 #### Stop
 
