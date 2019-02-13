@@ -11,7 +11,7 @@ const syncAssets = (options) => {
     const appName = "core";
     const stackName = getStackName(options, appName);
     const stack = await getStack(stackName);
-    const projectPath = "lib/core";
+    const projectPath = "lib";
     const publicDir = join(__dirname, `../${projectPath}/public`);
     const bucketName = stack.Outputs
       .find(data => data.OutputKey == "AssetsLogicAddress")

@@ -10,15 +10,14 @@
     "package": "sam-launchpad --skip-deploy --skip-build --skip-coverage --skip-validation",
     "deploy": "sam-launchpad --skip-package --skip-build --skip-coverage --skip-validation",
     "sam-test": "sam-launchpad --skip-package --skip-build --skip-deploy --skip-validation",
-
     "create-tables": "aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name payment_requests --attribute-definitions AttributeName=id,AttributeType=S AttributeName=created_at,AttributeType=S --key-schema AttributeName=id,KeyType=HASH AttributeName=created_at,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1",
     "delete-tables": "aws dynamodb delete-table --endpoint-url http://localhost:8000 --table-name payment_requests",
-    "test": "cd lib/core; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../../node_modules/.bin/nyc ../../node_modules/mocha/bin/mocha",
-    "test-watch": "cd lib/core; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../../node_modules/mocha/bin/mocha -R min --watch --watch-extensions yml,csv",
-    "coverage": "cd lib/core; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../../node_modules/.bin/nyc npm test && ../../node_modules/.bin/nyc report --reporter=text-lcov | ../../node_modules/coveralls/bin/coveralls.js -v",
-    "assets": "cd lib/core; node-http-server root=public port=8081 verbose=true &",
+    "test": "cd lib; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../node_modules/.bin/nyc ../node_modules/mocha/bin/mocha",
+    "test-watch": "cd lib; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../node_modules/mocha/bin/mocha -R min --watch --watch-extensions yml,csv",
+    "coverage": "cd lib; PAYMENT_REQUESTS_TABLE_NAME=payment_requests ../node_modules/.bin/nyc npm test && ../node_modules/.bin/nyc report --reporter=text-lcov | ../node_modules/coveralls/bin/coveralls.js -v",
+    "assets": "cd lib; node-http-server root=public port=8081 verbose=true &",
     "dynamodb": "docker start dynamodb",
-    "server": "cd lib/core; sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
+    "server": "cd lib; sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
     "development": "npm run dynamodb; npm run assets; npm run server",
     "stop": "killall sam; killall node",
     "restart": "npm run stop; npm run development"
@@ -51,7 +50,7 @@
     "stripe": "^5.8.0"
   },
   "devDependencies": {
-    "sam-launchpad": "^1.1.20",
+    "sam-launchpad": "^1.1.23",
     "aws-sdk-mock": "^1.7.0",
     "chai": "^4.1.2",
     "chai-jq": "0.0.9",

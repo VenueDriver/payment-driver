@@ -4,7 +4,7 @@ const afterDeployHook = require('./sam-hooks/after-deploy');
 
 module.exports = {
   "project_name": "payment-driver",
-  "project": join(__dirname, "./lib"),
+  "single_project": true "project": join(__dirname, "./lib"),
   "base_path": join(__dirname, "./lib"),
   "template_parameters": {
     "ProjectId": "1234abc",
