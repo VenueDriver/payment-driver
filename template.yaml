@@ -31,6 +31,7 @@ Globals:
         PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
         COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SenderEmail'
+        CLIENT_ID: !Ref 'ClientId'
         USER_POOL_ID: !Ref 'UserPoolId'
         STRIPE_SECRET_KEY : !Ref 'StripeSecretKey'
         STRIPE_PUBLISHABLE_KEY : !Ref 'StripePublishableKey'
