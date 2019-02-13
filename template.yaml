@@ -68,6 +68,7 @@ Resources:
   Home:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: .
       Handler: home.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
