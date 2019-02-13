@@ -16,7 +16,7 @@ module.exports = {
     "StripePublishableKey": process.env.STRIPE_PUBLISHABLE_KEY || "local"
   },
   "commands": {
-    "build": "npm i && npm run build",
+    "build": "exit 0",
     "test": "npm i && npm test"
   },
   "hooks": {
