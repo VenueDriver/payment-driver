@@ -8,7 +8,7 @@ const syncAssets = (options) => {
   return new Promise(async(resolve, reject) => {
     console.log("  DEPLOYING ASSETS TO S3:");
     const { args } = options;
-    const appName = "core";
+    const appName = "";
     const stackName = getStackName(options, appName);
     const stack = await getStack(stackName);
     const projectPath = "lib";
@@ -16,7 +16,7 @@ const syncAssets = (options) => {
     const bucketName = stack.Outputs
       .find(data => data.OutputKey == "AssetsLogicAddress")
       .OutputValue;
-    exec(`aws s3 sync ${publicDir} s3://${bucketName}/${appName}/ --acl public-read`,
+    exec(`aws s3 sync ${publicDir} s3://${bucketName}/ --acl public-read`,
       (error, stdout, stderr) => {
         if (error) {
           console.log(stderr);
