@@ -72,7 +72,7 @@ To scan the current contents of your ```payment_requests``` table:
 
 Run this:
 
-    node-http-server root=public port=8081 verbose=true
+    cd lib/core; node-http-server root=public port=8081 verbose=true
 
 (or you can run: ```npm run assets```)
 
@@ -80,7 +80,7 @@ Run this:
 
 Use SAM Local for development:
 
-    sam local start-api -p 8080 --docker-network sam-local --static-dir ""
+    cd lib/core; sam local start-api -p 8080 --docker-network sam-local --static-dir ""
 
 Port 8080 is important if you're using AWS Cloud9.
 
@@ -113,9 +113,41 @@ Each subsequent time that you want to spin up a development environment, do this
 
     npm run assets
 
+This will run a static HTTP server and it will continue running in your terminal.
+
 #### Start an HTTP server with SAM Local
 
-    sam local start-api -p 8080 --docker-network sam-local --static-dir ""
+Open another terminal window / tab / screen, and run:
+
+    npm run server
+
+### Shortcut
+
+NPM can spin up a whole development environment for you, including the asset server, DynamoDB instance, and SAM Local server.  The disadvantage is that the asset server and the SAM Local server both have to run in the background, so you have to stop them by killing them.  Or by running the handy NPM scripts for stopping or restarting.
+
+#### Start
+
+To start a development environment, run:
+
+    npm run development
+
+That will run:
+
+* `npm run dynamodb`
+* `npm run assets`
+* `npm run server`
+
+#### Stop
+
+To stop those things:
+
+    npm run stop`
+
+#### Reset
+
+To stop and restart everything:
+
+    npm run reset
 
 Payment management users
 ------------------------

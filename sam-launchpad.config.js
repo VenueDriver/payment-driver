@@ -3,10 +3,11 @@ const join = require('path').join;
 const afterDeployHook = require('./sam-hooks/after-deploy');
 
 module.exports = {
-  "project_name" : "payment-driver",
-  "projects" : join( __dirname , "./projects" ),
-  "template_parameters" : {
-    "ProjectId" : "1234abc",
+  "project_name": "payment-driver",
+  "project": join(__dirname, "./lib"),
+  "base_path": join(__dirname, "./lib"),
+  "template_parameters": {
+    "ProjectId": "1234abc",
     "CompanyName": process.env.COMPANY_NAME || "local",
     "SenderEmail": process.env.SENDER_EMAIL || "local",
     "ClientId": process.env.CLIENT_ID || "local",
@@ -14,12 +15,12 @@ module.exports = {
     "StripeSecretKey": process.env.STRIPE_SECRET_KEY || "local",
     "StripePublishableKey": process.env.STRIPE_PUBLISHABLE_KEY || "local"
   },
-  "commands" : {
-    "build" : "npm i && npm run build",
-    "test" : "exit 0"
+  "commands": {
+    "build": "npm i && npm run build",
+    "test": "npm i && npm test"
   },
-  "hooks" : {
-    "after-deploy" : [
+  "hooks": {
+    "after-deploy": [
       afterDeployHook
     ]
   }
