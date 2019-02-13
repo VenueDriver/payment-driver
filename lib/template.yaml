@@ -37,7 +37,7 @@ Globals:
         STAGE_NAME : !Ref 'Environment'
         BASE_URL: http://example.com
         REGION: us-east-1
-        ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket', 'core', !Ref 'Environment'] ]
+        ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket' ] ]
 
 Resources:
 
