@@ -7,6 +7,7 @@ const join = require('path').join;
 const syncAssets = (options) => {
   return new Promise(async(resolve, reject) => {
     console.log("  DEPLOYING ASSETS TO S3:");
+    
     const { args } = options;
     const appName = "";
     const stackName = getStackName(options, appName);
