@@ -22,6 +22,28 @@ This app includes:
 Development Setup
 -----------------
 
+#### Set up environment
+
+These instructions are specifically for setting up this project for development using AWS Cloud9.
+
+##### Create and expand Cloud9 environment
+
+Create a new Cloud9 environment, and expand it to at least about 25 GB.
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html
+
+##### Install SAM
+
+Using Linuxbrew to install SAM works great on the AWS AMI:
+
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install-linux.html
+
+##### Upgrade Node
+
+You want to use the same Node version that the Lambda functions use:
+
+    nvm install 8.10
+
 #### Set up Stripe keys
 
 Be sure to set the Stripe keys as environment variables:
