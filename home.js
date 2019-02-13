@@ -31,7 +31,6 @@ const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
 const authorizer = new APIGatewayAuthorizer()
 
 exports.index = async function (event, context) {
-
   // Check for the access token cookie and verify it if it exists.
   var accessToken
   try {
@@ -42,7 +41,6 @@ exports.index = async function (event, context) {
     console.log("NEW PASSWORD FORM")
     return loginFormResponse(event, {});
   }
-
 
   if (!accessToken) {
     // Respond with the login form so that the user can provide their
@@ -109,6 +107,7 @@ exports.logout = async function (event, context) {
 // authentication credentials.
 function loginFormResponse(event, templateParameters) {
   var templateParameters = Object.assign(templateParameters, {
+    'base_url_path': event.requestContext.path,
     'assets_host': process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
   })
 
