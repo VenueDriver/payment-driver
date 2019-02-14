@@ -46,17 +46,10 @@ You want to use the same Node version that the Lambda functions use:
 
 #### Set up Stripe keys
 
-Be sure to set the Stripe keys as environment variables:
+Be sure to set the Stripe keys as environment variables in your `.env` file.
 
-    STRIPE_PUBLISHABLE_KEY
-    STRIPE_SECRET_KEY
-
-Example ~/.bash_profile code:
-
-    export STRIPE_PUBLISHABLE_KEY="pk_..."
-    export STRIPE_SECRET_KEY="sk_..."
-
-Get the keys from the Stripe dashboard.
+    STRIPE_PUBLISHABLE_KEY=XXXXXX
+    STRIPE_SECRET_KEY=XXXXXX
 
 #### Set up local DynamoDB tables
 
