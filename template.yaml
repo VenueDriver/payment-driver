@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform:
 - AWS::Serverless-2016-10-31
-# - AWS::CodeStar
 
 Parameters:
   CompanyName:
@@ -22,7 +21,6 @@ Parameters:
     Type: String
   ProjectId:
     Type: String
-    Description: AWS CodeStar projectID used to associate new resources to team members
 
 Globals:
   Function:
@@ -72,9 +70,9 @@ Resources:
       Handler: home.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -88,9 +86,9 @@ Resources:
       Handler: home.login
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -104,9 +102,9 @@ Resources:
       Handler: home.logout
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -120,9 +118,9 @@ Resources:
       Handler: payment-requests.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -136,9 +134,9 @@ Resources:
       Handler: payment-requests.new
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -152,9 +150,9 @@ Resources:
       Handler: payment-requests.post
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -168,9 +166,9 @@ Resources:
       Handler: payment-requests.resend
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -184,9 +182,9 @@ Resources:
       Handler: payments.get
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -200,9 +198,9 @@ Resources:
       Handler: payments.post
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+      Role:
+        Fn::ImportValue:
+          !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
