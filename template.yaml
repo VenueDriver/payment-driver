@@ -32,7 +32,7 @@ Globals:
         COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SenderEmail'
         CLIENT_ID: !Ref 'CognitoUserPoolClient'
-        USER_POOL_ID: !Ref 'CognitoIdPool'
+        USER_POOL_ID: !Ref 'CognitoUserPool'
         STRIPE_SECRET_KEY : !Ref 'StripeSecretKey'
         STRIPE_PUBLISHABLE_KEY : !Ref 'StripePublishableKey'
         STAGE_NAME : !Ref 'Environment'
@@ -86,15 +86,50 @@ Resources:
           ProviderName: !GetAtt CognitoUserPool.ProviderName
       AllowUnauthenticatedIdentities: false
 
+  AuthRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Federated: 
+                - "cognito-identity.amazonaws.com"
+            Action: 
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: 
+                - !Ref CognitoIdPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr:
+                - "authenticated"
+      Path: "/"
+      Policies: 
+        - 
+          PolicyName: "QuickSightCreateUser"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: "quicksight:CreateUser"
+                Resource: "*"
+  AuthRoleAttach:
+    Type: "AWS::Cognito::IdentityPoolRoleAttachment"
+    Properties:
+      IdentityPoolId: !Ref CognitoIdPool
+      Roles: 
+        authenticated: !GetAtt AuthRole.Arn
+
   Home:
     Type: AWS::Serverless::Function
     Properties:
       Handler: home.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -108,9 +143,6 @@ Resources:
       Handler: home.login
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -124,9 +156,6 @@ Resources:
       Handler: home.logout
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -140,9 +169,6 @@ Resources:
       Handler: payment-requests.index
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -156,9 +182,6 @@ Resources:
       Handler: payment-requests.new
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -172,9 +195,6 @@ Resources:
       Handler: payment-requests.post
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -188,9 +208,6 @@ Resources:
       Handler: payment-requests.resend
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -204,9 +221,6 @@ Resources:
       Handler: payments.get
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
@@ -220,9 +234,6 @@ Resources:
       Handler: payments.post
       Runtime: nodejs8.10
       Policies: AmazonDynamoDBFullAccess
-      # Role:
-      #   Fn::ImportValue:
-      #     !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
       Events:
         GetEvent:
           Type: Api
