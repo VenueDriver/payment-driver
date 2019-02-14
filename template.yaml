@@ -69,7 +69,7 @@ Resources:
   CognitoUserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: CognitoAPIGWAngular
+      UserPoolName: PaymentDriver
   CognitoUserPoolClient:    
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
