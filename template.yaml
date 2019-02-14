@@ -79,7 +79,7 @@ Resources:
   CognitoIdPool:
     Type: "AWS::Cognito::IdentityPool"
     Properties:
-      IdentityPoolName: !Ref AWS::StackName
+      IdentityPoolName: PaymentDriver
       CognitoIdentityProviders: 
         -
           ClientId: !Ref CognitoUserPoolClient
