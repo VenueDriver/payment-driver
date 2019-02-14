@@ -66,6 +66,26 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
+  CognitoUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: CognitoAPIGWAngular
+  CognitoUserPoolClient:    
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+        ClientName: PaymentDriver
+        GenerateSecret: false
+        UserPoolId: !Ref CognitoUserPool
+  CognitoIdPool:
+    Type: "AWS::Cognito::IdentityPool"
+    Properties:
+      IdentityPoolName: !Ref AWS::StackName
+      CognitoIdentityProviders: 
+        -
+          ClientId: !Ref CognitoUserPoolClient
+          ProviderName: !GetAtt CognitoUserPool.ProviderName
+      AllowUnauthenticatedIdentities: false
+
   Home:
     Type: AWS::Serverless::Function
     Properties:
