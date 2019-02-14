@@ -86,44 +86,6 @@ Resources:
           ProviderName: !GetAtt CognitoUserPool.ProviderName
       AllowUnauthenticatedIdentities: false
 
-  AuthRole: 
-    Type: "AWS::IAM::Role"
-    Properties: 
-      AssumeRolePolicyDocument: 
-        Version: "2012-10-17"
-        Statement: 
-          - 
-            Effect: "Allow"
-            Principal: 
-              Federated: 
-                - "cognito-identity.amazonaws.com"
-            Action: 
-              - "sts:AssumeRoleWithWebIdentity"
-            Condition:
-              StringEquals:
-                cognito-identity.amazonaws.com:aud: 
-                - !Ref CognitoIdPool
-              ForAnyValue:StringLike:
-                cognito-identity.amazonaws.com:amr:
-                - "authenticated"
-      Path: "/"
-      Policies: 
-        - 
-          PolicyName: "QuickSightCreateUser"
-          PolicyDocument: 
-            Version: "2012-10-17"
-            Statement: 
-              - 
-                Effect: "Allow"
-                Action: "quicksight:CreateUser"
-                Resource: "*"
-  AuthRoleAttach:
-    Type: "AWS::Cognito::IdentityPoolRoleAttachment"
-    Properties:
-      IdentityPoolId: !Ref CognitoIdPool
-      Roles: 
-        authenticated: !GetAtt AuthRole.Arn
-
   Home:
     Type: AWS::Serverless::Function
     Properties:
