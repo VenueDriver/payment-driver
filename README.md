@@ -91,6 +91,12 @@ Run this:
 
 (or you can run: ```npm run assets```)
 
+#### Install Node modules
+
+The Lambda code running in SAM Local will need to be able to access the project's dependencies in the `node_modules` folder.  Create that and download those packages with:
+
+    npm install
+
 #### Start an HTTP server with SAM Local
 
 Use SAM Local for development:
