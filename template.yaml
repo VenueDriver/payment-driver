@@ -96,9 +96,15 @@ Resources:
           Properties:
             Path: /
             Method: get
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
 
   Login:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: home.login
       Runtime: nodejs8.10
@@ -112,6 +118,9 @@ Resources:
 
   Logout:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: home.logout
       Runtime: nodejs8.10
@@ -125,6 +134,9 @@ Resources:
 
   PaymentRequests:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payment-requests.index
       Runtime: nodejs8.10
@@ -138,6 +150,9 @@ Resources:
 
   PaymentRequestsNew:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payment-requests.new
       Runtime: nodejs8.10
@@ -151,6 +166,9 @@ Resources:
 
   PostPaymentRequest:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payment-requests.post
       Runtime: nodejs8.10
@@ -164,6 +182,9 @@ Resources:
 
   ResendPaymentRequest:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payment-requests.resend
       Runtime: nodejs8.10
@@ -177,6 +198,9 @@ Resources:
 
   PaymentForm:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payments.get
       Runtime: nodejs8.10
@@ -190,6 +214,9 @@ Resources:
 
   ProcessPayment:
     Type: AWS::Serverless::Function
+    Role:
+      Fn::ImportValue:
+        !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
     Properties:
       Handler: payments.post
       Runtime: nodejs8.10
