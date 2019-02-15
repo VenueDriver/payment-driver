@@ -7,3 +7,4 @@ coverage.txt
 .env
 *.db
 npm-debug.log
+packaged-dev.yaml
