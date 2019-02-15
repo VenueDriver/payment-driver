@@ -1,5 +1,7 @@
 'use strict'
 const fs = require('fs')
+const template = require('./lib/TemplateRenderer/index');
+const Response = require('./lib/Response/index');
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
@@ -32,6 +34,7 @@ const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
 const authorizer = new APIGatewayAuthorizer()
 
 exports.index = async function (event, context) {
+  console.log("HOMEEEE")
   // Check for the access token cookie and verify it if it exists.
   var accessToken
   try {
@@ -46,7 +49,9 @@ exports.index = async function (event, context) {
   if (!accessToken) {
     // Respond with the login form so that the user can provide their
     // authentication credentials.
-    return loginFormResponse(event, {});
+    // return loginFormResponse(event, {});
+    console.log("Response:",new Response('html').send(template.render('home')));
+    return new Response('html').send(template.render('home'));
   }
 
   return redirectToPaymentRequestsResponse(event)
