@@ -44,6 +44,10 @@ You want to use the same Node version that the Lambda functions use:
 
     nvm install 8.10
 
+Make that the default:
+
+    nvm alias default node
+
 #### Set up Stripe keys
 
 Be sure to set the Stripe keys as environment variables in your `.env` file.
