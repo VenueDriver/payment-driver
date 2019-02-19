@@ -50,8 +50,11 @@ exports.index = async function (event, context) {
     // Respond with the login form so that the user can provide their
     // authentication credentials.
     // return loginFormResponse(event, {});
-    console.log("Response:",new Response('html').send(template.render('home')));
-    return new Response('html').send(template.render('home'));
+
+    return new Response('html').send(
+      await template.render('home')
+    );
+
   }
 
   return redirectToPaymentRequestsResponse(event)
