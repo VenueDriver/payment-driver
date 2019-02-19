@@ -68,7 +68,7 @@ Resources:
     Type: "AWS::Cognito::UserPool"
     Properties:
       UserPoolName: PaymentDriver
-  CognitoUserPoolClient:    
+  CognitoUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
         ClientName: PaymentDriver
@@ -78,7 +78,7 @@ Resources:
     Type: "AWS::Cognito::IdentityPool"
     Properties:
       IdentityPoolName: PaymentDriver
-      CognitoIdentityProviders: 
+      CognitoIdentityProviders:
         -
           ClientId: !Ref CognitoUserPoolClient
           ProviderName: !GetAtt CognitoUserPool.ProviderName
@@ -105,6 +105,7 @@ Resources:
     Properties:
       Handler: home.index
       Runtime: nodejs8.10
+      Timeout: 10
       Policies: AmazonDynamoDBFullAccess
       Events:
         GetEvent:
