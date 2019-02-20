@@ -10,8 +10,6 @@ module.exports = {
     "ProjectId": "1234abc",
     "CompanyName": process.env.COMPANY_NAME || "local",
     "SenderEmail": process.env.SENDER_EMAIL || "local",
-    "ClientId": process.env.CLIENT_ID || "local",
-    "UserPoolId": process.env.USER_POOL_ID || "local",
     "StripeSecretKey": process.env.STRIPE_SECRET_KEY || "local",
     "StripePublishableKey": process.env.STRIPE_PUBLISHABLE_KEY || "local"
   },

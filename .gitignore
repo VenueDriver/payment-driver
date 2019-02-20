@@ -8,3 +8,4 @@ coverage.txt
 *.db
 npm-debug.log
 packaged-dev.yaml
+tmp/

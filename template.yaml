@@ -7,13 +7,9 @@ Parameters:
     Type: String
   SenderEmail:
     Type: String
-  UserPoolId:
-    Type: String
   StripeSecretKey:
     Type: String
   StripePublishableKey:
-    Type: String
-  ClientId:
     Type: String
   Environment:
     Type: String
@@ -67,45 +63,38 @@ Resources:
   CognitoUserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: PaymentDriver
-  CognitoUserPoolClient:    
+      UserPoolName: !Join ['-', [!Ref 'ProjectName', !Ref 'Environment']]
+  CognitoUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-        ClientName: PaymentDriver
-        GenerateSecret: false
-        UserPoolId: !Ref CognitoUserPool
+      ClientName: !Join ['', ['PaymentDriver', !Ref 'Environment']]
+      GenerateSecret: false
+      UserPoolId: !Ref CognitoUserPool
+      ExplicitAuthFlows: [ADMIN_NO_SRP_AUTH]
   CognitoIdPool:
     Type: "AWS::Cognito::IdentityPool"
     Properties:
-      IdentityPoolName: PaymentDriver
+      IdentityPoolName: !Join ['', ['PaymentDriver', !Ref 'Environment']]
       CognitoIdentityProviders: 
         -
           ClientId: !Ref CognitoUserPoolClient
           ProviderName: !GetAtt CognitoUserPool.ProviderName
       AllowUnauthenticatedIdentities: false
 
-  PaymentDriverRole:
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action:
-          - sts:AssumeRole
-        Effect: Allow
-        Principal:
-          Service:
-          - lambda.amazonaws.com
-        Version: '2012-10-17'
-      ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    Type: AWS::IAM::Role
-
   Home:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: home.index
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -115,11 +104,18 @@ Resources:
 
   Login:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: home.login
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
+         Statement:
+           - Effect: Allow
+             Action:
+               - cognito-idp:AdminInitiateAuth
+             Resource: !GetAtt CognitoUserPool.Arn
       Events:
         GetEvent:
           Type: Api
@@ -129,11 +125,18 @@ Resources:
 
   Logout:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: home.logout
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -143,11 +146,18 @@ Resources:
 
   PaymentRequests:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payment-requests.index
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -157,11 +167,18 @@ Resources:
 
   PaymentRequestsNew:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payment-requests.new
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -171,11 +188,18 @@ Resources:
 
   PostPaymentRequest:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payment-requests.post
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -185,11 +209,18 @@ Resources:
 
   ResendPaymentRequest:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payment-requests.resend
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -199,11 +230,18 @@ Resources:
 
   PaymentForm:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payments.get
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -213,11 +251,18 @@ Resources:
 
   ProcessPayment:
     Type: AWS::Serverless::Function
-    Role: !GetAtt PaymentDriverRole.Arn
     Properties:
       Handler: payments.post
       Runtime: nodejs8.10
-      Policies: AmazonDynamoDBFullAccess
+      Policies:
+       - AWSLambdaExecute # Managed Policy
+       - Version: '2012-10-17' # Policy Document
+         Statement:
+           - Effect: Allow
+             Action:
+               - s3:GetObject
+               - s3:GetObjectACL
+             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
