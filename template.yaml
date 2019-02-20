@@ -86,15 +86,8 @@ Resources:
     Properties:
       Handler: home.index
       Runtime: nodejs8.10
-      Policies:
-       - AWSLambdaExecute # Managed Policy
-       - Version: '2012-10-17' # Policy Document
-         Statement:
-           - Effect: Allow
-             Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
+      Timeout: 10
+      Policies: AmazonDynamoDBFullAccess
       Events:
         GetEvent:
           Type: Api
