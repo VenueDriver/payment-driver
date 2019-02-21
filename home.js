@@ -33,19 +33,9 @@ const clientId = process.env.CLIENT_ID
 const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
 const authorizer = new APIGatewayAuthorizer()
 
-
-
-
-
-
 // * ====================================== *
 // * HANDLERS
 // * ====================================== *
-
-
-
-
-
 
 // Index handler
 
@@ -57,26 +47,23 @@ let indexHandler = new BaseHandler("index").willDo(
       accessToken = await authorizer.getValidAccessTokenFromCookie(event)
     }
     catch (error) {
-      // Check for new-password
-      console.log("NEW PASSWORD FORM")
-      return loginFormResponse(event, {});
-    }
-    if (!accessToken) {
-      // Respond with the login form so that the user can provide their
-      // authentication credentials.
+      // Respond with login form if there is an error getting the access token.
       return new Response('html').send(
         await template.render('login')
-      );
-
+      )
+    }
+    if (!accessToken) {
+      // Respond with the login form if the access token is missing,
+      // so that the user can provide their authentication credentials and
+      // get a token.
+      return new Response('html').send(
+        await template.render('login')
+      )
     }
 
     return redirectToPaymentRequestsResponse(event)
   }
-);
-
-
-
-
+)
 
 
 // Login handler
@@ -100,12 +87,14 @@ let loginHandler = new BaseHandler("login").willDo(
           console.log("response: " + JSON.stringify(authResponse))
         }
         else {
-          return loginFormResponse(event, {
-            'message': 'Please change your password to proceed.',
-            'new_password': true, // Show the 'new password' field.
-            'username': params.username,
-            'password': params.password
-          })
+          return new Response('html').send(
+            await template.render('login', {
+              'message': 'Please change your password to proceed.',
+              'new_password': true, // Show the 'new password' field.
+              'username': params.username,
+              'password': params.password
+            })
+          )
         }
       }
 
@@ -114,14 +103,16 @@ let loginHandler = new BaseHandler("login").willDo(
       return redirectToPaymentRequestsResponse(event, authResponse.AuthenticationResult.AccessToken)
     }
     catch (error) {
-      return loginFormResponse(event, {
-        'message': error,
-        'username': params.username,
-        'password': params.password
-      })
+      return new Response('html').send(
+        await template.render('login', {
+          'message': error,
+          'username': params.username,
+          'password': params.password
+        })
+      )
     }
   }
-);
+)
 
 
 
