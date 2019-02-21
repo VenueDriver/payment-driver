@@ -107,7 +107,7 @@ Resources:
          Statement:
            - Effect: Allow
              Action:
-               - cognito-idp:AdminInitiateAuth
+               - cognito-idp:*
              Resource: !GetAtt CognitoUserPool.Arn
       Events:
         GetEvent:
