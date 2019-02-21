@@ -17,8 +17,8 @@
     "coverage": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests node_modules/.bin/nyc npm test && node_modules/.bin/nyc report --reporter=text-lcov | node_modules/coveralls/bin/coveralls.js -v",
     "assets": "node-http-server root=public port=8081 verbose=true &",
     "dynamodb": "docker start dynamodb",
-    "start": "sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
-    "development": "npm run dynamodb; npm run assets; npm run start",
+    "server": "sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
+    "start": "npm run dynamodb; npm run assets; npm run server",
     "stop": "killall sam; killall node",
     "restart": "npm run stop; npm run development"
   },
