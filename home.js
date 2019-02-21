@@ -6,7 +6,6 @@ const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
 const moment = require('moment')
-const urljoin = require('url-join')
 
 // Load environment variables and override anything already set.
 const dotenv = require('dotenv')
@@ -34,7 +33,6 @@ const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
 const authorizer = new APIGatewayAuthorizer()
 
 exports.index = async function (event, context) {
-  console.log("HOMEEEE")
   // Check for the access token cookie and verify it if it exists.
   var accessToken
   try {
@@ -49,10 +47,8 @@ exports.index = async function (event, context) {
   if (!accessToken) {
     // Respond with the login form so that the user can provide their
     // authentication credentials.
-    // return loginFormResponse(event, {});
-
     return new Response('html').send(
-      await template.render('home')
+      await template.render('login', event)
     );
 
   }
@@ -109,28 +105,6 @@ exports.logout = async function (event, context) {
       // Remove the access token cookie.
       'Set-Cookie': 'access_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
     }
-  }
-}
-
-// Respond with the login form so that the user can provide their
-// authentication credentials.
-function loginFormResponse(event, templateParameters) {
-  var templateParameters = Object.assign(templateParameters, {
-    'base_url_path': function () {
-      return function (text, render) {
-        return urljoin(event.requestContext.path, render(text));
-      }
-    },
-    'assets_host': process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
-  })
-
-  var template = fs.readFileSync('templates/login.mustache', 'utf8')
-  var html = mustache.render(template, templateParameters, partials())
-
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'text/html' },
-    body: html.toString()
   }
 }
 
