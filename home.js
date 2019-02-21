@@ -48,7 +48,7 @@ let indexHandler = new BaseHandler("index").willDo(
     }
     catch (error) {
       // Respond with login form if there is an error getting the access token.
-      return new Response('html').send(
+      return new Response('200').send(
         await template.render('login')
       )
     }
@@ -56,12 +56,14 @@ let indexHandler = new BaseHandler("index").willDo(
       // Respond with the login form if the access token is missing,
       // so that the user can provide their authentication credentials and
       // get a token.
-      return new Response('html').send(
+      return new Response('200').send(
         await template.render('login')
       )
     }
 
-    return redirectToPaymentRequestsResponse(event)
+    // Redirect to the home of the authenticated management area if the
+    // token is detected and valid.
+    redirectToPaymentRequestsResponse(event, accessToken)
   }
 )
 
@@ -87,7 +89,7 @@ let loginHandler = new BaseHandler("login").willDo(
           console.log("response: " + JSON.stringify(authResponse))
         }
         else {
-          return new Response('html').send(
+          return new Response('200').send(
             await template.render('login', {
               'message': 'Please change your password to proceed.',
               'new_password': true, // Show the 'new password' field.
@@ -98,12 +100,15 @@ let loginHandler = new BaseHandler("login").willDo(
         }
       }
 
-      console.log("Verifying access token: " + authResponse.AuthenticationResult.AccessToken)
-      await authenticator.verifyCognitoToken(authResponse.AuthenticationResult.AccessToken)
-      return redirectToPaymentRequestsResponse(event, authResponse.AuthenticationResult.AccessToken)
+      // Verify access token.
+      await authenticator.verifyCognitoToken(
+        authResponse.AuthenticationResult.AccessToken)
+      // TODO: This should only happen if the token was valid.
+      return redirectToPaymentRequestsResponse(event,
+        authResponse.AuthenticationResult.AccessToken)
     }
     catch (error) {
-      return new Response('html').send(
+      return new Response('200').send(
         await template.render('login', {
           'message': error,
           'username': params.username,
@@ -115,43 +120,41 @@ let loginHandler = new BaseHandler("login").willDo(
 )
 
 
-
-
-
-
 // Logout handler
 let logoutHandler = new BaseHandler("logout").willDo(
   async function (event, context) {
-    return {
-      statusCode: 302,
+    return new Response('302').send({
       headers: {
         location: 'https://' + event.headers.Host + '/',
         // Remove the access token cookie.
         'Set-Cookie': 'access_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
       }
-    }
+    })
   }
-);
+)
 
 
+// * ====================================== *
+// * FUNCTIONS
+// * ====================================== *
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
-  var headers = { location: 'https://' + event.headers.Host + '/payment-requests' }
-  if (accessToken) {
-    // This is a session cookie, since it has no expiration set.
-    headers['Set-Cookie'] = 'access_token = ' + accessToken + "; Secure; SameSite=Strict"
-  }
-  console.log("Redirecting: " + JSON.stringify(headers))
-  return {
-    statusCode: 302,
-    headers: headers
-  }
+      return new Response('302').send({
+      headers: {
+        // The home path of the authenticated management section.
+        location: 'https://' + event.headers.Host + '/payment-requests',
+        // Add the authentication token as a cookie.      
+        'Set-Cookie':
+          // This is a session cookie, since it has no expiration set.
+          'access_token = ' + accessToken + "; Secure; SameSite=Strict"
+      }
+    })
 }
 
 // * ====================================== *
 // * EXPORTS
 // * ====================================== *
 
-exports.index   = indexHandler.do;
-exports.login   = loginHandler.do;
-exports.logout  = logoutHandler.do;
+exports.index   = indexHandler.do
+exports.login   = loginHandler.do
+exports.logout  = logoutHandler.do
