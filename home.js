@@ -38,7 +38,9 @@ const authorizer = new APIGatewayAuthorizer()
 // * ====================================== *
 
 // Index handler
-
+// This is the home page of the app.
+// If you're not authenticated then you will be asked to log in.
+// If you're authenticated then you will be redirected to the management UI.
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
     // Check for the access token cookie and verify it if it exists.
@@ -63,12 +65,16 @@ let indexHandler = new BaseHandler("index").willDo(
 
     // Redirect to the home of the authenticated management area if the
     // token is detected and valid.
-    redirectToPaymentRequestsResponse(event, accessToken)
+    return redirectToPaymentRequestsResponse(event, accessToken)
   }
 )
 
 
 // Login handler
+// If you provide valid credentials but you need to change your password
+// according to Cognito, then you will see a form to change your password.
+// If you provide valid credentials and you do not need to change your password,
+// then you will be redirected to the management UI.
 let loginHandler = new BaseHandler("login").willDo(
   async function (event, context) {
     const params = querystring.parse(event.body)
@@ -80,13 +86,11 @@ let loginHandler = new BaseHandler("login").willDo(
         password: params.password
       })
 
-      console.log("Successful Authentication.")
-
       if (authResponse.ChallengeName == 'NEW_PASSWORD_REQUIRED') {
         if (params.new_password) {
-          console.log("last response: " + JSON.stringify(authResponse))
-          authResponse = await authenticator.respondToAuthChallenge(authResponse, params.username, params.new_password)
-          console.log("response: " + JSON.stringify(authResponse))
+          authResponse =
+            await authenticator.respondToAuthChallenge(
+              authResponse, params.username, params.new_password)
         }
         else {
           return new Response('200').send(
@@ -139,16 +143,16 @@ let logoutHandler = new BaseHandler("logout").willDo(
 // * ====================================== *
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
-      return new Response('302').send({
-      headers: {
-        // The home path of the authenticated management section.
-        location: 'https://' + event.headers.Host + '/payment-requests',
-        // Add the authentication token as a cookie.      
-        'Set-Cookie':
-          // This is a session cookie, since it has no expiration set.
-          'access_token = ' + accessToken + "; Secure; SameSite=Strict"
-      }
-    })
+  return new Response('302').send({
+    headers: {
+      // The home path of the authenticated management section.
+      location: 'https://' + event.headers.Host + '/payment-requests',
+      // Add the authentication token as a cookie.      
+      'Set-Cookie':
+        // This is a session cookie, since it has no expiration set.
+        'access_token = ' + accessToken + "; Secure; SameSite=Strict"
+    }
+  })
 }
 
 // * ====================================== *
