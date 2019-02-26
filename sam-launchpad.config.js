@@ -12,6 +12,7 @@ module.exports = {
     "SenderEmail": process.env.SENDER_EMAIL || "local",
     "StripeSecretKey": process.env.STRIPE_SECRET_KEY || "local",
     "StripePublishableKey": process.env.STRIPE_PUBLISHABLE_KEY || "local"
+    "ThemeName": process.env.THEME_NAME || ""
   },
   "commands": {
     "build": "exit 0",

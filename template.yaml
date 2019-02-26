@@ -17,6 +17,8 @@ Parameters:
     Type: String
   ProjectId:
     Type: String
+  ThemeName:
+    Type: String
 
 Globals:
   Function:
@@ -33,6 +35,7 @@ Globals:
         BASE_URL: http://example.com
         REGION: us-east-1
         ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket' ] ]
+        THEME_NAME: !Ref 'ThemeName'
 
 Resources:
 
@@ -75,7 +78,7 @@ Resources:
     Type: "AWS::Cognito::IdentityPool"
     Properties:
       IdentityPoolName: !Join ['', ['PaymentDriver', !Ref 'Environment']]
-      CognitoIdentityProviders: 
+      CognitoIdentityProviders:
         -
           ClientId: !Ref CognitoUserPoolClient
           ProviderName: !GetAtt CognitoUserPool.ProviderName
