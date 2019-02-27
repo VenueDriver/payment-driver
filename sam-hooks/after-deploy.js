@@ -13,11 +13,11 @@ const syncAssets = (options) => {
     const stackName = getStackName(options, appName);
     const stack = await getStack(stackName);
     const projectPath = ".";
-    const publicDir = join(__dirname, `../${projectPath}/public`);
+    const themesDirectory = join(__dirname, `../${projectPath}/themes`);
     const bucketName = stack.Outputs
       .find(data => data.OutputKey == "AssetsLogicAddress")
       .OutputValue;
-    exec(`aws s3 sync ${publicDir} s3://${bucketName}/ --acl public-read --exclude "*.mustache"`,
+    exec(`aws s3 sync ${themesDirectory} s3://${bucketName}/ --acl public-read --exclude "*.mustache"`,
       (error, stdout, stderr) => {
         if (error) {
           console.log(stderr);
