@@ -15,12 +15,12 @@
     "test": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests node_modules/.bin/nyc node_modules/mocha/bin/mocha",
     "test-watch": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests node_modules/mocha/bin/mocha -R min --watch --watch-extensions yml,csv",
     "coverage": "PAYMENT_REQUESTS_TABLE_NAME=payment_requests node_modules/.bin/nyc npm test && node_modules/.bin/nyc report --reporter=text-lcov | node_modules/coveralls/bin/coveralls.js -v",
-    "assets": "node-http-server root=public port=8081 verbose=true &",
+    "assets": "node-http-server root=themes port=8081 verbose=true &",
     "dynamodb": "docker start dynamodb",
     "server": "sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
     "start": "npm run dynamodb; npm run assets; npm run server",
     "stop": "killall sam; killall node",
-    "restart": "npm run stop; npm run development"
+    "restart": "npm run stop; npm run start"
   },
   "repository": {
     "type": "git",
