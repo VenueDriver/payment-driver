@@ -5,6 +5,9 @@ const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
 const moment = require('moment')
 const AWS = require('aws-sdk')
+const Response = require('./lib/Response/index')
+const template = require('./lib/TemplateRenderer/index')
+const BaseHandler = require('./lib/BaseHandler/index')
 
 // Load environment variables and override anything already set.
 const dotenv = require('dotenv')
@@ -23,180 +26,124 @@ const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotif
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
-exports.index = async function (event, context) {
-  var templateParameters
-  var template
 
-  try {
-    // If a payment request ID and created_at time stamp was provided as
-    // parameters, then show that payment request instead of the list.
-    if (event.queryStringParameters &&
-      event.queryStringParameters.id &&
-      event.queryStringParameters.created_at) {
-      var id = event.queryStringParameters.id
-      var created_at = event.queryStringParameters.created_at
-      templateParameters = await PaymentRequest.get(id, created_at)
-      templateParameters.payment_id = templateParameters.payment.id
-      templateParameters.paid_at_moment = function () {
-        return moment(this.paid_at).fromNow()
+// * ====================================== *
+// * HANDLERS
+// * ====================================== *
+
+let indexHandler = new BaseHandler("index").willDo(
+  async function (event, context) {
+    var templateParameters
+  
+    try {
+      // If a payment request ID and created_at time stamp was provided as
+      // parameters, then show that payment request instead of the list.
+      if (event.queryStringParameters &&
+        event.queryStringParameters.id &&
+        event.queryStringParameters.created_at) {
+        var id = event.queryStringParameters.id
+        var created_at = event.queryStringParameters.created_at
+        templateParameters = await PaymentRequest.get(id, created_at)
+        templateParameters.payment_id = templateParameters.payment.id
+        templateParameters.paid_at_moment = function () {
+          return moment(this.paid_at).fromNow()
+        }
+        templateParameters.assets_host = process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
       }
-      templateParameters.assets_host = process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
-
-      var template = fs.readFileSync('templates/payment-request.mustache', 'utf8')
-    }
-    else {
-      var paymentRequests = await PaymentRequest.index()
-
-      templateParameters = {
-        'paymentRequests': paymentRequests,
-        'created_at_escaped': function () {
-          return encodeURIComponent(this.created_at)
-        },
-        "created_at_moment": function () {
-          return moment(this.created_at).fromNow()
-        },
-        'assets_host': '//' + event.headers.Host + ':8081'
+      else {
+        var paymentRequests = await PaymentRequest.index()
+  
+        templateParameters = {
+          'paymentRequests': paymentRequests,
+          'created_at_escaped': function () {
+            return encodeURIComponent(this.created_at)
+          },
+          "created_at_moment": function () {
+            return moment(this.created_at).fromNow()
+          },
+          'assets_host': '//' + event.headers.Host + ':8081'
+        }
       }
-      template = fs.readFileSync('templates/payment-requests.mustache', 'utf8')
+      
+      return new Response('200').send(
+        await template.render('payment-requests', templateParameters))
     }
-
-    var html = mustache.render(template, templateParameters, partials())
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
+    catch (error) {
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
     }
   }
-  catch (error) {
-    var templateParamemters = {
-      'assets_host': '//' + event.headers.Host + ':8081',
-      'error': error
+)
+
+let newHandler = new BaseHandler("new").willDo(
+  async function (event, context) {
+    return new Response('200').send(
+      await template.render('payment-request-form'))
+  }
+)
+
+let postHandler = new BaseHandler("post").willDo(
+  async function (event, context) {
+
+    // Create the payment request record
+    var paymentRequest = querystring.parse(event.body)
+    paymentRequest['id'] = uuidv1()
+  
+    try {
+      await PaymentRequest.put(paymentRequest)
+      var templateParameters = paymentRequest
+  
+      // This notification goes to the customer.
+      templateParameters.subject = "Payment request from " + company
+      templateParameters.to = paymentRequest.email
+      var templateName = 'payment-request-email-to-customer'
+      await EmailNotification.sendEmail(templateName, templateParameters)
+  
+      // This notification goes to the requestor.
+      templateParameters.subject = "Payment request to " + paymentRequest.email
+      templateParameters.to = paymentRequest.requestor
+      templateName = 'payment-request-email-to-requestor'
+      await EmailNotification.sendEmail(templateName, templateParameters)
+  
+      return new Response('200').send(
+        await template.render('payment-request-confirmation', templateParameters))
     }
-
-    var template = fs.readFileSync('templates/error.mustache', 'utf8')
-    var html = mustache.render(template, templateParamemters, partials())
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
+    catch (error) {
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
     }
   }
-}
+)
 
-exports.new = async function (event, context) {
-  var templateParamemters = {
-    'assets_host': '//' + event.headers.Host + ':8081'
-  }
-  var template = fs.readFileSync('templates/payment-request-form.mustache', 'utf8')
-  var html = mustache.render(template, templateParamemters, partials())
+let resendHandler = new BaseHandler("resend").willDo(
+  async function (event, context) {
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'text/html' },
-    body: html.toString()
-  }
-}
+    try {
+      var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
+      var templateParameters = paymentRequest
 
-exports.post = async function (event, context) {
+      // This notification goes to the customer.
+      templateParameters.subject = "Payment request from " + company
+      templateParameters.to = paymentRequest.email
+      var templateName = 'payment-request-email-to-customer'
+      await EmailNotification.sendEmail(templateName, templateParameters)
 
-  // Create the payment request record
-  var paymentRequest = querystring.parse(event.body)
-  paymentRequest['id'] = uuidv1()
-
-  try {
-    await PaymentRequest.put(paymentRequest)
-
-    var templateParameters = paymentRequest
-    templateParameters.assets_host = process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
-
-    // Add 'Origin' from API Gateway so that the email can include a URL
-    // back to this same instance of the web app.
-    templateParameters.origin = event['headers']['Origin']
-    if (process.env.BASE_URL) {
-      templateParameters.base_url = process.env.BASE_URL
+      return new Response('200').send(
+        await template.render('payment-request-resent', templateParameters))
     }
-    else {
-      templateParameters.base_url = templateParameters.origin
-    }
-
-    // This notification goes to the customer.
-    templateParameters.subject = "Payment request from " + company
-    templateParameters.to = paymentRequest.email
-    var templateName = 'payment-request-email-to-customer'
-    await EmailNotification.sendEmail(templateName, templateParameters)
-
-    // This notification goes to the requestor.
-    templateParameters.subject = "Payment request to " + paymentRequest.email
-    templateParameters.to = paymentRequest.requestor
-    templateName = 'payment-request-email-to-requestor'
-    await EmailNotification.sendEmail(templateName, templateParameters)
-
-    var template = fs.readFileSync('templates/payment-request-confirmation.mustache', 'utf8')
-    var html = mustache.render(template, paymentRequest, partials())
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
+    catch (error) {
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
     }
   }
-  catch (error) {
-    var parameters = { 'error': error }
+)
 
-    var template = fs.readFileSync('templates/error.mustache', 'utf8')
-    var html = mustache.render(template, parameters, partials())
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
-    }
-  }
-}
+// * ====================================== *
+// * EXPORTS
+// * ====================================== *
 
-exports.resend = async function (event, context) {
-  try {
-    var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
-    var templateParameters = paymentRequest
-    templateParameters.assets_host = process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
-
-    // Add 'Origin' from API Gateway so that the email can include a URL
-    // back to this same instance of the web app.
-    templateParameters.origin = event['headers']['Origin']
-    if (process.env.BASE_URL) {
-      templateParameters.base_url = process.env.BASE_URL
-    }
-    else {
-      templateParameters.base_url = templateParameters.origin
-    }
-
-    // This notification goes to the customer.
-    templateParameters.subject = "Payment request from " + company
-    templateParameters.to = paymentRequest.email
-    var templateName = 'payment-request-email-to-customer'
-    await EmailNotification.sendEmail(templateName, templateParameters)
-
-    var template = fs.readFileSync('templates/payment-request-resent.mustache', 'utf8')
-    var html = mustache.render(template, paymentRequest, partials())
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
-    }
-  }
-  catch (error) {
-    var parameters = { 'error': error }
-
-    var template = fs.readFileSync('templates/error.mustache', 'utf8')
-    var html = mustache.render(template, parameters, partials())
-
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'text/html' },
-      body: html.toString()
-    }
-  }
-}
+exports.index  = indexHandler.do
+exports.new    = newHandler.do
+exports.post   = postHandler.do
+exports.resend = resendHandler.do
