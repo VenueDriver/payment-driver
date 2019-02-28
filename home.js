@@ -1,8 +1,8 @@
 'use strict'
 const fs = require('fs')
-const template = require('./lib/TemplateRenderer/index')
-const Response = require('./lib/Response/index')
-const BaseHandler = require('./lib/BaseHandler/index')
+const template = require('./lib/TemplateRenderer')
+const Response = require('./lib/Response')
+const BaseHandler = require('./lib/BaseHandler')
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
 const mustache = require('mustache')
@@ -147,7 +147,7 @@ function redirectToPaymentRequestsResponse(event, accessToken) {
     headers: {
       // The home path of the authenticated management section.
       location: 'https://' + event.headers.Host + '/payment-requests',
-      // Add the authentication token as a cookie.      
+      // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.
         'access_token = ' + accessToken + "; Secure; SameSite=Strict"
