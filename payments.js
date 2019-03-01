@@ -101,12 +101,6 @@ let postHandler = new BaseHandler("post").willDo(
   
       var templateParameters = paymentRequest
 
-      // TODO: DRY this duplicate base_url computation code.
-      // This is here because global.handler.base_url is not set yet.
-      let pathRegex = new RegExp(event.requestContext.resourcePath+"$");
-      let base_path = event.requestContext.path.replace(pathRegex,'');
-      global.handler.base_url = `https://${event.headers['Host']}${base_path}/`;
-  
       // This notification goes to the customer.
       templateParameters.subject = "Payment to " + company
       templateParameters.to = paymentRequest.email
