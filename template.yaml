@@ -147,6 +147,7 @@ Resources:
       Runtime: nodejs8.10
       Policies:
        - AWSLambdaExecute # Managed Policy
+       - AmazonDynamoDBFullAccess
        - Version: '2012-10-17' # Policy Document
          Statement:
            - Effect: Allow
@@ -168,6 +169,7 @@ Resources:
       Runtime: nodejs8.10
       Policies:
        - AWSLambdaExecute # Managed Policy
+       - AmazonDynamoDBFullAccess
        - Version: '2012-10-17' # Policy Document
          Statement:
            - Effect: Allow
@@ -189,6 +191,7 @@ Resources:
       Runtime: nodejs8.10
       Policies:
        - AWSLambdaExecute # Managed Policy
+       - AmazonDynamoDBFullAccess
        - Version: '2012-10-17' # Policy Document
          Statement:
            - Effect: Allow
@@ -210,6 +213,7 @@ Resources:
       Runtime: nodejs8.10
       Policies:
        - AWSLambdaExecute # Managed Policy
+       - AmazonDynamoDBFullAccess
        - Version: '2012-10-17' # Policy Document
          Statement:
            - Effect: Allow
