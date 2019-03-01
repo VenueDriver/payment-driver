@@ -131,7 +131,7 @@ function redirectToPaymentRequestsResponse(event, accessToken) {
   return new Response('302').send({
     headers: {
       // The home path of the authenticated management section.
-      location: 'https://' + event.headers.Host.replace(/\:\d+$/g, '') + '/payment-requests',
+      location: global.handler.base_url + 'payment-requests',
       // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.
