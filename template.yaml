@@ -219,7 +219,7 @@ Resources:
            - Effect: Allow
              Action:
                - ses:*
-             Resource: *
+             Resource: '*'
          Statement:
            - Effect: Allow
              Action:
