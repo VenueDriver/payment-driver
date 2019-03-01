@@ -10,10 +10,11 @@
 <body>
 
   <div class="container">
-    <img alt="Payment Driver" src="{{assets_host}}/assets/img/Payment-Driver-logo.png" class="logo" />
+    <img alt="Payment Driver" src="{{#full_theme_asset_url}}assets/img/logo.png{{/full_theme_asset_url}}" class="logo" />
 
     <form method="post" action="payments">
       <input type="hidden" name="payment_request_id" id="payment_request_id" value="{{id}}" />
+      <input type="hidden" name="payment_request_created_at" id="payment_request_created_at" value="{{created_at}}" />
       <fieldset>
         <div class="d-flex w-100 justify-content-between">
           {{^paid}}

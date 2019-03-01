@@ -91,7 +91,7 @@
 
           <a class="btn btn-secondary" href="/payment-requests" role="button">back</a>
           {{^paid}}
-          <a class="btn btn-primary" href="/payment-requests-resend?id={{id}}" role="button">re-send</a>
+          <a class="btn btn-primary" href="/payment-requests-resend?id={{id}}&created_at={{created_at}}" role="button">re-send</a>
           {{/paid}}
         </fieldset>
       </form>

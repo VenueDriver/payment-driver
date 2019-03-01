@@ -1,37 +1,14 @@
 'use strict'
-const fs = require('fs')
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
 const querystring = require('querystring')
-const uuidv1 = require('uuid/v1')
-const mustache = require('mustache')
-const moment = require('moment')
-
-// Load environment variables and override anything already set.
-const dotenv = require('dotenv')
-try {
-  const envConfig = dotenv.parse(fs.readFileSync('.env'))
-  for (var k in envConfig) { process.env[k] = envConfig[k] }
-}
-catch (err) {
-  // There will not be a .env file in production.
-}
-
-const partials = require('./partial-html-templates')
-const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
-const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const APIGatewayAuthorizer = require('./lib/APIGatewayAuthorizer.js')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
 const CognitoAuthenticator = require('./lib/CognitoAuthenticator.js')
-const userPoolId = process.env.USER_POOL_ID
-const region = process.env.AWS_REGION
-const clientId = process.env.CLIENT_ID
-const authenticator = new CognitoAuthenticator(region, userPoolId, clientId)
-const authorizer = new APIGatewayAuthorizer()
 
 // * ====================================== *
 // * HANDLERS
@@ -78,6 +55,13 @@ let indexHandler = new BaseHandler("index").willDo(
 let loginHandler = new BaseHandler("login").willDo(
   async function (event, context) {
     const params = querystring.parse(event.body)
+
+    const authenticator =
+      new CognitoAuthenticator(
+        process.env.AWS_REGION,
+        process.env.USER_POOL_ID,
+        process.env.CLIENT_ID)
+    const authorizer = new APIGatewayAuthorizer()
 
     var authResponse
     try {
@@ -143,10 +127,11 @@ let logoutHandler = new BaseHandler("logout").willDo(
 // * ====================================== *
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
+  console.log("HOST: " + event.headers.Host.replace(/\:\d+$/g, ''))
   return new Response('302').send({
     headers: {
       // The home path of the authenticated management section.
-      location: 'https://' + event.headers.Host + '/payment-requests',
+      location: 'https://' + event.headers.Host.replace(/\:\d+$/g, '') + '/payment-requests',
       // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.

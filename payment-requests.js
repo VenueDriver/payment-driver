@@ -1,31 +1,16 @@
 'use strict'
-const fs = require('fs')
+const template = require('./lib/TemplateRenderer')
+const Response = require('./lib/Response')
+const BaseHandler = require('./lib/BaseHandler')
 const querystring = require('querystring')
 const uuidv1 = require('uuid/v1')
-const mustache = require('mustache')
 const moment = require('moment')
 const AWS = require('aws-sdk')
-const Response = require('./lib/Response/index')
-const template = require('./lib/TemplateRenderer/index')
-const BaseHandler = require('./lib/BaseHandler/index')
-
-// Load environment variables and override anything already set.
-const dotenv = require('dotenv')
-try {
-  const envConfig = dotenv.parse(fs.readFileSync('.env'))
-  for (var k in envConfig) { process.env[k] = envConfig[k] }
-}
-catch (err) {
-  // There will not be a .env file in production.
-}
-
-const partials = require('./partial-html-templates')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
-
 
 // * ====================================== *
 // * HANDLERS
@@ -48,11 +33,13 @@ let indexHandler = new BaseHandler("index").willDo(
         templateParameters.paid_at_moment = function () {
           return moment(this.paid_at).fromNow()
         }
-        templateParameters.assets_host = process.env.ASSETS_HOST || '//' + (event.headers.Host + ':8081')
+
+        return new Response('200').send(
+          await template.render('payment-request', templateParameters))
       }
       else {
         var paymentRequests = await PaymentRequest.index()
-  
+
         templateParameters = {
           'paymentRequests': paymentRequests,
           'created_at_escaped': function () {
@@ -60,13 +47,12 @@ let indexHandler = new BaseHandler("index").willDo(
           },
           "created_at_moment": function () {
             return moment(this.created_at).fromNow()
-          },
-          'assets_host': '//' + event.headers.Host + ':8081'
+          }
         }
+        
+        return new Response('200').send(
+          await template.render('payment-requests', templateParameters))
       }
-      
-      return new Response('200').send(
-        await template.render('payment-requests', templateParameters))
     }
     catch (error) {
       return new Response('200').send(
@@ -97,7 +83,7 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.subject = "Payment request from " + company
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-request-email-to-customer'
-      await EmailNotification.sendEmail(templateName, templateParameters)
+      await EmailNotification.sendEmail(templateName, global.handler.base_url, templateParameters)
   
       // This notification goes to the requestor.
       templateParameters.subject = "Payment request to " + paymentRequest.email
@@ -119,8 +105,17 @@ let resendHandler = new BaseHandler("resend").willDo(
   async function (event, context) {
 
     try {
-      var paymentRequest = await PaymentRequest.get(event.queryStringParameters.id)
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
       var templateParameters = paymentRequest
+      
+      // TODO: DRY this duplicate base_url computation code.
+      // This is here because global.handler.base_url is not set yet.
+      let pathRegex = new RegExp(event.requestContext.resourcePath+"$");
+      let base_path = event.requestContext.path.replace(pathRegex,'');
+      global.handler.base_url = `https://${event.headers['Host']}${base_path}/`;
 
       // This notification goes to the customer.
       templateParameters.subject = "Payment request from " + company

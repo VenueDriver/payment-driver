@@ -5,7 +5,7 @@
   <body>
     <p>{{email}} has made a payment of ${{amount}}.</p>
     <p>Description: {{description}}</p>
-    <p>The payment request is <a href="{{base_url}}/payment-requests?id={{id}}">here.</a></p>
+    <p>The payment request is <a href="{{#full_app_url}}/payment-requests?id={{id}}&created_at={{created_at}}{{/full_app_url}}">here.</a></p>
   </body>
 
 </html>
