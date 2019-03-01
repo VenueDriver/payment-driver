@@ -3,6 +3,7 @@ const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
 const querystring = require('querystring')
+const urljoin     = require('url-join')
 const APIGatewayAuthorizer = require('./lib/APIGatewayAuthorizer.js')
 
 // The company name from the settings, for the email notifications.
@@ -23,6 +24,13 @@ let indexHandler = new BaseHandler("index").willDo(
     // Check for the access token cookie and verify it if it exists.
     var accessToken
     try {
+      const authenticator =
+        new CognitoAuthenticator(
+          process.env.AWS_REGION,
+          process.env.USER_POOL_ID,
+          process.env.CLIENT_ID)
+      const authorizer = new APIGatewayAuthorizer()
+
       accessToken = await authorizer.getValidAccessTokenFromCookie(event)
     }
     catch (error) {
@@ -113,7 +121,7 @@ let logoutHandler = new BaseHandler("logout").willDo(
   async function (event, context) {
     return new Response('302').send({
       headers: {
-        location: 'https://' + event.headers.Host + '/',
+        location: global.handler.base_url,
         // Remove the access token cookie.
         'Set-Cookie': 'access_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
       }
@@ -131,7 +139,7 @@ function redirectToPaymentRequestsResponse(event, accessToken) {
   return new Response('302').send({
     headers: {
       // The home path of the authenticated management section.
-      location: global.handler.base_url + 'payment-requests',
+      location: urljoin(global.handler.base_url, 'payment-requests'),
       // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.
