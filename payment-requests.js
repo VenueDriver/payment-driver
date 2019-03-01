@@ -39,6 +39,14 @@ let indexHandler = new BaseHandler("index").willDo(
       }
       else {
         var paymentRequests = await PaymentRequest.index()
+        
+        // Sort them in mempory.
+        // (Since it's so hard to sort them with DynamoDB.)
+        paymentRequests.sort((a,b)=>{
+          let aDate = new Date(a.created_at);
+          let bDate = new Date(b.created_at);
+          return bDate.getTime() - aDate.getTime();
+        });
 
         templateParameters = {
           'paymentRequests': paymentRequests,
