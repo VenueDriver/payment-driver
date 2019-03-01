@@ -128,10 +128,8 @@ let logoutHandler = new BaseHandler("logout").willDo(
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
   console.log("HOST: " + event.headers.Host.replace(/\:\d+$/g, ''))
-  return new Response('302').send({
+  return new Response('302').redirect('payment-requests',{
     headers: {
-      // The home path of the authenticated management section.
-      location: global.handler.base_url + 'payment-requests',
       // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.
