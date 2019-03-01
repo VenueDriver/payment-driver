@@ -12,7 +12,7 @@
   <div class="container">
     <img alt="Payment Driver" src="{{#full_theme_asset_url}}assets/img/logo.png{{/full_theme_asset_url}}" class="logo" />
 
-    <form method="post" action="payments">
+    <form method="post" action="{{#full_app_url}}payments{{/full_app_url}}">
       <input type="hidden" name="payment_request_id" id="payment_request_id" value="{{id}}" />
       <input type="hidden" name="payment_request_created_at" id="payment_request_created_at" value="{{created_at}}" />
       <fieldset>

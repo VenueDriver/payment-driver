@@ -12,7 +12,7 @@
       {{> logo }}
       {{> navbar }}
 
-      <form method="post" action="/payment-requests" data-toggle="validator">
+      <form method="post" action="{{#full_app_url}}/payment-requests{{/full_app_url}}" data-toggle="validator">
         <fieldset>
           <legend>New payment request</legend>
 
@@ -66,7 +66,7 @@
             <textarea class="form-control" name="description" id="description" placeholder="What is this payment for?"></textarea>
           </div>
 
-          <a class="btn btn-secondary" href="/payment-requests" role="button">cancel</a>
+          <a class="btn btn-secondary" href="{{#full_app_url}}/payment-requests{{/full_app_url}}" role="button">cancel</a>
           <button class="btn btn-large btn-primary" type="submit">send payment request</button>
         </fieldset>
       </form>
