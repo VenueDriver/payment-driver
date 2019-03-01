@@ -220,12 +220,6 @@ Resources:
              Action:
                - ses:*
              Resource: '*'
-         Statement:
-           - Effect: Allow
-             Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
