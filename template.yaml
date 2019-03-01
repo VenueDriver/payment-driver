@@ -125,14 +125,7 @@ Resources:
       Handler: home.logout
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
-       - Version: '2012-10-17' # Policy Document
-         Statement:
-           - Effect: Allow
-             Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
+       - AWSLambdaExecute
       Events:
         GetEvent:
           Type: Api
@@ -146,15 +139,8 @@ Resources:
       Handler: payment-requests.index
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
+       - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
-       - Version: '2012-10-17' # Policy Document
-         Statement:
-           - Effect: Allow
-             Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -168,15 +154,8 @@ Resources:
       Handler: payment-requests.new
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
+       - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
-       - Version: '2012-10-17' # Policy Document
-         Statement:
-           - Effect: Allow
-             Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
       Events:
         GetEvent:
           Type: Api
@@ -190,15 +169,14 @@ Resources:
       Handler: payment-requests.post
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
+       - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
-       - Version: '2012-10-17' # Policy Document
+       - Version: '2012-10-17'
          Statement:
            - Effect: Allow
              Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
+               - ses:*
+             Resource: '*'
       Events:
         GetEvent:
           Type: Api
@@ -212,9 +190,9 @@ Resources:
       Handler: payment-requests.resend
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
+       - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
-       - Version: '2012-10-17' # Policy Document
+       - Version: '2012-10-17'
          Statement:
            - Effect: Allow
              Action:
@@ -233,8 +211,9 @@ Resources:
       Handler: payments.get
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
-       - Version: '2012-10-17' # Policy Document
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
          Statement:
            - Effect: Allow
              Action:
@@ -254,14 +233,14 @@ Resources:
       Handler: payments.post
       Runtime: nodejs8.10
       Policies:
-       - AWSLambdaExecute # Managed Policy
-       - Version: '2012-10-17' # Policy Document
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
          Statement:
            - Effect: Allow
              Action:
-               - s3:GetObject
-               - s3:GetObjectACL
-             Resource: 'arn:aws:s3:::my-bucket/*'
+               - ses:*
+             Resource: '*'
       Events:
         GetEvent:
           Type: Api
