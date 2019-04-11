@@ -19,7 +19,7 @@ const CognitoAuthenticator = require('./lib/CognitoAuthenticator.js')
 // This is the home page of the app.
 // If you're not authenticated then you will be asked to log in.
 // If you're authenticated then you will be redirected to the management UI.
-let indexHandler = new BaseHandler("index").willDo(
+let indexHandler = new BaseHandler("index",{ middlewares : [()=> console.log("\nMIDDLEWARE!\n\n")] }).willDo(
   async function (event, context) {
     // Check for the access token cookie and verify it if it exists.
     var accessToken
