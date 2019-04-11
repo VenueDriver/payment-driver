@@ -10,6 +10,7 @@ const APIGatewayAuthorizer = require('./lib/APIGatewayAuthorizer.js')
 const company = process.env.COMPANY_NAME
 
 const CognitoAuthenticator = require('./lib/CognitoAuthenticator.js')
+const authenticatorMiddleware = require('./middleware/authenticate');
 
 // * ====================================== *
 // * HANDLERS
@@ -19,41 +20,16 @@ const CognitoAuthenticator = require('./lib/CognitoAuthenticator.js')
 // This is the home page of the app.
 // If you're not authenticated then you will be asked to log in.
 // If you're authenticated then you will be redirected to the management UI.
-let indexHandler = new BaseHandler("index",{ middlewares : [()=> console.log("\nMIDDLEWARE!\n\n")] }).willDo(
+let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
-    // Check for the access token cookie and verify it if it exists.
-    var accessToken
-    try {
-      const authenticator =
-        new CognitoAuthenticator(
-          process.env.AWS_REGION,
-          process.env.USER_POOL_ID,
-          process.env.CLIENT_ID)
-      const authorizer = new APIGatewayAuthorizer()
-
-      accessToken = await authorizer.getValidAccessTokenFromCookie(event)
-    }
-    catch (error) {
-      // Respond with login form if there is an error getting the access token.
-      return new Response('200').send(
-        await template.render('login')
-      )
-    }
-    if (!accessToken) {
-      // Respond with the login form if the access token is missing,
-      // so that the user can provide their authentication credentials and
-      // get a token.
-      return new Response('200').send(
-        await template.render('login')
-      )
-    }
-
+  
     // Redirect to the home of the authenticated management area if the
     // token is detected and valid.
     return redirectToPaymentRequestsResponse(event, accessToken)
   }
 )
 
+indexHandler.middleware(authenticatorMiddleware);
 
 // Login handler
 // If you provide valid credentials but you need to change your password
