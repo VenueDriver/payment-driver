@@ -77,6 +77,7 @@ let postHandler = new BaseHandler("post").willDo(
     var stripeToken = params.stripeToken
 
     try {
+      console.log("Starting stripe payment");
       paymentRequest.payment = await stripe.charges.create({
         amount: params.amount,
         description: paymentRequest.description,
@@ -87,6 +88,7 @@ let postHandler = new BaseHandler("post").willDo(
         currency: "usd",
         source: stripeToken
       })
+      console.log("Payment completed");
 
       paymentRequest.params = params;
 

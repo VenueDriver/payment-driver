@@ -230,6 +230,7 @@ Resources:
   ProcessPayment:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 360
       Handler: payments.post
       Runtime: nodejs8.10
       Policies:
