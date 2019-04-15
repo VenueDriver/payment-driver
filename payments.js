@@ -56,7 +56,9 @@ let getHandler = new BaseHandler("get").willDo(
 // Process a payment.
 let postHandler = new BaseHandler("post").willDo(
   async function (event, context) {
+    console.log("Post start");
     const params = querystring.parse(event.body)
+    console.log("Params:",params);
 
     // Look up the payment request record in DynamoDB.
     var paymentRequest;
@@ -70,6 +72,8 @@ let postHandler = new BaseHandler("post").willDo(
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
+
+    console.log("paymentRequest",paymentRequest)
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
