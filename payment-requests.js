@@ -71,8 +71,13 @@ let indexHandler = new BaseHandler("index").willDo(
 
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
+    let routes = await template.getRoutes();
+    let fields = Object.keys(routes.forms.partials)
+      .map( k => k.replace('fields-','') );
+    let templateParameters = { fields };
+    console.log("Template parameters",templateParameters);
     return new Response('200').send(
-      await template.render('payment-request-form'))
+      await template.render('payment-request-form',templateParameters))
   }
 )
 
