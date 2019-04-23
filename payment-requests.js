@@ -73,9 +73,17 @@ let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
     let routes = await template.getRoutes();
     let fields = Object.keys(routes.forms.partials)
-      .map( k => k.replace('fields-','') );
+      .map( k => ({
+        value : k,
+        label : k.replace('fields-','').replace(/\-/gi,' ')
+      }) );
+    for(let i = 0; i < fields.length; i++){
+      fields[i].partial = await template.renderPartial("forms/"+fields[i].value)
+    }
     let templateParameters = { fields };
-    console.log("Template parameters",templateParameters);
+
+    console.log("new.templateParameters",templateParameters);
+
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
   }
