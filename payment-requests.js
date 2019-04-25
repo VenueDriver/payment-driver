@@ -19,7 +19,7 @@ const company = process.env.COMPANY_NAME
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
     var templateParameters
-  
+
     try {
       // If a payment request ID and created_at time stamp was provided as
       // parameters, then show that payment request instead of the list.
@@ -49,7 +49,7 @@ let indexHandler = new BaseHandler("index").willDo(
             return moment(this.created_at).fromNow()
           }
         }
-        
+
         return new Response('200').send(
           await template.render('payment-requests', templateParameters))
       }
@@ -63,8 +63,21 @@ let indexHandler = new BaseHandler("index").willDo(
 
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
+    let routes = await template.getRoutes();
+    let fields = Object.keys(routes.forms.partials)
+      .map( k => ({
+        value : k,
+        label : k.replace('fields-','').replace(/\-/gi,' ')
+      }) );
+    for(let i = 0; i < fields.length; i++){
+      fields[i].partial = await template.renderPartial("forms/"+fields[i].value)
+    }
+    let templateParameters = { fields };
+
+    console.log("new.templateParameters",templateParameters);
+
     return new Response('200').send(
-      await template.render('payment-request-form'))
+      await template.render('payment-request-form',templateParameters))
   }
 )
 
@@ -74,23 +87,23 @@ let postHandler = new BaseHandler("post").willDo(
     // Create the payment request record
     var paymentRequest = querystring.parse(event.body)
     paymentRequest['id'] = uuidv1()
-  
+
     try {
       await PaymentRequest.put(paymentRequest)
       var templateParameters = paymentRequest
-  
+
       // This notification goes to the customer.
       templateParameters.subject = "Payment request from " + company
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-request-email-to-customer'
       await EmailNotification.sendEmail(templateName, global.handler.base_url, templateParameters)
-  
+
       // This notification goes to the requestor.
       templateParameters.subject = "Payment request to " + paymentRequest.email
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-request-email-to-requestor'
       await EmailNotification.sendEmail(templateName, templateParameters)
-  
+
       return new Response('200').send(
         await template.render('payment-request-confirmation', templateParameters))
     }

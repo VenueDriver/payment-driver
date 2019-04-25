@@ -40,10 +40,30 @@
           <input type="hidden" name="amount" id="amount" value="{{integer_amount}}" />
         </div>
 
-        <label for="description" class="cols-sm-2 control-label">Description</label>
+        <label for="description" class="cols-sm-2 control-label">Notes</label>
         <div class="input-group mb-3">
-          <textarea class="form-control" name="description" id="description" readonly>{{description}}</textarea>
+          <textarea class="form-control" name="description" id="description">{{description}}</textarea>
         </div>
+
+        
+
+        <label for="display_amount" class="cols-sm-2 control-label">Paid by</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" name="paid_by" id="display_amount" value="{{firstname}} {{lastname}}"  />
+        </div>
+
+        <label for="display_amount" class="cols-sm-2 control-label">Booked By</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" name="booked_by" id="display_amount" value="{{firstname}} {{lastname}}"  />
+        </div>
+
+        <label for="display_amount" class="cols-sm-2 control-label">Reservation ID</label>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" name="reservation_id" id="display_amount" value=""  />
+        </div>
+
+
+
 
         {{^paid}}
         <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"

@@ -22,7 +22,7 @@ let getHandler = new BaseHandler("get").willDo(
         await PaymentRequest.get(
           event['queryStringParameters']['id'],
           event['queryStringParameters']['created_at'])
-  
+
       var templateParameters = paymentRequest
       templateParameters.assets_host =
         process.env.ASSETS_HOST ||
@@ -34,7 +34,7 @@ let getHandler = new BaseHandler("get").willDo(
       templateParameters.paid_at_moment = function () {
         return moment(this.paid_at).fromNow()
       }
-  
+
       // Stripe only accepts payment amounts as integers.
       // You can't simply mulitply the amount by 100 because it's a floating-point number.
       // Example: Try entering the expression "32.12 * 100" into the Node REPL.
@@ -42,7 +42,7 @@ let getHandler = new BaseHandler("get").willDo(
       templateParameters.integer_amount =
         // The solution is to use fixed-point arithmetic.
         (new BigNumber(32.12)).times(100).toString()
-  
+
       return new Response('200').send(
         await template.render('payment-form', templateParameters))
     }
@@ -56,8 +56,10 @@ let getHandler = new BaseHandler("get").willDo(
 // Process a payment.
 let postHandler = new BaseHandler("post").willDo(
   async function (event, context) {
+    console.log("Post start");
     const params = querystring.parse(event.body)
-  
+    console.log("Params:",params);
+
     // Look up the payment request record in DynamoDB.
     var paymentRequest;
     try {
@@ -70,14 +72,17 @@ let postHandler = new BaseHandler("post").willDo(
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
-  
+
+    console.log("paymentRequest",paymentRequest)
+
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
     var amount = params.amount
     var stripeToken = params.stripeToken
-  
+
     try {
-      var payment = await stripe.charges.create({
+      console.log("Starting stripe payment");
+      paymentRequest.payment = await stripe.charges.create({
         amount: params.amount,
         description: paymentRequest.description,
         metadata: {
@@ -87,18 +92,21 @@ let postHandler = new BaseHandler("post").willDo(
         currency: "usd",
         source: stripeToken
       })
-  
+      console.log("Payment completed");
+
+      paymentRequest.params = params;
+
       try {
-        await PaymentRequest.recordPayment(
+        await PaymentRequest.putPayment(
           params.payment_request_id,
           params.payment_request_created_at,
-          payment)
+          paymentRequest)
       }
       catch (error) {
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
-  
+
       var templateParameters = paymentRequest
 
       // This notification goes to the customer.
@@ -106,7 +114,7 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-email-to-customer'
       await EmailNotification.sendEmail(templateName, templateParameters)
-  
+
       // This notification goes to the requestor.
       templateParameters.subject = "Payment from " + paymentRequest.email
       templateParameters.to = paymentRequest.requestor
