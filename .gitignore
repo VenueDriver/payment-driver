@@ -11,3 +11,4 @@ packaged-dev.yaml
 tmp/
 themes/**
 !themes/default**
+.gitmodules
