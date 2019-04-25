@@ -9,3 +9,5 @@ coverage.txt
 npm-debug.log
 packaged-dev.yaml
 tmp/
+themes/**
+!themes/default**
