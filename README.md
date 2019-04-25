@@ -144,7 +144,7 @@ This will run a static HTTP server and it will continue running in your terminal
 
 Open another terminal window / tab / screen, and run:
 
-    npm run start
+    npm run server
 
 ### Shortcut
 
@@ -154,13 +154,13 @@ NPM can spin up a whole development environment for you, including the asset ser
 
 To start a development environment, run:
 
-    npm run development
+    npm run start
 
 That will run:
 
 * `npm run dynamodb`
 * `npm run assets`
-* `npm run start`
+* `npm run server`
 
 #### Stop
 
