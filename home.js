@@ -135,7 +135,6 @@ let logoutHandler = new BaseHandler("logout").willDo(
 // * ====================================== *
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
-  console.log("HOST: " + event.headers.Host.replace(/\:\d+$/g, ''))
   return new Response('302').redirect('payment-requests',{
     headers: {
       // Add the authentication token as a cookie.
