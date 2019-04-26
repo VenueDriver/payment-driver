@@ -43,6 +43,13 @@ let getHandler = new BaseHandler("get").willDo(
         // The solution is to use fixed-point arithmetic.
         (new BigNumber(32.12)).times(100).toString()
 
+        let routes = await template.getRoutes();
+        
+        if(templateParameters.additional_fields && routes.forms.partials[templateParameters.additional_fields]){
+          templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields);
+        }
+
+
       return new Response('200').send(
         await template.render('payment-form', templateParameters))
     }
