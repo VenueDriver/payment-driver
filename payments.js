@@ -45,17 +45,14 @@ let getHandler = new BaseHandler("get").willDo(
 
         let routes = await template.getRoutes();
         templateParameters.additional_fields_partial = "";
-        console.log("Checking for additional fields");
         if(
           templateParameters.additional_fields &&
           templateParameters.additional_fields != "none"
           && routes.forms.partials[templateParameters.additional_fields]
         ){
-          console.log("Additional fields found",templateParameters.additional_fields);
           templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields);
         }
 
-        console.log("Template parameters:",templateParameters);
 
 
       return new Response('200').send(

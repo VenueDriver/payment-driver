@@ -36,6 +36,16 @@ let indexHandler = new BaseHandler("index").willDo(
           return moment(this.paid_at).fromNow()
         }
 
+        let routes = await template.getRoutes();
+        templateParameters.additional_fields_partial = "";
+        if(
+          templateParameters.additional_fields &&
+          templateParameters.additional_fields != "none"
+          && routes.forms.partials[templateParameters.additional_fields]
+        ){
+          templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields);
+        }
+
         return new Response('200').send(
           await template.render('payment-request', templateParameters))
       }
