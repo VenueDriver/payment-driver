@@ -50,7 +50,7 @@ let getHandler = new BaseHandler("get").willDo(
           templateParameters.additional_fields != "none"
           && routes.forms.partials[templateParameters.additional_fields]
         ){
-          templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields);
+          templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields,templateParameters);
         }
 
 
