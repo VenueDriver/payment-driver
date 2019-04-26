@@ -22,7 +22,7 @@ const authenticatorMiddleware = require('./middleware/authenticate');
 // If you're authenticated then you will be redirected to the management UI.
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
-  
+
     // Redirect to the home of the authenticated management area if the
     // token is detected and valid.
     return redirectToPaymentRequestsResponse(event, accessToken)
@@ -38,6 +38,10 @@ indexHandler.middleware(authenticatorMiddleware);
 // then you will be redirected to the management UI.
 let loginHandler = new BaseHandler("login").willDo(
   async function (event, context) {
+    console.log("Login in")
+    console.log(process.env.AWS_REGION,
+    process.env.USER_POOL_ID,
+    process.env.CLIENT_ID);
     const params = querystring.parse(event.body)
 
     const authenticator =

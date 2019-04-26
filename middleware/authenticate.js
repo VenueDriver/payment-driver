@@ -1,8 +1,8 @@
 'use strict'
 const template = require('../lib/TemplateRenderer')
 const Response = require('../lib/Response')
-const APIGatewayAuthorizer = require('../lib/APIGatewayAuthorizer.js')
-const CognitoAuthenticator = require('../lib/CognitoAuthenticator.js')
+const APIGatewayAuthorizer = require('../lib/APIGatewayAuthorizer')
+const CognitoAuthenticator = require('../lib/CognitoAuthenticator')
 
 
 async function authenticate(event, context) {
@@ -19,6 +19,7 @@ async function authenticate(event, context) {
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
   }
   catch (error) {
+    console.log("Authenticate error:",error);
     // Respond with login form if there is an error getting the access token.
     return new Response('200').send(
       await template.render('login')

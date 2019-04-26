@@ -9,6 +9,8 @@ const AWS = require('aws-sdk')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 
+const authenticatorMiddleware = require('./middleware/authenticate');
+
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
@@ -61,6 +63,12 @@ let indexHandler = new BaseHandler("index").willDo(
   }
 )
 
+/*
+=================================================
+ [GET] NEW PAYMENT REQUEST HANDLER
+=================================================
+*/
+
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
     let routes = await template.getRoutes();
@@ -80,6 +88,12 @@ let newHandler = new BaseHandler("new").willDo(
       await template.render('payment-request-form',templateParameters))
   }
 )
+
+// newHandler.middleware(authenticatorMiddleware);
+
+/* ================================================= */
+
+
 
 let postHandler = new BaseHandler("post").willDo(
   async function (event, context) {
