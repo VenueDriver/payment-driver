@@ -124,7 +124,7 @@ let postHandler = new BaseHandler("post").willDo(
         console.log("routes",routes);
         let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,paymentRequest);
         console.log("fieldsPartials",fieldsPartials);
-        let fieldsModel = FormTemplate(fieldsPartials);
+        let fieldsModel = new FormTemplate(fieldsPartials);
         console.log("fieldsModel",fieldsModel);
         let errors = validator.validate(fieldsModel,params);
         console.log(errors);
