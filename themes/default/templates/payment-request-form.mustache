@@ -108,15 +108,15 @@
     {{> scripts }}
     <script type="text/javascript">
       (function($){
-        console.log("doc ready");
         $("#additional_fields").on("change",function(){
-          console.log("it changed");
-          console.log($(this).val());
           var output = $("#additional-fields-output");
           if($(this).val() === ""){
             output.empty();
           }else{
             var toInsert = $("#"+$(this).val()).clone();
+            toInsert.find('[readonly]').each(function(){
+              $(this).removeAttr('readonly');
+            });
             output.html(toInsert);
           }
         })

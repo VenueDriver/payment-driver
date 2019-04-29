@@ -22,6 +22,7 @@ Parameters:
 
 Globals:
   Function:
+    Timeout: 10
     Environment:
       Variables:
         PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable

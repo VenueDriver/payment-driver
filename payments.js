@@ -11,6 +11,10 @@ const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
 
+const FormTemplateValidator = require('./lib/FormTemplateValidator');
+const FormTemplate = FormTemplateValidator.FormTemplate;
+const validator = new FormTemplateValidator();
+
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
@@ -68,6 +72,7 @@ let getHandler = new BaseHandler("get").willDo(
 // Process a payment.
 let postHandler = new BaseHandler("post").willDo(
   async function (event, context) {
+
     console.log("Post start");
     const params = querystring.parse(event.body)
     console.log("Params:",params);
@@ -108,11 +113,27 @@ let postHandler = new BaseHandler("post").willDo(
 
       paymentRequest.params = params;
 
+
+      // GATHER ADDITIONAL FIELDS
+      console.log("GATHER ADDITIONAL FIELDS")
+      if(
+        paymentRequest.additional_fields &&
+        paymentRequest.additional_fields != "none"
+      ){
+        let routes = await template.getRoutes();
+        console.log("routes",routes);
+        let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,paymentRequest);
+        console.log("fieldsPartials",fieldsPartials);
+        let fieldsModel = FormTemplate(fieldsPartials);
+        console.log("fieldsModel",fieldsModel);
+        let errors = validator.validate(fieldsModel,params);
+        console.log(errors);
+      }
+
+
+
       try {
-        await PaymentRequest.putPayment(
-          params.payment_request_id,
-          params.payment_request_created_at,
-          paymentRequest)
+        await PaymentRequest.putPayment(paymentRequest);
       }
       catch (error) {
         return new Response('200').send(
@@ -140,6 +161,7 @@ let postHandler = new BaseHandler("post").willDo(
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
+
   }
 )
 
