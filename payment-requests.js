@@ -31,6 +31,14 @@ console.log("Dependencies Ready");
 // * HANDLERS
 // * ====================================== *
 
+
+
+/*
+=================================================
+ [GET] PAYMENT REQUESTS HANDLER
+=================================================
+*/
+
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
     var templateParameters
@@ -86,6 +94,8 @@ let indexHandler = new BaseHandler("index").willDo(
   }
 )
 
+indexHandler.middleware(authenticatorMiddleware);
+
 /*
 =================================================
  [GET] NEW PAYMENT REQUEST HANDLER
@@ -115,8 +125,12 @@ let newHandler = new BaseHandler("new").willDo(
 
 newHandler.middleware(authenticatorMiddleware);
 
-/* ================================================= */
 
+/*
+=================================================
+ [POST] NEW PAYMENT REQUEST HANDLER
+=================================================
+*/
 
 
 let postHandler = new BaseHandler("post").willDo(
@@ -151,6 +165,15 @@ let postHandler = new BaseHandler("post").willDo(
     }
   }
 )
+postHandler.middleware(authenticatorMiddleware);
+
+
+/*
+=================================================
+ [GET] RESEND PAYMENT REQUEST HANDLER
+=================================================
+*/
+
 
 let resendHandler = new BaseHandler("resend").willDo(
   async function (event, context) {
@@ -176,6 +199,8 @@ let resendHandler = new BaseHandler("resend").willDo(
     }
   }
 )
+
+resendHandler.middleware(authenticatorMiddleware);
 
 
 // * ====================================== *
