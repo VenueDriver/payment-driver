@@ -11,7 +11,10 @@ const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
 
-const customerFacing = require('./middleware/customerFacing');
+const setCustomerFacing = require('./middleware/customer-endpoint');
+const loadPaymentRequest = require('./middleware/load-existing-payment-request');
+const rejectIfPaid = require('./middleware/reject-if-paid');
+
 const FormTemplateValidator = require('./lib/FormTemplateValidator');
 const FormTemplate = FormTemplateValidator.FormTemplate;
 const validator = new FormTemplateValidator();
@@ -24,10 +27,8 @@ const company = process.env.COMPANY_NAME
 let getHandler = new BaseHandler("get").willDo(
   async function (event, context) {
     try {
-      var paymentRequest =
-        await PaymentRequest.get(
-          event['queryStringParameters']['id'],
-          event['queryStringParameters']['created_at'])
+      var paymentRequest = global.handler.paymentRequest;
+
 
       var templateParameters = paymentRequest
       templateParameters.assets_host =
@@ -71,31 +72,24 @@ let getHandler = new BaseHandler("get").willDo(
   }
 )
 
-getHandler.middleware(customerFacing);
+getHandler.middleware([
+  setCustomerFacing,
+  loadPaymentRequest,
+  rejectIfPaid
+]);
 
 
 // Process a payment.
 let postHandler = new BaseHandler("post").willDo(
   async function (event, context) {
 
-    console.log("Post start");
     const params = querystring.parse(event.body)
-    console.log("Params:",params);
 
     // Look up the payment request record in DynamoDB.
-    var paymentRequest;
-    try {
-      paymentRequest =
-        await PaymentRequest.get(
-          params.payment_request_id,
-          params.payment_request_created_at)
-    }
-    catch (error) {
-      return new Response('200').send(
-        await template.render('error', { 'error': error }))
-    }
+    const paymentRequest = global.handler.paymentRequest;
 
     console.log("paymentRequest",paymentRequest)
+
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
@@ -180,6 +174,11 @@ let postHandler = new BaseHandler("post").willDo(
 
   }
 )
+
+postHandler.middleware([
+  loadPaymentRequest,
+  rejectIfPaid
+]);
 
 // * ====================================== *
 // * EXPORTS
