@@ -11,9 +11,11 @@ const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
 
+const customerFacing = require('./middleware/customerFacing');
 const FormTemplateValidator = require('./lib/FormTemplateValidator');
 const FormTemplate = FormTemplateValidator.FormTemplate;
 const validator = new FormTemplateValidator();
+
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -68,6 +70,9 @@ let getHandler = new BaseHandler("get").willDo(
     }
   }
 )
+
+getHandler.middleware(customerFacing);
+
 
 // Process a payment.
 let postHandler = new BaseHandler("post").willDo(
@@ -131,7 +136,9 @@ let postHandler = new BaseHandler("post").willDo(
         if(errors.length == 0){
           fieldsModel.fields.forEach(field =>{
             let key = field.name;
-            if(!field.readonly) paymentRequest[key] = params[key];
+            if(!field.readonly && params[key]){
+              paymentRequest[key] = params[key];
+            }
           });
         }else{
           return new Response('200').send(
