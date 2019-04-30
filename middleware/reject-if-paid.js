@@ -1,3 +1,5 @@
+const Response = require('../lib/Response');
+
 async function rejectIfPaid(event, context) {
 
   const paymentRequest = global.handler.paymentRequest;
