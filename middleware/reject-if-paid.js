@@ -1,4 +1,5 @@
 const Response = require('../lib/Response');
+const template = require('../lib/TemplateRenderer')
 
 async function rejectIfPaid(event, context) {
 
