@@ -131,8 +131,11 @@ let postHandler = new BaseHandler("post").willDo(
         if(errors.length == 0){
           fieldsModel.fields.forEach(field =>{
             let key = field.name;
-            paymentRequest[key] = params[key];
+            if(!field.readonly) paymentRequest[key] = params[key];
           });
+        }else{
+          return new Response('200').send(
+            await template.render('error', { 'error': errors.join("<br>") }))
         }
       }
 
