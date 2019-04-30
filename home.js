@@ -25,7 +25,7 @@ let indexHandler = new BaseHandler("index").willDo(
 
     // Redirect to the home of the authenticated management area if the
     // token is detected and valid.
-    return redirectToPaymentRequestsResponse(event, accessToken)
+    return new Response('302').redirect('payment-requests')
   }
 )
 
