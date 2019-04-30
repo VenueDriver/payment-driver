@@ -128,6 +128,12 @@ let postHandler = new BaseHandler("post").willDo(
         console.log("fieldsModel",fieldsModel);
         let errors = validator.validate(fieldsModel,params);
         console.log(errors);
+        if(errors.length == 0){
+          fieldsModel.fields.forEach(field =>{
+            let key = field.name;
+            paymentRequest[key] = params[key];
+          });
+        }
       }
 
 
