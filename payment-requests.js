@@ -113,7 +113,7 @@ let newHandler = new BaseHandler("new").willDo(
   }
 )
 
-// newHandler.middleware(authenticatorMiddleware);
+newHandler.middleware(authenticatorMiddleware);
 
 /* ================================================= */
 
