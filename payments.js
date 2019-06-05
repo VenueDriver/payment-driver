@@ -103,7 +103,8 @@ let postHandler = new BaseHandler("post").willDo(
         description: paymentRequest.description,
         metadata: {
           payment_request_id: paymentRequest.id,
-          payment_request_created_at: paymentRequest.created_at
+          payment_request_created_at: paymentRequest.created_at,
+          account_id : paymentRequest.account
         },
         currency: "usd",
         source: stripeToken
