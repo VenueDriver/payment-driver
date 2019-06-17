@@ -112,7 +112,10 @@ let postHandler = new BaseHandler("post").willDo(
       console.log("Payment completed");
 
       paymentRequest.params = params;
-      if(paymentRequest.payment.status == "succeeded") paymentRequest.paid = true;
+      if(paymentRequest.payment.status == "succeeded"){
+        paymentRequest.paid = true;
+        paymentRequest.paid_at = new Date().toISOString()
+      }
 
 
       // GATHER ADDITIONAL FIELDS
