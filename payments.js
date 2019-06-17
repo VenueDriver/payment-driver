@@ -112,6 +112,7 @@ let postHandler = new BaseHandler("post").willDo(
       console.log("Payment completed");
 
       paymentRequest.params = params;
+      if(paymentRequest.payment.status == "succeeded") paymentRequest.paid = true;
 
 
       // GATHER ADDITIONAL FIELDS
