@@ -10,7 +10,7 @@ body {
 
 form,
 .jumbotron {
-  max-width: 400px;
+  /*max-width: 800px;*/
   padding: 19px 29px 29px;
   margin: 0 auto 20px;
   background-color: #fff;
