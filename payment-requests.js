@@ -148,7 +148,7 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.subject = "Payment request from " + company
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-request-email-to-customer'
-      await EmailNotification.sendEmail(templateName, global.handler.base_url, templateParameters)
+      await EmailNotification.sendEmail(templateName, templateParameters)
 
       // This notification goes to the requestor.
       templateParameters.subject = "Payment request to " + paymentRequest.email
