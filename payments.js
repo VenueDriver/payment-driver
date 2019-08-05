@@ -106,8 +106,7 @@ let postHandler = new BaseHandler("post").willDo(
     // GATHER ADDITIONAL FIELDS
     console.log("GATHER ADDITIONAL FIELDS")
     if(
-      paymentRequest.additional_fields &&
-      paymentRequest.additional_fields.toLowerCase() != "none"
+      paymentRequest.additional_fields
     ){
       let routes = await template.getRoutes();
       console.log("routes",routes);
@@ -115,6 +114,7 @@ let postHandler = new BaseHandler("post").willDo(
       console.log("fieldsPartials",fieldsPartials);
       let fieldsModel = new FormTemplate(fieldsPartials);
       console.log("fieldsModel",fieldsModel);
+      console.log("fields",fieldsModel.fields);
       let errors = validator.validate(fieldsModel,params);
       console.log(errors);
       if(errors.length == 0){
@@ -145,9 +145,7 @@ let postHandler = new BaseHandler("post").willDo(
         currency: "usd",
         source: stripeToken
       };
-      Object.keys(params).forEach((key)=>{
-        stripePayload.metadata['form-'+key] = params[key];
-      });
+
       paymentRequest.payment = await stripe.charges.create(stripePayload);
       console.log("Payment completed");
 
