@@ -93,19 +93,52 @@ let postHandler = new BaseHandler("post").willDo(
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-    var amount = params.amount
-    var stripeToken = params.stripeToken
+    const amount = paymentRequest.amount
+    const stripeToken = params.stripeToken
+
+    const metadata = {};
+
+
+
+    // GATHER ADDITIONAL FIELDS
+    console.log("GATHER ADDITIONAL FIELDS")
+    if(
+      paymentRequest.additional_fields &&
+      paymentRequest.additional_fields.toLowerCase() != "none"
+    ){
+      let routes = await template.getRoutes();
+      console.log("routes",routes);
+      let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,paymentRequest);
+      console.log("fieldsPartials",fieldsPartials);
+      let fieldsModel = new FormTemplate(fieldsPartials);
+      console.log("fieldsModel",fieldsModel);
+      let errors = validator.validate(fieldsModel,params);
+      console.log(errors);
+      if(errors.length == 0){
+        fieldsModel.fields.forEach(field =>{
+          let key = field.name;
+          if(!field.readonly && params[key]){
+            paymentRequest[key] = params[key];
+          }
+          metadata[key] = paymentRequest[key];
+        });
+      }else{
+        return new Response('200').send(
+          await template.render('error', { 'error': errors.join("<br>") }))
+      }
+    }
 
     try {
       console.log("Starting stripe payment");
+
+      metadata.payment_request_id = paymentRequest.id;
+      metadata.payment_request_created_at = paymentRequest.created_at;
+      metadata.account_id = paymentRequest.account;
+
       const stripePayload = {
-        amount: params.amount,
+        amount: amount,
         description: paymentRequest.description,
-        metadata: {
-          payment_request_id: paymentRequest.id,
-          payment_request_created_at: paymentRequest.created_at,
-          account_id : paymentRequest.account
-        },
+        metadata: metadata,
         currency: "usd",
         source: stripeToken
       };
@@ -116,39 +149,11 @@ let postHandler = new BaseHandler("post").willDo(
       console.log("Payment completed");
 
       paymentRequest.params = params;
+
       if(paymentRequest.payment.status == "succeeded"){
         paymentRequest.paid = true;
         paymentRequest.paid_at = new Date().toISOString()
       }
-
-
-      // GATHER ADDITIONAL FIELDS
-      console.log("GATHER ADDITIONAL FIELDS")
-      if(
-        paymentRequest.additional_fields &&
-        paymentRequest.additional_fields != "none"
-      ){
-        let routes = await template.getRoutes();
-        console.log("routes",routes);
-        let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,paymentRequest);
-        console.log("fieldsPartials",fieldsPartials);
-        let fieldsModel = new FormTemplate(fieldsPartials);
-        console.log("fieldsModel",fieldsModel);
-        let errors = validator.validate(fieldsModel,params);
-        console.log(errors);
-        if(errors.length == 0){
-          fieldsModel.fields.forEach(field =>{
-            let key = field.name;
-            if(!field.readonly && params[key]){
-              paymentRequest[key] = params[key];
-            }
-          });
-        }else{
-          return new Response('200').send(
-            await template.render('error', { 'error': errors.join("<br>") }))
-        }
-      }
-
 
 
       try {
