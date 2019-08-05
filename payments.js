@@ -46,9 +46,9 @@ let getHandler = new BaseHandler("get").willDo(
       // You can't simply mulitply the amount by 100 because it's a floating-point number.
       // Example: Try entering the expression "32.12 * 100" into the Node REPL.
       // You will get: 32.12 * 100 = 3211.9999999999995
-      templateParameters.integer_amount =
+      // templateParameters.integer_amount =
         // The solution is to use fixed-point arithmetic.
-        (new BigNumber(32.12)).times(100).toString()
+        // (new BigNumber(32.12)).times(100).toString()
 
         let routes = await template.getRoutes();
         templateParameters.additional_fields_partial = "";
@@ -93,7 +93,7 @@ let postHandler = new BaseHandler("post").willDo(
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-    const amount = paymentRequest.amount
+    const amount = parseInt( paymentRequest.amount.replace(/\./gi,"") )
     const stripeToken = params.stripeToken
 
     console.log("params.amount | type:" , typeof params.amount , " | ",params.amount)

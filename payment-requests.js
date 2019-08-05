@@ -142,6 +142,14 @@ let postHandler = new BaseHandler("post").willDo(
     var paymentRequest = querystring.parse(event.body)
     paymentRequest['id'] = uuidv1()
 
+    // SANITIZE AMOUNT
+    var decimals = paymentRequest.amount.split('.');
+    if(decimals.length < 2) decimals.push("00");
+    if(decimals[1].length == 0) decimals[1] = "00";
+    if(decimals[1].length == 1) decimals[1] = decimals[1] + "0";
+    if(decimals[1].length > 2) decimals[1] = decimals[1].substring(0,2);
+    paymentRequest.amount = decimals[0] + "." + decimals[1];
+
     try {
       await PaymentRequest.put(paymentRequest)
       var templateParameters = paymentRequest
