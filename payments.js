@@ -93,8 +93,11 @@ let postHandler = new BaseHandler("post").willDo(
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-    const amount = params.amount
+    const amount = paymentRequest.amount
     const stripeToken = params.stripeToken
+
+    console.log("params.amount"," | type:" typeof params.amount, " | ",params.amount)
+    console.log("params.amount"," | type:" typeof paymentRequest.amount, " | ",paymentRequest.amount)
 
     const metadata = {};
 
