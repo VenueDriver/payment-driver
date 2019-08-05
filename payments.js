@@ -98,7 +98,7 @@ let postHandler = new BaseHandler("post").willDo(
 
     try {
       console.log("Starting stripe payment");
-      paymentRequest.payment = await stripe.charges.create({
+      const stripePayload = {
         amount: params.amount,
         description: paymentRequest.description,
         metadata: {
@@ -108,7 +108,11 @@ let postHandler = new BaseHandler("post").willDo(
         },
         currency: "usd",
         source: stripeToken
-      })
+      };
+      Object.keys(params).forEach((key)=>{
+        stripePayload.metadata['form-'+key] = params[key];
+      });
+      paymentRequest.payment = await stripe.charges.create(stripePayload);
       console.log("Payment completed");
 
       paymentRequest.params = params;
