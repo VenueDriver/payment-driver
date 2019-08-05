@@ -58,6 +58,7 @@ let indexHandler = new BaseHandler("index").willDo(
         }
 
         let routes = await template.getRoutes();
+        if(!routes.forms) route.forms = { partials : {} };
         templateParameters.additional_fields_partial = "";
         if(
           templateParameters.additional_fields &&
@@ -106,6 +107,7 @@ let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
     console.log("\nNew Handler\n");
     let routes = await template.getRoutes();
+    if(!routes.forms) route.forms = { partials : {} };
     let fields = Object.keys(routes.forms.partials)
       .map( k => ({
         value : k,
