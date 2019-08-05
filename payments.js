@@ -96,8 +96,8 @@ let postHandler = new BaseHandler("post").willDo(
     const amount = paymentRequest.amount
     const stripeToken = params.stripeToken
 
-    console.log("params.amount"," | type:" typeof params.amount, " | ",params.amount)
-    console.log("params.amount"," | type:" typeof paymentRequest.amount, " | ",paymentRequest.amount)
+    console.log("params.amount | type:" , typeof params.amount , " | ",params.amount)
+    console.log("params.amount | type:" , typeof paymentRequest.amount , " | ",paymentRequest.amount)
 
     const metadata = {};
 
