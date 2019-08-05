@@ -110,7 +110,7 @@ let postHandler = new BaseHandler("post").willDo(
     ){
       let routes = await template.getRoutes();
       console.log("routes",routes);
-      let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,paymentRequest);
+      let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,Object.assign({customer_facing : false},paymentRequest));
       console.log("fieldsPartials",fieldsPartials);
       let fieldsModel = new FormTemplate(fieldsPartials);
       console.log("fieldsModel",fieldsModel);
