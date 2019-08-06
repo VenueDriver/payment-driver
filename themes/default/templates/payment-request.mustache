@@ -30,6 +30,12 @@
           {{#paid}}
           <p>Paid {{paid_at_moment}}</p>
           {{/paid}}
+          {{^paid}}
+            {{#expiration}}
+              <p>Expires: <span id="expiration">{{expiration}}</span></p>
+            {{/expiration}}
+          {{/paid}}
+
 
           <div class="form-group has-feedback">
             <label for="amount" class="cols-sm-2 control-label">Payment amount</label>
@@ -72,6 +78,9 @@
           <div class="input-group mb-3 ">
             <textarea class="form-control" name="description" id="description" readonly>{{description}}</textarea>
           </div>
+
+
+
 
           {{{additional_fields_partial}}}
 
@@ -121,6 +130,17 @@
     </div>
 
     {{> scripts }}
+    <script type="text/javascript">
+      window.addEventListener("load",function(){
+        var expiration = document.querySelector('#expiration');
+        if(expiration.length > 0){
+          var text = expiration.textContent;
+          var localDate = new Date(text);
+          var timezone = "GMT"+((localDate.getTimezoneOffset()*-1)/60);
+          expiration.textContent = localDate.toLocaleDateString() +" "+ localDate.toLocaleTimeString() + " ("+timezone+")";
+        }
+      });
+    </script>
   </body>
 
 </html>
