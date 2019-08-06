@@ -1,15 +1,18 @@
 const Response = require('../lib/Response');
 const template = require('../lib/TemplateRenderer')
 
-async function rejectIfPaid(event, context) {
+async function rejectIfExpired(event, context) {
 
   const paymentRequest = global.handler.paymentRequest;
 
-  if(paymentRequest.payment && paymentRequest.payment.captured){
+  if(
+    paymentRequest.expiration &&
+    new Date(paymentRequest.expiration).getTime() < new Date().getTime()
+  ){
     return new Response('200').send(
       await template.render('error', { 'error': 'This payment request is no longer available, please contact support at <a href="mailto:support@hakkasan.com">support@hakkasan.com</a>.' }))
   }
 
 }
 
-module.exports = rejectIfPaid;
+module.exports = rejectIfExpired;

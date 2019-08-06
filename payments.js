@@ -14,6 +14,7 @@ const BigNumber = require('bignumber.js');
 const setCustomerFacing = require('./middleware/customer-endpoint');
 const loadPaymentRequest = require('./middleware/load-existing-payment-request');
 const rejectIfPaid = require('./middleware/reject-if-paid');
+const rejectIfExpired = require('./middleware/reject-if-expired');
 
 const FormTemplateValidator = require('./lib/FormTemplateValidator');
 const FormTemplate = FormTemplateValidator.FormTemplate;
@@ -75,7 +76,8 @@ let getHandler = new BaseHandler("get").willDo(
 getHandler.middleware([
   setCustomerFacing,
   loadPaymentRequest,
-  rejectIfPaid
+  rejectIfPaid,
+  rejectIfExpired
 ]);
 
 
