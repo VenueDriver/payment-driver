@@ -146,7 +146,7 @@
       jQuery(function () {
         $('#datetimepicker1').datetimepicker();
         $('#datetimepicker1').on("change.datetimepicker", function (e) {
-          var expiration = new Date($(this).val()).toISOString();
+          var expiration = new Date($('#display-expiration').val()).toISOString();
           $('input[name="expiration"]').val(expiration);
         });
       });
