@@ -71,7 +71,8 @@
               <label for="expiration" class="cols-sm-2 control-label">Expiration <span id="display-timezone"></span></label>
               <div class="input-group mb-3">
                 <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                  <input name="expiration" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                  <input type="text" id="display-expiration" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                  <input name="expiration" type="hidden" style="display:none" />
                     <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
                       <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                     </div>
@@ -125,6 +126,12 @@
         // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
         var offset = (new Date().getTimezoneOffset()) * -1;
         $('#display-timezone').text("(GMT"+(offset/60)+")");
+
+        $("#display-expiration").on('change',function(event){
+          var expiration = new Date($(this).val()).toISOString();
+          $('input[name="expiration"]').val(expiration);
+        });
+
         $("#additional_fields").on("change",function(){
           var output = $("#additional-fields-output");
           if($(this).val() === ""){
