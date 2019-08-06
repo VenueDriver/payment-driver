@@ -68,7 +68,7 @@
                 </div>
               </div>
 
-              <label for="expiration" class="cols-sm-2 control-label">Expiration</label>
+              <label for="expiration" class="cols-sm-2 control-label">Expiration <span id="display-timezone"></span></label>
               <div class="input-group mb-3">
                 <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
                   <input name="expiration" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
@@ -121,6 +121,10 @@
     {{> scripts }}
     <script type="text/javascript">
       (function($){
+        // JAVASCRIPT SUCKS AND THE OFFSET FOR GMT-3 is = POSITIVE 180 (+180), FOR GMT+3 IT IS NEGATIVE 180 (-180)
+        // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
+        var offset = (new Date().getTimezoneOffset()) * -1;
+        $('#display-timezone').text("(GMT"+(offset/60)+")");
         $("#additional_fields").on("change",function(){
           var output = $("#additional-fields-output");
           if($(this).val() === ""){
