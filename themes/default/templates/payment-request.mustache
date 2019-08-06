@@ -133,7 +133,7 @@
     <script type="text/javascript">
       window.addEventListener("load",function(){
         var expiration = document.querySelector('#expiration');
-        if(expiration.length > 0){
+        if(expiration){
           var text = expiration.textContent;
           var localDate = new Date(text);
           var timezone = "GMT"+((localDate.getTimezoneOffset()*-1)/60);
