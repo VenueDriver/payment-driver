@@ -127,10 +127,7 @@
         var offset = (new Date().getTimezoneOffset()) * -1;
         $('#display-timezone').text("(GMT"+(offset/60)+")");
 
-        $("#display-expiration").on('change',function(event){
-          var expiration = new Date($(this).val()).toISOString();
-          $('input[name="expiration"]').val(expiration);
-        });
+
 
         $("#additional_fields").on("change",function(){
           var output = $("#additional-fields-output");
@@ -148,6 +145,10 @@
 
       jQuery(function () {
         $('#datetimepicker1').datetimepicker();
+        $('#datetimepicker1').on("dp.change", function (e) {
+          var expiration = new Date($(this).val()).toISOString();
+          $('input[name="expiration"]').val(expiration);
+        });
       });
     </script>
   </body>
