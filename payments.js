@@ -10,7 +10,7 @@ const AWS = require('aws-sdk')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
-const Hook      = require('../Hook')
+const Hook      = require('./lib/Hook')
 
 const setCustomerFacing = require('./middleware/customer-endpoint');
 const loadPaymentRequest = require('./middleware/load-existing-payment-request');
