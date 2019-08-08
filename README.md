@@ -212,7 +212,7 @@ module.exports = beforeHandler;
 
 ```
 
-#### Hook names list
+#### Hook name list
 - `before-handler-do`
 - `before-sending-to-stripe`
 - `after-sending-to-stripe`
