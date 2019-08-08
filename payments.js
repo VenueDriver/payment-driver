@@ -10,6 +10,7 @@ const AWS = require('aws-sdk')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const BigNumber = require('bignumber.js');
+const Hook      = require('../Hook')
 
 const setCustomerFacing = require('./middleware/customer-endpoint');
 const loadPaymentRequest = require('./middleware/load-existing-payment-request');
@@ -90,16 +91,18 @@ let postHandler = new BaseHandler("post").willDo(
     // Look up the payment request record in DynamoDB.
     const paymentRequest = global.handler.paymentRequest;
 
+
     console.log("paymentRequest",paymentRequest)
 
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-    const amount = parseInt( paymentRequest.total.replace(/\./gi,"") )
     const stripeToken = params.stripeToken
-
-
     const metadata = {};
+
+    global.handler.stripeAmount = parseInt( paymentRequest.total.replace(/\./gi,"") )
+
+
 
 
 
@@ -131,6 +134,8 @@ let postHandler = new BaseHandler("post").willDo(
       }
     }
 
+    Hook.execute('before-sending-to-stripe');
+
     try {
       console.log("Starting stripe payment");
 
@@ -138,33 +143,43 @@ let postHandler = new BaseHandler("post").willDo(
       metadata.payment_request_created_at = paymentRequest.created_at;
       metadata.account_id = paymentRequest.account;
 
-      const stripePayload = {
-        amount: amount,
+      global.handler.stripePayload = {
+        amount: global.handler.stripeAmount,
         description: paymentRequest.description,
         metadata: metadata,
         currency: "usd",
         source: stripeToken
       };
 
-      paymentRequest.payment = await stripe.charges.create(stripePayload);
+
+
+      paymentRequest.payment = await stripe.charges.create(global.handler.stripePayload);
       console.log("Payment completed");
 
       paymentRequest.params = params;
 
+      Hook.execute('after-sending-to-stripe');
+
       if(paymentRequest.payment.status == "succeeded"){
+        Hook.execute('after-successful-payment');
         paymentRequest.paid = true;
         paymentRequest.paid_at = new Date().toISOString()
+      }else{
+        Hook.execute('after-unsuccessful-payment');
       }
 
 
       try {
+        Hook.execute('before-updating-dynamodb');
         await PaymentRequest.putPayment(paymentRequest);
+        Hook.execute('after-updating-dynamodb');
       }
       catch (error) {
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
 
+      Hook.execute('before-sending-email-notifications');
       var templateParameters = paymentRequest
 
       // This notification goes to the customer.
@@ -178,6 +193,8 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-email-to-requestor'
       await EmailNotification.sendEmail(templateName, templateParameters)
+
+      Hook.execute('after-sending-email-notifications');
 
       return new Response('200').send(
         await template.render('payment-confirmation', templateParameters))
