@@ -21,6 +21,10 @@ console.log("Load: SESEmailNotification");
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 console.log("Load: AuthenticatorMiddleware");
 const authenticatorMiddleware = require('./middleware/authenticate');
+console.log("Load: BypassNewPaymentRequestAuthenticator");
+const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator');
+console.log("Load: BypassNewPaymentRequestAuthenticator");
+const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload');
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -113,10 +117,19 @@ let newHandler = new BaseHandler("new").willDo(
         value : k,
         label : k.replace('fields-','').replace(/\-/gi,' ')
       }) );
-    for(let i = 0; i < fields.length; i++){
-      fields[i].partial = await template.renderPartial("forms/"+fields[i].value)
+
+    let templateParameters = {};
+
+    if (global.handler.newPaymentRequestParams && Object.keys(global.handler.newPaymentRequestParams).length) {
+      templateParameters = global.handler.newPaymentRequestParams;
+      delete global.handler.newPaymentRequestParams;
     }
-    let templateParameters = { fields };
+
+    for(let i = 0; i < fields.length; i++){
+      fields[i].partial = await template.renderPartial("forms/"+fields[i].value, templateParameters)
+    }
+
+    templateParameters = { ...templateParameters, fields };
 
     console.log("new.templateParameters",templateParameters);
 
@@ -125,8 +138,11 @@ let newHandler = new BaseHandler("new").willDo(
   }
 )
 
-newHandler.middleware(authenticatorMiddleware);
-
+newHandler.middleware([
+  bypassNewPaymentRequestAuthenticatorMiddleware,
+  fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware,
+  authenticatorMiddleware
+]);
 
 /*
 =================================================
@@ -176,7 +192,10 @@ let postHandler = new BaseHandler("post").willDo(
     }
   }
 )
-postHandler.middleware(authenticatorMiddleware);
+postHandler.middleware([
+  bypassNewPaymentRequestAuthenticatorMiddleware,
+  authenticatorMiddleware
+]);
 
 
 /*
