@@ -3,18 +3,13 @@ const Response = require('../lib/Response');
 
 async function bypassNewPaymentRequestAuthenticator(event, context) {
   console.log("\nBypassNewPaymentRequestAuthenticator\n");
-
-  if (!global.handler.httpMethod == "GET") {
-    return;
-  }
-
   const authorizer = new PaymentRequestAuthorizer();
 
   try {
     let accessToken = authorizer.getValidAccessTokenFromQueryParams(event);
 
     if (accessToken) {
-      const cookieWithAccessToken = authorizer.getAccessTokenWrapperInCookie(accessToken, event);
+      const cookieWithAccessToken = authorizer.getAccessTokenWrappedInCookie(accessToken, event);
       return new Response('302').redirect('payment-requests-new',{ headers: cookieWithAccessToken });
     }
 
@@ -27,7 +22,7 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
   }
   catch (error) {
     console.log("Error: " + JSON.stringify(error));
-    const expiredAccessTokenCookie = authorizer.getExpiredAccessTokenWrapperInCookie();
+    const expiredAccessTokenCookie = authorizer.getExpiredAccessTokenWrappedInCookie();
     return new Response('302').redirect('payment-requests-new',{ headers: expiredAccessTokenCookie });
   }
 }
