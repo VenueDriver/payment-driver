@@ -12,7 +12,7 @@
       {{> logo }}
       {{> navbar }}
 
-      <form method="post" action="{{#full_app_url}}/payment-requests{{/full_app_url}}" data-toggle="validator">
+      <form method="post" action="{{#full_app_url}}/payment-requests{{queryParams}}{{/full_app_url}}" data-toggle="validator">
         <fieldset>
           <legend>New payment request</legend>
 

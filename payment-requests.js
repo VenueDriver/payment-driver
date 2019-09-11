@@ -125,6 +125,10 @@ let newHandler = new BaseHandler("new").willDo(
       delete global.handler.newPaymentRequestParams;
     }
 
+    if (global.handler.queryParams) {
+      templateParameters['queryParams'] = global.handler.queryParams;
+    }
+
     for(let i = 0; i < fields.length; i++){
       fields[i].partial = await template.renderPartial("forms/"+fields[i].value, templateParameters)
     }
