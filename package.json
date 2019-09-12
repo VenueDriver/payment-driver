@@ -19,7 +19,7 @@
     "dynamodb": "docker start dynamodb",
     "server": "sam local start-api -p 8080 --docker-network sam-local --static-dir \"\" &",
     "start": "npm run dynamodb; npm run assets; npm run server",
-    "stop": "killall sam; killall node",
+    "stop": "pkill -f \"sam local\"; pkill -f \"node-http-server\"",
     "restart": "npm run stop; npm run start"
   },
   "repository": {
