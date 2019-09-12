@@ -3,21 +3,20 @@ Payment Driver
 
 A general payment service for sending payment requests that customers can pay, without our employees ever seeing the credit card information.
 
-This project creates a serverless payment system using AWS Lambda, AWS API Gateway, AWS DynamoDB, and AWS Cognito,
-with management users configured in AWS IAM.  This setup ensures a low operation cost (virtually free)
-and high availability.
+This project creates a serverless payment system using AWS Lambda, AWS API Gateway, AWS DynamoDB, and AWS Cognito, with management users configured in AWS IAM.  This setup ensures a low operation cost (virtually free) and high availability.
 
 What's Here
 -----------
 
 This app includes:
 
-* buildspec.yml - this file is used by AWS CodeBuild to package your
-  application for deployment to AWS Lambda
-* index.js - this file contains the sample Node.js code for the web service
-* template.yml - this file contains the Serverless Application Model (SAM) used
-  by AWS Cloudformation to deploy your application to AWS Lambda and Amazon API
-  Gateway.
+* ```.js``` files - these files contain AWS Lambda functions for the service.
+* template.yml - this file contains the Serverless Application Model (SAM) used by AWS Cloudformation to deploy your application to AWS Lambda and Amazon API Gateway.
+* ```sam-launchpad.config.js``` - configuration for high-level deployment assistance scripting.
+* package.json - This project uses the Node toolchain, and this file is for NPM.
+* ```lib/``` - Code used by the Lambda functions.
+* ```sam-hooks/``` - the ```after-deploy.js``` script hooks into the deployment and synchronizes the project's static asset files to AWS S3.
+* ```themes/``` - This app supports white-label branding through swappable themes.  Add yours here to override templates, assets, and to provide code hooks that will run in Lambda before or after events.
 
 Development Setup
 -----------------
@@ -38,7 +37,7 @@ Using Linuxbrew to install SAM works great on the AWS AMI:
 
 https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install-linux.html
 
-##### Upgrade Node
+##### Use the same Node version as AWS
 
 You want to use the same Node version that the Lambda functions use:
 
@@ -49,6 +48,8 @@ Make that the default:
     nvm alias default node
 
 #### Set up Stripe keys
+
+This app processes payments using Stripe, so you'll need a Stripe account.  The keys come from the dashboard in Stripe.
 
 Be sure to set the Stripe keys as environment variables in your `.env` file.
 
@@ -87,69 +88,9 @@ To scan the current contents of your ```payment_requests``` table:
 
     aws dynamodb scan --endpoint-url http://localhost:8000 --table-name payment_requests
 
-#### Start an asset server
-
-Run this:
-
-    node_modules/.bin/node-http-server root=themes port=8081 verbose=true
-
-(or you can run: ```npm run assets```)
-
-#### Install Node modules
-
-The Lambda code running in SAM Local will need to be able to access the project's dependencies in the `node_modules` folder.  Create that and download those packages with:
-
-    npm install
-
-#### Start an HTTP server with SAM Local
-
-Use SAM Local for development:
-
-    cd lib/core; sam local start-api -p 8080 --docker-network sam-local --static-dir ""
-    cd lib; sam local start-api -p 8080 --docker-network sam-local --static-dir ""
-
-Port 8080 is important if you're using AWS Cloud9.
-
-The ```--env-vars``` parameter loads environment variables from the ```env.json``` file.
-
-The ```-docker-network``` parameter enables it to connect to the DynamoDB container.  SAM Local runs in a container, so without this you can't connect to the database.
-
-The ```--static-dir ""``` parameter stops SAM Local from mounting the ```public``` folder on ```/``` on the HTTP server.  This project has a dynamic response on that URL path.  That's why you need to run the HTTP server for assets, when normally you could use SAM Local for that.
-
-#### Go to the app in a web browser
-
-To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
-
-To do a test Stripe transaction, ensure that your Stripe keys are set as described above.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
-
-#### Generate documentation
-
-    documentation build lib/** -f html -o documentation/
-
-Ongoing Development
--------------------
-
-Each subsequent time that you want to spin up a development environment, do this:
-
-#### Start your local DynamoDB service
-
-    docker start dynamodb
-
-#### Start an asset server
-
-    npm run assets
-
-This will run a static HTTP server and it will continue running in your terminal.
-
-#### Start an HTTP server with SAM Local
-
-Open another terminal window / tab / screen, and run:
-
-    npm run server
-
 ### Shortcut
 
-NPM can spin up a whole development environment for you, including the asset server, DynamoDB instance, and SAM Local server.  The disadvantage is that the asset server and the SAM Local server both have to run in the background, so you have to stop them by killing them.  Or by running the handy NPM scripts for stopping or restarting.
+NPM can spin up a whole development environment for you, including an asset server,  a localDynamoDB instance, and SAM Local server.  The disadvantage is that the asset server and the SAM Local server both have to run in the background, so you have to stop them by killing them.  Or by running the handy NPM scripts for stopping or restarting.
 
 #### Start
 
@@ -175,14 +116,25 @@ To stop and restart everything:
 
     npm run reset
 
-Payment management users
-------------------------
+#### Go to the app in a web browser
 
-Only authorized users can send payment requests and review payment records.  The users are managed by AWS IAM.  The web app uses the AWS Cognito [server-side flow](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow.html#amazon-cognito-user-pools-server-side-authentication-flow).
+To reach the form for the first user story, go to ```http://localhost:8080/payment-request-form.html```
+
+To do a test Stripe transaction, ensure that your Stripe keys are set as described above.  Then send a GET request to the ```/payments``` REST resource: ```http://localhost:8080/payments```
 
 Now, with those three things running, you should be able to run the app and access it on port 8080.
 
-#### Run tests
+### Usage
+
+#### Payment management users
+
+Only authorized users can send payment requests and review payment records.  The users are managed by AWS IAM.  The web app uses the AWS Cognito [server-side flow](https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow.html#amazon-cognito-user-pools-server-side-authentication-flow).
+
+### Generating documentation
+
+    documentation build lib/** -f html -o documentation/
+
+### Running tests
 
     npm test
 
