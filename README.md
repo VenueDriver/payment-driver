@@ -106,6 +106,7 @@ The Lambda code running in SAM Local will need to be able to access the project'
 Use SAM Local for development:
 
     cd lib/core; sam local start-api -p 8080 --docker-network sam-local --static-dir ""
+    cd lib; sam local start-api -p 8080 --docker-network sam-local --static-dir ""
 
 Port 8080 is important if you're using AWS Cloud9.
 
