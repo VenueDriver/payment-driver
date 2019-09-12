@@ -91,7 +91,7 @@ To scan the current contents of your ```payment_requests``` table:
 
 Run this:
 
-    cd lib/core; node-http-server root=public port=8081 verbose=true
+    node_modules/.bin/node-http-server root=themes port=8081 verbose=true
 
 (or you can run: ```npm run assets```)
 
