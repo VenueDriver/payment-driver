@@ -13,6 +13,7 @@ module.exports = {
     "StripeSecretKey": process.env.STRIPE_SECRET_KEY || "local",
     "StripePublishableKey": process.env.STRIPE_PUBLISHABLE_KEY || "local",
     "ThemeName": process.env.THEME_NAME || "default",
+    "NewPaymentRequestJwtSecret": process.env.NEW_PAYMENT_REQUEST_JWT_SECRET || "default"
   },
   "commands": {
     "build": "exit 0",
