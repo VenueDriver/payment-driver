@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/VenueDriver/payment-driver#readme",
   "dependencies": {
-    "aws-sdk": "^2.224.1",
+    "aws-sdk": "^2.530.0",
     "bignumber.js": "^6.0.0",
     "bootstrap-validator": "^0.11.9",
     "cheerio": "^1.0.0-rc.3",
@@ -46,23 +46,23 @@
     "mustache": "^2.3.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2",
-    "request-promise-native": "^1.0.5",
+    "request-promise": "^4.2.4",
+    "request-promise-native": "^1.0.7",
     "stripe": "^5.8.0",
-    "url-join": "^4.0.0"
+    "url-join": "^4.0.1"
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.7.0",
     "chai": "^4.1.2",
     "chai-jq": "0.0.9",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.6",
     "documentation": "^6.3.1",
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "mocha-lcov-reporter": "^1.3.0",
     "nock": "^9.1.6",
     "node-http-server": "^8.1.2",
-    "nyc": "^14.1.0",
+    "nyc": "^14.1.1",
     "sam-launchpad": "^1.1.23",
     "sinon": "^6.1.5",
     "watch-run": "^1.2.5"
