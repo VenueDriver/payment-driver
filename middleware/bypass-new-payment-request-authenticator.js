@@ -11,7 +11,7 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
     global.handler.skipAuthentication = true;
   }
   catch (error) {
-    console.log("Error: " + JSON.stringify(error));
+    console.log(error);
   }
 }
 
