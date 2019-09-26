@@ -21,6 +21,8 @@ Parameters:
     Type: String
   NewPaymentRequestJwtSecret:
     Type: String
+  AwsPaymentQueueName:
+    Type: String
 
 Globals:
   Function:
@@ -40,6 +42,7 @@ Globals:
         ASSETS_HOST: !Join ['/', ['https://s3.amazonaws.com',!Ref 'S3AssetsBucket' ] ]
         THEME_NAME: !Ref 'ThemeName'
         NEW_PAYMENT_REQUEST_JWT_SECRET: !Ref 'NewPaymentRequestJwtSecret'
+        AWS_PAYMENT_QUEUE_NAME: !Ref 'AwsPaymentQueueName'
 
 Resources:
 
