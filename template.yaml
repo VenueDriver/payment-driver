@@ -241,11 +241,14 @@ Resources:
       Handler: payments.post
       Runtime: nodejs8.10
       Policies:
-       - SQSSendMessagePolicy
-         QueueName:
-           !Sub ${AwsPaymentQueueName}-${Environment}
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
+       - Version : "2012-10-17",
+         Statement :
+            - Effect" : Allow
+              Action":
+                - sqs:*,
+              Resource": !Sub arn:aws:sqs:::${AwsPaymentQueueName}-${Environment}
        - Version: '2012-10-17'
          Statement:
            - Effect: Allow
