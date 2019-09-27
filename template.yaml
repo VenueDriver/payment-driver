@@ -244,11 +244,11 @@ Resources:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
        - Version : '2012-10-17'
-         Statement :
-            - Effect" : Allow
-              Action":
+         Statement:
+            - Effect: Allow
+              Action:
                 - sqs:*
-              Resource": '*'
+              Resource: '*'
        - Version: '2012-10-17'
          Statement:
            - Effect: Allow
