@@ -242,7 +242,8 @@ Resources:
       Runtime: nodejs8.10
       Policies:
        - SQSSendMessagePolicy
-         QueueName: !Sub ${AwsPaymentQueueName}-${Environment}
+         QueueName:
+           !Sub ${AwsPaymentQueueName}-${Environment}
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
        - Version: '2012-10-17'
