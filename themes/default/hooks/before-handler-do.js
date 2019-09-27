@@ -1,6 +1,7 @@
 async function beforeHandler(){
 
-  console.log("This is the handler name:",global.handler.name);
+  console.log("beforeHandler Default")
+  console.log("This is the handler name:",global.handler.name)
   console.log("This is the before handler do hook")
   console.log("This is the handler event:",global.handler.event)
   console.log("This is the handler context:",global.handler.context)
