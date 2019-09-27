@@ -243,12 +243,12 @@ Resources:
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
-       - Version : "2012-10-17",
+       - Version : '2012-10-17'
          Statement :
             - Effect" : Allow
               Action":
-                - sqs:*,
-              Resource": !Sub arn:aws:sqs:::${AwsPaymentQueueName}-${Environment}
+                - sqs:*
+              Resource": '*'
        - Version: '2012-10-17'
          Statement:
            - Effect: Allow
