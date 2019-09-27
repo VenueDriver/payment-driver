@@ -241,6 +241,7 @@ Resources:
       Handler: payments.post
       Runtime: nodejs8.10
       Policies:
+       - SQSSendMessagePolicy
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
        - Version: '2012-10-17'
