@@ -1,30 +1,18 @@
 'use strict'
 console.log("payment-requests.js");
 
-console.log("Load: TemplateRenderer");
 const template = require('./lib/TemplateRenderer')
-console.log("Load: Response");
 const Response = require('./lib/Response')
-console.log("Load: BaseHandler");
 const BaseHandler = require('./lib/BaseHandler')
-console.log("Load: querystring");
 const querystring = require('querystring')
-console.log("Load: uuid/v1");
 const uuidv1 = require('uuid/v1')
-console.log("Load: moment");
 const moment = require('moment')
-console.log("Load: aws-sdk");
 const AWS = require('aws-sdk')
-console.log("Load: PaymentRequest");
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
-console.log("Load: SESEmailNotification");
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
-console.log("Load: AuthenticatorMiddleware");
-const authenticatorMiddleware = require('./middleware/authenticate');
-console.log("Load: BypassNewPaymentRequestAuthenticator");
-const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator');
-console.log("Load: BypassNewPaymentRequestAuthenticator");
-const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload');
+const authenticatorMiddleware = require('./middleware/authenticate')
+const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
+const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
