@@ -173,7 +173,9 @@
           }
 
           // LOAD DEFAULT OPTION
-          window.addEventListener("load",loadAdditionalFields);
+          window.addEventListener("load",function(){
+            $("#additional_fields").trigger('change');
+          });
           // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
           $("#additional_fields").on("change",loadAdditionalFields);
         })(jQuery)
