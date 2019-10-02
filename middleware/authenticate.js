@@ -20,6 +20,7 @@ async function authenticate(event, context) {
     const authorizer = new APIGatewayAuthorizer()
 
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
+    console.log("Access token requested...");
   }
   catch (error) {
     console.log("Authenticate error:",error);
@@ -29,6 +30,7 @@ async function authenticate(event, context) {
     )
   }
   if (!accessToken) {
+    console.log("No access token, redirecting to login");
     // Respond with the login form if the access token is missing,
     // so that the user can provide their authentication credentials and
     // get a token.
