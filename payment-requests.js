@@ -33,6 +33,8 @@ console.log("Dependencies Ready");
 
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
+
+    console.log("payment-requests.index");
     var templateParameters
 
     try {
