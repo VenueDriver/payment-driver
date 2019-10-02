@@ -78,7 +78,7 @@
                     </div>
                 </div>
               </div>
-              
+
               <input name="expiration" type="hidden" style="display:none" />
 
               <label for="description" class="cols-sm-2 control-label">Description</label>
@@ -129,9 +129,7 @@
         var offset = (new Date().getTimezoneOffset()) * -1;
         $('#display-timezone').text("(GMT"+(offset/60)+")");
 
-
-
-        $("#additional_fields").on("change",function(){
+        var loadAdditionalFields = function(){
           var output = $("#additional-fields-output");
           if($(this).val() === ""){
             output.empty();
@@ -142,7 +140,12 @@
             // });
             output.html(toInsert);
           }
-        })
+        }
+
+        // LOAD DEFAULT OPTION
+        $(document).ready(loadAdditionalFields);
+        // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
+        $("#additional_fields").on("change",loadAdditionalFields);
       })(jQuery)
 
       jQuery(function () {
