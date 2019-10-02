@@ -123,30 +123,7 @@
 
     {{> scripts }}
     <script type="text/javascript">
-      (function($){
-        // JAVASCRIPT SUCKS AND THE OFFSET FOR GMT-3 is = POSITIVE 180 (+180), FOR GMT+3 IT IS NEGATIVE 180 (-180)
-        // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
-        var offset = (new Date().getTimezoneOffset()) * -1;
-        $('#display-timezone').text("(GMT"+(offset/60)+")");
 
-        var loadAdditionalFields = function(){
-          var output = $("#additional-fields-output");
-          if($(this).val() === ""){
-            output.empty();
-          }else{
-            var toInsert = $("#"+$(this).val()).clone();
-            // toInsert.find('[readonly]').each(function(){
-            //   $(this).removeAttr('readonly');
-            // });
-            output.html(toInsert);
-          }
-        }
-
-        // LOAD DEFAULT OPTION
-        window.addEventListener("load",loadAdditionalFields);
-        // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
-        $("#additional_fields").on("change",loadAdditionalFields);
-      })(jQuery)
 
       jQuery(function () {
         $('#datetimepicker1').datetimepicker();
@@ -157,8 +134,8 @@
       });
 
       jQuery(function () {
-          const account = $('#account-hidden').val().trim();
-          const accountOption = $(`#account option[value="${account}"]`);
+          var account = $('#account-hidden').val().trim();
+          var accountOption = $(`#account option[value="${account}"]`);
 
           if (account && accountOption.length) {
               $("#account").val(account);
@@ -170,11 +147,37 @@
         Change event is not fired when value is assigned within the rendering.
        */
       jQuery(document).ready(function(){
-        const amount = $("#amount");
-        const isAmountPresent = amount.val().trim().length > 0;
+        var amount = $("#amount");
+        var isAmountPresent = amount.val().trim().length > 0;
         if (isAmountPresent) {
           amount.trigger('change');
         }
+
+        (function($){
+          // JAVASCRIPT SUCKS AND THE OFFSET FOR GMT-3 is = POSITIVE 180 (+180), FOR GMT+3 IT IS NEGATIVE 180 (-180)
+          // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
+          var offset = (new Date().getTimezoneOffset()) * -1;
+          $('#display-timezone').text("(GMT"+(offset/60)+")");
+
+          var loadAdditionalFields = function(){
+            var output = $("#additional-fields-output");
+            if($(this).val() === ""){
+              output.empty();
+            }else{
+              var toInsert = $("#"+$(this).val()).clone();
+              // toInsert.find('[readonly]').each(function(){
+              //   $(this).removeAttr('readonly');
+              // });
+              output.html(toInsert);
+            }
+          }
+
+          // LOAD DEFAULT OPTION
+          window.addEventListener("load",loadAdditionalFields);
+          // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
+          $("#additional_fields").on("change",loadAdditionalFields);
+        })(jQuery)
+
       });
     </script>
   </body>
