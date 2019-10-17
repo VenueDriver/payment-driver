@@ -36,7 +36,7 @@
 
         <label for="display_amount" class="cols-sm-2 control-label">Payment Amount</label>
         <div class="input-group mb-3">
-          <input type="text" class="form-control" name="display_amount" id="display_amount" value="{{amount}}" readonly />
+          <input type="text" class="form-control" name="display_amount" id="display_amount" value="{{total}}" readonly />
 
         </div>
 
@@ -70,7 +70,8 @@
         <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
           data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k"
           data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-          data-locale="auto">
+          data-locale="auto"
+          data-label="Pay Now">
         </script>
         {{/paid}}
       </fieldset>
