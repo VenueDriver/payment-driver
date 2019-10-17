@@ -89,7 +89,9 @@ let indexHandler = new BaseHandler("index").willDo(
   }
 )
 
-indexHandler.middleware(authenticatorMiddleware);
+indexHandler.middleware(
+  bypassNewPaymentRequestAuthenticatorMiddleware,
+  authenticatorMiddleware);
 
 /*
 =================================================
