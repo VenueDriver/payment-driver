@@ -11,6 +11,7 @@ const AWS = require('aws-sdk')
 const PaymentRequest = require('./lib/PaymentRequest.js').PaymentRequest
 const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotification
 const authenticatorMiddleware = require('./middleware/authenticate')
+const bypassPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-payment-request-authenticator')
 const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
 const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
 
@@ -89,9 +90,9 @@ let indexHandler = new BaseHandler("index").willDo(
   }
 )
 
-indexHandler.middleware(
-  bypassNewPaymentRequestAuthenticatorMiddleware,
-  authenticatorMiddleware);
+indexHandler.middleware([
+  bypassPaymentRequestAuthenticatorMiddleware,
+  authenticatorMiddleware]);
 
 /*
 =================================================
