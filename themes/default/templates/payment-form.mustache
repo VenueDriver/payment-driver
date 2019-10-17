@@ -68,7 +68,7 @@
 
         {{^paid}}
         <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-          data-key="pk_test_BcMS464kHeHc5Rs9Y2fdOF2k"
+          data-key="{{#handler}}{{#env}}{{STRIPE_PUBLISHABLE_KEY}}{{/env}}{{/handler}}"
           data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
           data-locale="auto"
           data-label="Pay Now">
