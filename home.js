@@ -6,6 +6,7 @@ const querystring = require('querystring')
 const urljoin     = require('url-join')
 const APIGatewayAuthorizer = require('./lib/APIGatewayAuthorizer.js')
 
+
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
