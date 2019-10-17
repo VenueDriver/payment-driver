@@ -12,7 +12,6 @@ const EmailNotification = require('./lib/SESEmailNotification.js').SESEmailNotif
 const BigNumber = require('bignumber.js');
 const Hook      = require('./lib/Hook')
 
-
 const setCustomerFacing = require('./middleware/customer-endpoint');
 const loadPaymentRequest = require('./middleware/load-existing-payment-request');
 const rejectIfPaid = require('./middleware/reject-if-paid');
