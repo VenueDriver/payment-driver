@@ -134,7 +134,7 @@ let postHandler = new BaseHandler("post").willDo(
       }
     }
 
-    Hook.execute('before-sending-to-stripe');
+
 
     try {
       console.log("Starting stripe payment");
@@ -150,6 +150,8 @@ let postHandler = new BaseHandler("post").willDo(
         currency: "usd",
         source: stripeToken
       };
+
+      Hook.execute('before-sending-to-stripe');
 
 
 
