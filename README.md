@@ -173,5 +173,7 @@ module.exports = beforeHandler;
 - `after-unsuccessful-payment`
 - `before-updating-dynamodb`
 - `after-updating-dynamodb`
-- `before-sending-email-notifications`
-- `after-sending-email-notifications`
+- `before-sending-confirmation-email-to-customer`
+- `before-sending-confirmation-email-to-requestor`
+- `before-sending-request-email-to-customer`
+- `before-sending-request-email-to-requestor`

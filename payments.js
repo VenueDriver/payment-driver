@@ -182,20 +182,23 @@ let postHandler = new BaseHandler("post").willDo(
           await template.render('error', { 'error': error }))
       }
 
-      Hook.execute('before-sending-email-notifications');
       var templateParameters = paymentRequest
 
       // This notification goes to the customer.
       templateParameters.subject = "Payment to " + company
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-email-to-customer'
-      await EmailNotification.sendEmail(templateName, templateParameters)
+      global.handler.emailToCustomerParameters = templateParameters
+      Hook.execute('before-sending-confirmation-email-to-customer')
+      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
       templateParameters.subject = "Payment from " + paymentRequest.email
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-email-to-requestor'
-      await EmailNotification.sendEmail(templateName, templateParameters)
+      global.handler.emailToRequestorParameters = templateParameters
+      Hook.execute('before-sending-confirmation-email-to-requestor')
+      await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
       Hook.execute('after-sending-email-notifications');
 

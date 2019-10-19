@@ -14,6 +14,7 @@ const authenticatorMiddleware = require('./middleware/authenticate')
 const bypassPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-payment-request-authenticator')
 const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
 const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
+const Hook      = require('./lib/Hook')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -173,13 +174,17 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.subject = "Payment request from " + company
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-request-email-to-customer'
-      await EmailNotification.sendEmail(templateName, templateParameters)
+      global.handler.emailToCustomerParameters = templateParameters
+      Hook.execute('before-sending-request-email-to-customer')
+      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
       templateParameters.subject = "Payment request to " + paymentRequest.email
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-request-email-to-requestor'
-      await EmailNotification.sendEmail(templateName, templateParameters)
+      global.handler.emailToRequestorParameters = templateParameters
+      Hook.execute('before-sending-request-email-to-requestor')
+      await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
       return new Response('200').send(
         await template.render('payment-request-confirmation', templateParameters))
