@@ -1,6 +1,5 @@
 'use strict'
 console.log("payment-requests.js");
-
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
@@ -125,7 +124,7 @@ let newHandler = new BaseHandler("new").willDo(
     for(let i = 0; i < fields.length; i++){
       fields[i].partial = await template.renderPartial("forms/"+fields[i].value, templateParameters)
     }
-    
+
 
     templateParameters = { ...templateParameters, fields };
 
