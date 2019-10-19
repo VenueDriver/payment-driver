@@ -1,4 +1,5 @@
 'use strict'
+
 console.log("payment-requests.js");
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
