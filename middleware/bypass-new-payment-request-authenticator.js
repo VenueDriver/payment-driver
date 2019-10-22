@@ -7,6 +7,7 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
   try {
     let accessToken = authorizer.getValidAccessTokenFromQueryParams(event);
     global.handler.paymentRequestRequestPayload = authorizer.verify(accessToken);
+    console.log("Token Payload:",global.handler.paymentRequestRequestPayload);
     global.handler.queryParams = `?payment-request-token=${accessToken}`;
     global.handler.skipAuthentication = true;
   }
