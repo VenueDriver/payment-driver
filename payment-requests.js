@@ -67,20 +67,26 @@ let indexHandler = new BaseHandler("index").willDo(
           await template.render('payment-request', templateParameters))
       }
       else {
-        var paymentRequests = await PaymentRequest.index()
+        // TODO -- Remove this.
+        // Temporarily disabled this page that's outside of our MVP use case
+        // because we have a problem with the authentication bypass code that
+        // causes this page to be revealed to people following links to
+        // status pages for existing payment requests.
 
-        templateParameters = {
-          'paymentRequests': paymentRequests,
-          'created_at_escaped': function () {
-            return encodeURIComponent(this.created_at)
-          },
-          "created_at_moment": function () {
-            return moment(this.created_at).fromNow()
-          }
-        }
+        // var paymentRequests = await PaymentRequest.index()
 
-        return new Response('200').send(
-          await template.render('payment-requests', templateParameters))
+        // templateParameters = {
+        //   'paymentRequests': paymentRequests,
+        //   'created_at_escaped': function () {
+        //     return encodeURIComponent(this.created_at)
+        //   },
+        //   "created_at_moment": function () {
+        //     return moment(this.created_at).fromNow()
+        //   }
+        // }
+
+        // return new Response('200').send(
+        //   await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
@@ -125,7 +131,7 @@ let newHandler = new BaseHandler("new").willDo(
     for(let i = 0; i < fields.length; i++){
       fields[i].partial = await template.renderPartial("forms/"+fields[i].value, templateParameters)
     }
-    
+
 
     templateParameters = { ...templateParameters, fields };
 
