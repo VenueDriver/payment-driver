@@ -143,12 +143,6 @@
         Change event is not fired when value is assigned within the rendering.
        */
       jQuery(document).ready(function(){
-        var amount = $("#amount");
-        var isAmountPresent = amount.val().trim().length > 0;
-        if (isAmountPresent) {
-          amount.trigger('change');
-        }
-
         (function($){
           // JAVASCRIPT SUCKS AND THE OFFSET FOR GMT-3 is = POSITIVE 180 (+180), FOR GMT+3 IT IS NEGATIVE 180 (-180)
           // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
@@ -169,6 +163,11 @@
           }
           // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
           $("#additional_fields").on("change",loadAdditionalFields);
+          var amount = $("#amount");
+          var isAmountPresent = amount.val().trim().length > 0;
+          if (isAmountPresent) {
+            amount.trigger('change');
+          }
         })(jQuery)
 
       });
