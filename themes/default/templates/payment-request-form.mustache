@@ -150,6 +150,7 @@
           $('#display-timezone').text("(GMT"+(offset/60)+")");
 
           var loadAdditionalFields = function(){
+            console.log("Trigger additional fields");
             var output = $("#additional-fields-output");
             if($(this).val() === ""){
               output.empty();
