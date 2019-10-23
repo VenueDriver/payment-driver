@@ -120,24 +120,6 @@
     {{> scripts }}
     <script type="text/javascript">
 
-
-      jQuery(function () {
-        $('#datetimepicker1').datetimepicker();
-        $('#datetimepicker1').on("change.datetimepicker", function (e) {
-          var expiration = new Date($('#display-expiration').val()).toISOString();
-          $('input[name="expiration"]').val(expiration);
-        });
-      });
-
-      jQuery(function () {
-          var account = $('#account-hidden').val().trim();
-          var accountOption = $(`#account option[value="${account}"]`);
-
-          if (account && accountOption.length) {
-              $("#account").val(account);
-          }
-      });
-
       /*
         Notify UI that Amount value has been changed.
         Change event is not fired when value is assigned within the rendering.
@@ -173,6 +155,20 @@
           if (isAmountPresent) {
             amount.trigger('change');
           }
+
+          $('#datetimepicker1').datetimepicker();
+          $('#datetimepicker1').on("change.datetimepicker", function (e) {
+            var expiration = new Date($('#display-expiration').val()).toISOString();
+            $('input[name="expiration"]').val(expiration);
+          });
+
+          var account = $('#account-hidden').val().trim();
+          var accountOption = $(`#account option[value="${account}"]`);
+
+          if (account && accountOption.length) {
+              $("#account").val(account);
+          }
+          
         })(jQuery)
 
       });
