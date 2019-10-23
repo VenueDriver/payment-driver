@@ -163,7 +163,11 @@
             }
           }
           // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
-          $("#additional_fields").on("change",loadAdditionalFields);
+          var additionalFields = $("#additional_fields");
+          if(additionalFields.length > 0){
+            additionalFields.on("change",loadAdditionalFields);
+            additionalFields.trigger("change");
+          }
           var amount = $("#amount");
           var isAmountPresent = amount.val().trim().length > 0;
           if (isAmountPresent) {
