@@ -30,6 +30,7 @@ let indexHandler = new BaseHandler("index").willDo(
   }
 )
 
+
 indexHandler.middleware(authenticatorMiddleware);
 
 // Login handler
