@@ -156,7 +156,7 @@ newHandler.middleware([
 */
 
 
-let postHandler = new BaseHandler("post").willDo(
+let postHandler = new BaseHandler("Post Payment Request").willDo(
   async function (event, context) {
 
     // Create the payment request record
