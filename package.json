@@ -63,6 +63,7 @@
     "nock": "^9.1.6",
     "node-http-server": "^8.1.2",
     "nyc": "^14.1.1",
+    "print-directory-tree": "^1.0.0",
     "sam-launchpad": "^1.1.23",
     "sinon": "^6.1.5",
     "watch-run": "^1.2.5"
