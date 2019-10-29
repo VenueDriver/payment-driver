@@ -151,7 +151,7 @@ let postHandler = new BaseHandler("post").willDo(
         source: stripeToken
       };
 
-      Hook.execute('before-sending-to-stripe');
+      await Hook.execute('before-sending-to-stripe');
 
 
 
@@ -160,21 +160,21 @@ let postHandler = new BaseHandler("post").willDo(
 
       paymentRequest.params = params;
 
-      Hook.execute('after-sending-to-stripe');
+      await Hook.execute('after-sending-to-stripe');
 
       if(paymentRequest.payment.status == "succeeded"){
-        Hook.execute('after-successful-payment');
+        await Hook.execute('after-successful-payment');
         paymentRequest.paid = true;
         paymentRequest.paid_at = new Date().toISOString()
       }else{
-        Hook.execute('after-unsuccessful-payment');
+        await Hook.execute('after-unsuccessful-payment');
       }
 
 
       try {
-        Hook.execute('before-updating-dynamodb');
+        await Hook.execute('before-updating-dynamodb');
         await PaymentRequest.putPayment(paymentRequest);
-        Hook.execute('after-updating-dynamodb');
+        await Hook.execute('after-updating-dynamodb');
       }
       catch (error) {
         return new Response('200').send(
@@ -188,7 +188,7 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-email-to-customer'
       global.handler.emailToCustomerParameters = templateParameters
-      Hook.execute('before-sending-confirmation-email-to-customer')
+      await Hook.execute('before-sending-confirmation-email-to-customer')
       await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
@@ -196,10 +196,10 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-email-to-requestor'
       global.handler.emailToRequestorParameters = templateParameters
-      Hook.execute('before-sending-confirmation-email-to-requestor')
+      await Hook.execute('before-sending-confirmation-email-to-requestor')
       await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
-      Hook.execute('after-sending-email-notifications');
+      await Hook.execute('after-sending-email-notifications');
 
       return new Response('200').send(
         await template.render('payment-confirmation', templateParameters))

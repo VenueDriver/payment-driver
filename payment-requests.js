@@ -181,7 +181,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-request-email-to-customer'
       global.handler.emailToCustomerParameters = templateParameters
-      Hook.execute('before-sending-request-email-to-customer')
+      await Hook.execute('before-sending-request-email-to-customer')
       await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
@@ -189,7 +189,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-request-email-to-requestor'
       global.handler.emailToRequestorParameters = templateParameters
-      Hook.execute('before-sending-request-email-to-requestor')
+      await Hook.execute('before-sending-request-email-to-requestor')
       await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
       return new Response('200').send(
