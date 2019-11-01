@@ -43,6 +43,7 @@
     "jwk-to-pem": "^2.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.22.1",
+    "moment-timezone": "^0.5.27",
     "mustache": "^2.3.0",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
