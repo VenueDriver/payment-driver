@@ -95,7 +95,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: home.index
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 10
       Policies: AmazonDynamoDBFullAccess
       Events:
@@ -109,7 +109,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: home.login
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -130,7 +130,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: home.logout
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
       Events:
@@ -144,7 +144,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.index
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -159,7 +159,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.new
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -174,7 +174,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.post
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -195,7 +195,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payment-requests.resend
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -216,7 +216,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: payments.get
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
@@ -239,7 +239,7 @@ Resources:
     Properties:
       Timeout: 360
       Handler: payments.post
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
