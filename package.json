@@ -45,6 +45,7 @@
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.27",
     "mustache": "^2.3.0",
+    "print-directory-tree": "^1.0.1",
     "querystring": "^0.2.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
