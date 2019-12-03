@@ -6,6 +6,7 @@ const CognitoAuthenticator = require('../lib/CognitoAuthenticator')
 
 
 async function authenticate(event, context) {
+  console.log("Trying to authenticate")
   if (global.handler.skipAuthentication) {
     console.log("Authenticator Middleware: Skipping authentication.");
     return;
@@ -13,11 +14,6 @@ async function authenticate(event, context) {
   // Check for the access token cookie and verify it if it exists.
   var accessToken
   try {
-    const authenticator =
-      new CognitoAuthenticator(
-        process.env.AWS_REGION,
-        process.env.USER_POOL_ID,
-        process.env.CLIENT_ID)
     const authorizer = new APIGatewayAuthorizer()
 
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
