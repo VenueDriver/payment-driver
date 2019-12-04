@@ -122,7 +122,9 @@ function redirectToPaymentRequestsResponse(event, accessToken) {
       // Add the authentication token as a cookie.
       'Set-Cookie':
         // This is a session cookie, since it has no expiration set.
-        'access_token = ' + accessToken + "; Secure; SameSite=Strict"
+        'access_token = ' + accessToken + (
+          process.env.STAGE_NAME == 'development' ? "" : "; Secure; SameSite=Strict"
+        )
     }
   })
 }
