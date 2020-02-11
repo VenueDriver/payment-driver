@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Payment Rejected - Payment Driver</title>
+    {{> head }}
+  </head>
+
+  <body>
+
+    <div class="container">
+      {{> logo }}
+
+      <div class="jumbotron">
+        <h1>Rejected</h1>
+        <p class="lead">The expiration date can't be greater than the event date and time.<br>You're being redirected to the previous form..</p>
+
+      </div>
+    </div>
+
+    {{> scripts }}
+    <script type="text/javascript">
+      setTimeout(function(){
+        window.location.href = "{{#full_app_url}}/payment-requests-new{{{queryParams}}}{{/full_app_url}}";
+      },5000);
+    </script>
+  </body>
+
+
+
+</html>

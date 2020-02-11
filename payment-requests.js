@@ -137,7 +137,6 @@ let newHandler = new BaseHandler("new").willDo(
     templateParameters = { ...templateParameters, fields };
 
     console.log("new.templateParameters",templateParameters);
-
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
   }
@@ -158,7 +157,6 @@ newHandler.middleware([
 
 let postHandler = new BaseHandler("Post Payment Request").willDo(
   async function (event, context) {
-
     // Create the payment request record
     var paymentRequest = querystring.parse(event.body)
     paymentRequest['id'] = uuidv1()
@@ -171,32 +169,51 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     if(decimals[1].length == 1) decimals[1] = decimals[1] + "0";
     paymentRequest.total = decimals[0] + "." + decimals[1];
 
-    try {
-      await PaymentRequest.put(paymentRequest)
-      var templateParameters = paymentRequest
+    var templateParameters = paymentRequest
 
-      // This notification goes to the customer.
-      templateParameters.subject = "Payment request from " + company
-      templateParameters.to = paymentRequest.email
-      var templateName = 'payment-request-email-to-customer'
-      global.handler.emailToCustomerParameters = templateParameters
-      await Hook.execute('before-sending-request-email-to-customer')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
+    //Check if the expiration date is valid
+    var maxDate = new Date(paymentRequest.event_open).toISOString();
+    var formDate = new Date(paymentRequest.expiration);
 
-      // This notification goes to the requestor.
-      templateParameters.subject = "Payment request to " + paymentRequest.email
-      templateParameters.to = paymentRequest.requestor
-      templateName = 'payment-request-email-to-requestor'
-      global.handler.emailToRequestorParameters = templateParameters
-      await Hook.execute('before-sending-request-email-to-requestor')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
-
-      return new Response('200').send(
-        await template.render('payment-request-confirmation', templateParameters))
-    }
-    catch (error) {
-      return new Response('200').send(
-        await template.render('error', { 'error': error }))
+    //If the expiration date is greater than the event date/time, it will render
+    //the rejected payment request template and THEN redirect the user back 
+    //to the form.
+    if(formDate > maxDate){
+      try{
+        templateParameters.queryParams = global.handler.queryParams;
+        return new Response('200').send(
+          await template.render('payment-request-rejected', templateParameters))
+      } catch(error){
+        return new Response('200').send(
+          await template.render('error', { 'error': error }))
+      }
+    } else {
+      try {
+        await PaymentRequest.put(paymentRequest)
+        
+        // This notification goes to the customer.
+        templateParameters.subject = "Payment request from " + company
+        templateParameters.to = paymentRequest.email
+        var templateName = 'payment-request-email-to-customer'
+        global.handler.emailToCustomerParameters = templateParameters
+        await Hook.execute('before-sending-request-email-to-customer')
+        await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
+  
+        // This notification goes to the requestor.
+        templateParameters.subject = "Payment request to " + paymentRequest.email
+        templateParameters.to = paymentRequest.requestor
+        templateName = 'payment-request-email-to-requestor'
+        global.handler.emailToRequestorParameters = templateParameters
+        await Hook.execute('before-sending-request-email-to-requestor')
+        await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
+  
+        return new Response('200').send(
+          await template.render('payment-request-confirmation', templateParameters))
+      }
+      catch (error) {
+        return new Response('200').send(
+          await template.render('error', { 'error': error }))
+      }
     }
   }
 )
