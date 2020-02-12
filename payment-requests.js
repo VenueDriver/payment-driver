@@ -1,6 +1,5 @@
 'use strict'
 
-console.log("payment-requests.js");
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
@@ -19,8 +18,6 @@ const Hook      = require('./lib/Hook')
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
-console.log("Dependencies Ready");
-
 // * ====================================== *
 // * HANDLERS
 // * ====================================== *
@@ -36,7 +33,8 @@ console.log("Dependencies Ready");
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    console.log("payment-requests.index");
+    if(process.env.DEBUG){
+      console.log("payment-requests.index"); }
     var templateParameters
 
     try {
@@ -109,7 +107,6 @@ indexHandler.middleware([
 
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
-    console.log("\nNew Handler\n");
     let routes = await template.getRoutes();
     if(!routes.forms) route.forms = { partials : {} };
     let fields = Object.keys(routes.forms.partials)
@@ -136,7 +133,8 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    console.log("new.templateParameters",templateParameters);
+    if(process.env.DEBUG){
+      console.log("new.templateParameters",templateParameters); }
 
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
