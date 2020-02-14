@@ -1,6 +1,5 @@
 'use strict'
 
-console.log("payment-requests.js");
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
@@ -19,8 +18,6 @@ const Hook      = require('./lib/Hook')
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
-console.log("Dependencies Ready");
-
 // * ====================================== *
 // * HANDLERS
 // * ====================================== *
@@ -36,7 +33,8 @@ console.log("Dependencies Ready");
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    console.log("payment-requests.index");
+    if(process.env.DEBUG){
+      console.log("payment-requests.index"); }
     var templateParameters
 
     try {
@@ -74,20 +72,35 @@ let indexHandler = new BaseHandler("index").willDo(
         // causes this page to be revealed to people following links to
         // status pages for existing payment requests.
 
-        // var paymentRequests = await PaymentRequest.index()
+        var paymentRequests = await PaymentRequest.index()
+        
+        //get current date and time to filter payment requests
+        var today = new Date();
+        var time =  ("0" + today.getHours()).slice(-2) + ':' + ("0" + today.getMinutes()).slice(-2);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
 
-        // templateParameters = {
-        //   'paymentRequests': paymentRequests,
-        //   'created_at_escaped': function () {
-        //     return encodeURIComponent(this.created_at)
-        //   },
-        //   "created_at_moment": function () {
-        //     return moment(this.created_at).fromNow()
-        //   }
-        // }
+        today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
+        today = new Date(today).toISOString();
+        
+        var expiredPayments = paymentRequests.filter(function(p){
+          return today < new Date(p.expiration).toISOString();
+        });
 
-        // return new Response('200').send(
-        //   await template.render('payment-requests', templateParameters))
+
+        templateParameters = {
+          'paymentRequests': paymentRequests,
+          'created_at_escaped': function () {
+            return encodeURIComponent(this.created_at)
+          },
+          "created_at_moment": function () {
+            return moment(this.created_at).fromNow()
+          }
+        }
+        // console.log('dashboard params',templateParameters);
+        return new Response('200').send(
+          await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
@@ -109,7 +122,6 @@ indexHandler.middleware([
 
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
-    console.log("\nNew Handler\n");
     let routes = await template.getRoutes();
     if(!routes.forms) route.forms = { partials : {} };
     let fields = Object.keys(routes.forms.partials)
@@ -136,7 +148,9 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    console.log("new.templateParameters",templateParameters);
+    if(process.env.DEBUG){
+      console.log("new.templateParameters",templateParameters); }
+
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
   }

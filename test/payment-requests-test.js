@@ -16,7 +16,7 @@ describe('Payment Driver', function () {
   describe('payment requests REST resource', function () {
 
     it('should send a payment request form when the index is requested', async() => {
-      const result = await paymentRequests.new({ 'headers': { 'Host': 'example.com' } }, {})
+      const result = await paymentRequests.new({ 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 

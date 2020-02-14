@@ -138,6 +138,14 @@ Only authorized users can send payment requests and review payment records.  The
 
     npm test
 
+Set the `DEBUG` environment variable if you want to see the console output:
+
+    DEBUG=true npm test
+
+To run a single test:
+
+    node_modules/mocha/bin/mocha -g 'should send a payment request form when the index is requested'
+
 #### Operation hooks
 You can add hooks to the theme by including a `async/await` compatible function inside `theme-name/hooks/hook-name.js`.
 This is an example:

@@ -2,7 +2,8 @@ const PaymentRequestAuthorizer = require('../lib/PaymentRequestAuthorizer');
 const Response = require('../lib/Response')
 
 async function bypassNewPaymentRequestAuthenticator(event, context) {
-  console.log("\nBypassNewPaymentRequestAuthenticator\n");
+  if(process.env.DEBUG){
+  console.log("\nBypassNewPaymentRequestAuthenticator\n"); }
   const authorizer = new PaymentRequestAuthorizer();
 
   let paymentRequestRequestPayload = null;

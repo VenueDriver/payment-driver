@@ -6,9 +6,11 @@ const CognitoAuthenticator = require('../lib/CognitoAuthenticator')
 
 
 async function authenticate(event, context) {
-  console.log("Trying to authenticate")
+  if(process.env.DEBUG){
+    console.log("Trying to authenticate") }
   if (global.handler.skipAuthentication) {
-    console.log("Authenticator Middleware: Skipping authentication.");
+    if(process.env.DEBUG){
+      console.log("Authenticator Middleware: Skipping authentication."); }
     return;
   }
   // Check for the access token cookie and verify it if it exists.
