@@ -72,20 +72,35 @@ let indexHandler = new BaseHandler("index").willDo(
         // causes this page to be revealed to people following links to
         // status pages for existing payment requests.
 
-        // var paymentRequests = await PaymentRequest.index()
+        var paymentRequests = await PaymentRequest.index()
+        
+        //get current date and time to filter payment requests
+        var today = new Date();
+        var time =  ("0" + today.getHours()).slice(-2) + ':' + ("0" + today.getMinutes()).slice(-2);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
 
-        // templateParameters = {
-        //   'paymentRequests': paymentRequests,
-        //   'created_at_escaped': function () {
-        //     return encodeURIComponent(this.created_at)
-        //   },
-        //   "created_at_moment": function () {
-        //     return moment(this.created_at).fromNow()
-        //   }
-        // }
+        today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
+        today = new Date(today).toISOString();
+        
+        var expiredPayments = paymentRequests.filter(function(p){
+          return today < new Date(p.expiration).toISOString();
+        });
 
-        // return new Response('200').send(
-        //   await template.render('payment-requests', templateParameters))
+
+        templateParameters = {
+          'paymentRequests': paymentRequests,
+          'created_at_escaped': function () {
+            return encodeURIComponent(this.created_at)
+          },
+          "created_at_moment": function () {
+            return moment(this.created_at).fromNow()
+          }
+        }
+        // console.log('dashboard params',templateParameters);
+        return new Response('200').send(
+          await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
@@ -179,7 +194,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
       var templateName = 'payment-request-email-to-customer'
       global.handler.emailToCustomerParameters = templateParameters
       await Hook.execute('before-sending-request-email-to-customer')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
+      // await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
       templateParameters.subject = "Payment request to " + paymentRequest.email
@@ -187,7 +202,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
       templateName = 'payment-request-email-to-requestor'
       global.handler.emailToRequestorParameters = templateParameters
       await Hook.execute('before-sending-request-email-to-requestor')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
+      // await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
       return new Response('200').send(
         await template.render('payment-request-confirmation', templateParameters))
