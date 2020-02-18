@@ -7,43 +7,245 @@
   </head>
 
   <body>
-
+    
     <div class="container">
       {{> logo }}
       {{> navbar }}
 
+      <h1>Payment Requests</h1>
+      <label>Search for payments by email
+      <input type="text" id="emailSearch">
+
+      </label>
+
       <div class="d-flex w-100 justify-content-between">
-        <h2 class="mb-1">Payment requests</h2>
+        <h2 class="mb-1">Soon To Expire Requests</h2>
+        <div class="controlContainer" id="soonControlsContainer">
+          <span class="back" id="soonBack"><</span><span class="forward" id="soonForward">></span>
+          <input style="display:none" class="value"  id="soonValue" type="number" min="1">
+        </div>
         <div>
           <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-new{{/full_app_url}}" role="button">create new</a>
         </div>
       </div>
 
-      <p>
-        <ul class="list-group">
-        {{#paymentRequests}}
-          <a href="{{#full_app_url}}payment-requests?id={{id}}&created_at={{created_at_escaped}}{{/full_app_url}}" class="list-group-item list-group-item-action flex-column align-items-start">
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{email}}</h5>
-              <small>{{created_at_moment}}</small>
-            </div>
-            <p class="mb-1">{{description}}</p>
-            <small>${{amount}}</small>
-            {{#paid}}
-            <span class="badge badge-success badge-pill">PAID</span>
-            {{/paid}}
-          </a>
-        {{/paymentRequests}}
+      <p id="soonToExpirePaymentsContainer">
+        <ul id="soonToExpirePayments" class="list-group">
+
         </ul>
-        {{^paymentRequests}}
-          No payment requests found.
-        {{/paymentRequests}}
+      </p>
+
+      <div class="d-flex w-100 justify-content-between">
+        <h2 class="mb-1">Long To Expire Requests</h2>
+        <div class="controlContainer" id="longControlsContainer">
+          <span class="back" id="longBack"><</span><span class="forward" id="longForward">></span>
+          <input style="display:none" class="value" id="longValue" type="number" min="1">
+        </div>
+      </div>
+      <p id="longToExpirePaymentsContainer">
+        <ul id="longToExpirePayments" class="list-group">
+        
+        </ul>
+      </p>
+
+      <div class="d-flex w-100 justify-content-between">
+        <h2 class="mb-1">Expired Requests</h2>
+        <div class="controlContainer" id="expiredControlsContainer">
+          <span class="back" id="expiredBack"><</span><span class="forward" id="expiredForward">></span>
+          <input style="display:none" class="value" min="1" id="expiredValue" type="number">
+        </div>
+      </div>
+      <p id="expiredPaymentsContainer">
+        <ul id="expiredPayments" class="list-group">
+        </ul>
       </p>
 
       {{> footer }}
     </div>
 
     {{> scripts }}
+
+    <script type="text/javascript">
+    var expiredPayments = [{{{expiredPayments}}}], longToExpirePayments = [{{{longToExpirePayments}}}], soonToExpirePayments = [{{{soonToExpirePayments}}}];
+    var increment = 5;
+    var displayedExpired = filterPayments(expiredPayments);
+    var displayedLong = filterPayments(longToExpirePayments);
+    var displayedSoon = filterPayments(soonToExpirePayments);
+
+    function filterPayments(data , email = null){
+      if(email){
+        data = data.filter( function(obj){
+          var result = false;
+          if (obj.email && obj.email.includes(email)){
+            result = true;
+          }
+          return result;
+        });
+      }
+
+      data = data.map( obj => {
+        return returnFormedElement(obj);
+      });
+
+      return data;
+    }
+
+    function returnArrayPortion(index, data , quantity ){
+      var resultingData = "";
+
+      
+      if( index === 1){
+        var diffIndex = 0;
+      } else {
+        var diffIndex = index - 1;
+      }
+
+      if(data.length >= (diffIndex*quantity)){
+        for( var i = (quantity*diffIndex) ; i < (quantity*index) ; i++){
+          if(data[i]){
+            resultingData += data[i];
+          }
+        }
+      }
+
+      if(resultingData.length === 0){
+        resultingData = "No Payments Found";
+      }
+      
+      return resultingData;
+    }
+
+    function returnFormedElement(obj){
+      var element = '<a href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" class="list-group-item list-group-item-action flex-column align-items-start">'+
+      '<div class="d-flex w-100 justify-content-between">'+
+      '<h5 class="mb-1">'+obj.email+'</h5>'+
+      '<small>'+obj.created_at_moment+'</small>'+
+      '</div>'+
+      '<p class="mb-1">'+obj.description+'</p>'+
+      '<small>$'+obj.amount+'</small>';
+      if(obj.paid){
+        element += '<span class="badge badge-success badge-pill">PAID</span>';
+      }
+      element += '</a>';
+      return element; 
+    }
+
+    function checkArrowAvailability(container){
+      var val = container.find('.value').first().val();
+      if(val <= 1){
+        container.find('.back').first().css('opacity','0.5');
+      } else {
+        container.find('.back').first().css('opacity','1');
+      }
+
+      if( val >= container.find('.value').first().attr('max')){
+        container.find('.forward').first().css('opacity','0.5');
+      } else {
+        container.find('.forward').first().css('opacity','1');
+      }
+    }
+
+    function calculateMax(data,increment){
+      return Math.ceil(data.length/increment);
+    }
+
+    function updatePaymentsDisplayed(){
+      $('.value').each(function(){
+        $(this).val(1);
+      })
+
+      $('#expiredPayments,#longToExpirePayments,#soonToExpirePayments').empty();
+      $('#expiredPayments').append(returnArrayPortion($('#expiredValue').val(),displayedExpired,increment));
+      $('#longToExpirePayments').append(returnArrayPortion($('#longValue').val(),displayedLong,increment));
+      $('#soonToExpirePayments').append(returnArrayPortion($('#soonValue').val(),displayedSoon,increment));
+
+      
+      if(displayedExpired.length > 0){
+        $('#expiredControlsContainer').fadeIn('fast');
+        var max = calculateMax(displayedExpired,increment);
+        $('#expiredControlsContainer').find('.value').first().attr('max',max);
+        checkArrowAvailability($('#expiredControlsContainer'));
+      } else {
+        $('#expiredControlsContainer').fadeOut('fast');
+      }
+
+      if(displayedLong.length > 0){
+        $('#longControlsContainer').fadeIn('fast');
+        var max = calculateMax(displayedLong,increment);
+        $('#longControlsContainer').find('.value').first().attr('max',max);
+        checkArrowAvailability($('#longControlsContainer'));
+      } else {
+        $('#longControlsContainer').fadeOut('fast');
+      }
+
+      if(displayedSoon.length > 0){
+        $('#soonControlsContainer').fadeIn('fast');
+        var max = calculateMax(displayedSoon,increment);
+        $('#soonControlsContainer').find('.value').first().attr('max',max);
+        checkArrowAvailability($('#soonControlsContainer'));
+      } else {
+        $('#soonControlsContainer').fadeOut('fast');
+      }
+    }
+
+    jQuery(document).ready(function(){
+        (function($){
+
+          updatePaymentsDisplayed();
+
+          $('.back').on('click',function(){
+            var input = $(this).closest('.controlContainer').find('.value').first();
+            var oldValue = $(input).val();
+            var inputId = $(input).attr('id');
+            document.getElementById(inputId).stepDown();
+            var newValue = $(input).val();
+            if(oldValue !== newValue){
+              $(input).trigger('change');
+            }
+          });
+
+          $('.forward').on('click',function(){
+            var input = $(this).closest('.controlContainer').find('.value').first();
+            var oldValue = $(input).val();
+            var inputId = $(input).attr('id');
+            document.getElementById(inputId).stepUp();
+            var newValue = $(input).val();
+            if(oldValue !== newValue){
+              $(input).trigger('change');
+            }
+          });
+
+          $('.value').on('change',function(){
+            checkArrowAvailability($(this).closest('.controlContainer'));
+          });
+
+
+          $('#soonValue').on('change',function(){
+            $('#soonToExpirePayments').empty().append(returnArrayPortion($('#soonValue').val(),displayedSoon,increment));
+          });
+
+          $('#longValue').on('change',function(){
+            $('#longToExpirePayments').empty().append(returnArrayPortion($('#longValue').val(),displayedLong,increment));
+          });
+
+          $('#expiredValue').on('change',function(){
+            $('#expiredPayments').empty().append(returnArrayPortion($('#expiredValue').val(),displayedExpired,increment));
+          });
+
+          $('#emailSearch').on('input change',function(){
+            var val = $(this).val();
+
+            displayedExpired = filterPayments(expiredPayments,val);
+            displayedLong = filterPayments(longToExpirePayments,val);
+            displayedSoon = filterPayments(soonToExpirePayments,val);
+
+            updatePaymentsDisplayed();
+          });
+
+        })(jQuery)
+    });
+
+    </script>
   </body>
 
 </html>

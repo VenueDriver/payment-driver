@@ -82,23 +82,35 @@ let indexHandler = new BaseHandler("index").willDo(
         var yyyy = today.getFullYear();
 
         today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
-        today = new Date(today).toISOString();
+        today = new Date(today).getTime();
         
-        var expiredPayments = paymentRequests.filter(function(p){
-          return today < new Date(p.expiration).toISOString();
-        });
+        var expiredPayments = [], soonToExpirePayments = [] , longToExpirePayments = [];
 
+        //adding a day to the current date and time to check for soon to expire payment requests
+        var marginDate = new Date(new Date(today).setDate(new Date(today).getDate() + 1)).getTime();
+
+        //filter the payments in three different arrays
+        for( var i = 0 ; i < paymentRequests.length ; i++ ){
+          var paymentDate = new Date(paymentRequests[i].expiration).getTime();
+          paymentRequests[i].created_at_escaped = encodeURIComponent(paymentRequests[i].created_at);
+          paymentRequests[i].created_at_moment = moment(paymentRequests[i].created_at).fromNow();
+
+          if( today > paymentDate ){
+            expiredPayments.push(JSON.stringify(paymentRequests[i]));
+          } else if( today < paymentDate && paymentDate <= marginDate ){
+              soonToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+          else if ( today < paymentDate && paymentDate > marginDate ){
+            longToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+        }        
 
         templateParameters = {
-          'paymentRequests': paymentRequests,
-          'created_at_escaped': function () {
-            return encodeURIComponent(this.created_at)
-          },
-          "created_at_moment": function () {
-            return moment(this.created_at).fromNow()
-          }
+          'soonToExpirePayments': soonToExpirePayments,
+          'longToExpirePayments': longToExpirePayments,
+          'expiredPayments': expiredPayments
         }
-        // console.log('dashboard params',templateParameters);
+        console.log('dashboard params',templateParameters);
         return new Response('200').send(
           await template.render('payment-requests', templateParameters))
       }
