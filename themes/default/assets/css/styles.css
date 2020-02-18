@@ -41,3 +41,37 @@ form,
   margin-right: auto;
   margin-bottom: 2em;
 }
+
+.controlContainer span{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.controlContainer span.current,.controlContainer span.paymentsTotal,.controlContainer span.separator{
+  font-size: 18px;
+  font-weight: normal;
+}
+.controlContainer span.back,.controlContainer span.forward{
+  font-size: 24px;
+  padding: 2px 2px 6px 2px;
+  border: 1px solid black;
+  border-radius: 25%;
+  opacity: 1;
+  cursor: pointer;
+}
+.controlContainer span.current{
+  margin-left: 10px;
+}
+.controlContainer span.paymentsTotal{
+  margin-right: 10px;
+}
+.controlContainer span.disabled{
+  opacity: 0.5;
+}
+.payments-title{
+  margin-top: 30px;
+  margin-bottom: 10px;
+}

@@ -12,20 +12,22 @@
       {{> logo }}
       {{> navbar }}
 
-      <h1>Payment Requests</h1>
+      <div class="d-flex w-100 justify-content-between payments-title">
+        <h1>Payment Requests</h1>
+        <div>
+          <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-new{{/full_app_url}}" role="button">create new</a>
+        </div>
+      </div>
       <label>Search for payments by email
       <input type="text" id="emailSearch">
 
       </label>
 
-      <div class="d-flex w-100 justify-content-between">
+      <div class="d-flex w-100 justify-content-between payments-title">
         <h2 class="mb-1">Soon To Expire Requests</h2>
         <div class="controlContainer" id="soonControlsContainer">
-          <span class="back" id="soonBack"><</span><span class="forward" id="soonForward">></span>
+          <span class="back" id="soonBack"><</span><span class="current" id="soonCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="soonTotal"></span><span class="forward" id="soonForward">></span>
           <input style="display:none" class="value"  id="soonValue" type="number" min="1">
-        </div>
-        <div>
-          <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-new{{/full_app_url}}" role="button">create new</a>
         </div>
       </div>
 
@@ -35,10 +37,10 @@
         </ul>
       </p>
 
-      <div class="d-flex w-100 justify-content-between">
+      <div class="d-flex w-100 justify-content-between payments-title">
         <h2 class="mb-1">Long To Expire Requests</h2>
         <div class="controlContainer" id="longControlsContainer">
-          <span class="back" id="longBack"><</span><span class="forward" id="longForward">></span>
+          <span class="back" id="longBack"><</span><span class="current" id="longCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="longTotal"></span><span class="forward" id="longForward">></span>
           <input style="display:none" class="value" id="longValue" type="number" min="1">
         </div>
       </div>
@@ -48,10 +50,10 @@
         </ul>
       </p>
 
-      <div class="d-flex w-100 justify-content-between">
+      <div class="d-flex w-100 justify-content-between payments-title">
         <h2 class="mb-1">Expired Requests</h2>
         <div class="controlContainer" id="expiredControlsContainer">
-          <span class="back" id="expiredBack"><</span><span class="forward" id="expiredForward">></span>
+          <span class="back" id="expiredBack"><</span><span class="current" id="expiredCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="expiredTotal"></span><span class="forward" id="expiredForward">></span>
           <input style="display:none" class="value" min="1" id="expiredValue" type="number">
         </div>
       </div>
@@ -107,10 +109,6 @@
           }
         }
       }
-
-      if(resultingData.length === 0){
-        resultingData = "No Payments Found";
-      }
       
       return resultingData;
     }
@@ -133,15 +131,15 @@
     function checkArrowAvailability(container){
       var val = container.find('.value').first().val();
       if(val <= 1){
-        container.find('.back').first().css('opacity','0.5');
+        container.find('.back').first().addClass('disabled');
       } else {
-        container.find('.back').first().css('opacity','1');
+        container.find('.back').first().removeClass('disabled');
       }
 
       if( val >= container.find('.value').first().attr('max')){
-        container.find('.forward').first().css('opacity','0.5');
+        container.find('.forward').first().addClass('disabled');
       } else {
-        container.find('.forward').first().css('opacity','1');
+        container.find('.forward').first().removeClass('disabled');
       }
     }
 
@@ -165,27 +163,37 @@
         var max = calculateMax(displayedExpired,increment);
         $('#expiredControlsContainer').find('.value').first().attr('max',max);
         checkArrowAvailability($('#expiredControlsContainer'));
+        $('#expiredTotal').empty().append(max);
       } else {
         $('#expiredControlsContainer').fadeOut('fast');
+        $('#expiredPayments').append('No Payments Found');
       }
 
       if(displayedLong.length > 0){
         $('#longControlsContainer').fadeIn('fast');
         var max = calculateMax(displayedLong,increment);
         $('#longControlsContainer').find('.value').first().attr('max',max);
+        $('#longTotal').empty().append(max);
         checkArrowAvailability($('#longControlsContainer'));
       } else {
         $('#longControlsContainer').fadeOut('fast');
+        $('#longToExpirePayments').append('No Payments Found');
       }
 
       if(displayedSoon.length > 0){
         $('#soonControlsContainer').fadeIn('fast');
         var max = calculateMax(displayedSoon,increment);
         $('#soonControlsContainer').find('.value').first().attr('max',max);
+        $('#soonTotal').empty().append(max);
         checkArrowAvailability($('#soonControlsContainer'));
       } else {
         $('#soonControlsContainer').fadeOut('fast');
+        $('#soonToExpirePayments').append('No Payments Found');
       }
+
+      $('.current').each(function(){
+        $(this).empty().append('1');
+      })
     }
 
     jQuery(document).ready(function(){
@@ -194,23 +202,27 @@
           updatePaymentsDisplayed();
 
           $('.back').on('click',function(){
-            var input = $(this).closest('.controlContainer').find('.value').first();
+            var container = $(this).closest('.controlContainer');
+            var input = $(container).find('.value').first();
             var oldValue = $(input).val();
             var inputId = $(input).attr('id');
             document.getElementById(inputId).stepDown();
             var newValue = $(input).val();
             if(oldValue !== newValue){
+              $(container).find('.current').first().empty().append(newValue);
               $(input).trigger('change');
             }
           });
 
           $('.forward').on('click',function(){
-            var input = $(this).closest('.controlContainer').find('.value').first();
+            var container = $(this).closest('.controlContainer');
+            var input = $(container).find('.value').first();
             var oldValue = $(input).val();
             var inputId = $(input).attr('id');
             document.getElementById(inputId).stepUp();
             var newValue = $(input).val();
             if(oldValue !== newValue){
+              $(container).find('.current').first().empty().append(newValue);
               $(input).trigger('change');
             }
           });
