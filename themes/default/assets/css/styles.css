@@ -42,6 +42,10 @@ form,
   margin-bottom: 2em;
 }
 
+.controlContainer{
+  display: none;
+}
+
 .controlContainer span{
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -49,6 +53,10 @@ form,
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+.controlContainer span.back,.controlContainer span.forward{
+  transition-property: color, background-color;
+  transition-duration: 0.2s ease-in-out;
 }
 .controlContainer span.current,.controlContainer span.paymentsTotal,.controlContainer span.separator{
   font-size: 18px;
@@ -71,7 +79,24 @@ form,
 .controlContainer span.disabled{
   opacity: 0.5;
 }
+.controlContainer span.back:not(.disabled):hover,.controlContainer span.forward:not(.disabled):hover{
+  color: #fff;
+  background-color: #000;
+}
 .payments-title{
   margin-top: 30px;
   margin-bottom: 10px;
+}
+
+.payment__inner-container{
+  text-align: center;
+}
+.payment__inner-container div:not(:last-child){
+  margin-bottom: 10px;
+}
+.payment-badge{
+  margin-left: 5px;
+}
+#emailSearch{
+  border: 1px solid #000;
 }

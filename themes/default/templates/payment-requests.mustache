@@ -5,14 +5,14 @@
     <title>Send Payment Request - Payment Driver</title>
     {{> head }}
   </head>
-
+  
   <body>
     
     <div class="container">
       {{> logo }}
       {{> navbar }}
 
-      <div class="d-flex w-100 justify-content-between payments-title">
+      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
         <h1>Payment Requests</h1>
         <div>
           <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-new{{/full_app_url}}" role="button">create new</a>
@@ -23,7 +23,7 @@
 
       </label>
 
-      <div class="d-flex w-100 justify-content-between payments-title">
+      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
         <h2 class="mb-1">Soon To Expire Requests</h2>
         <div class="controlContainer" id="soonControlsContainer">
           <span class="back" id="soonBack"><</span><span class="current" id="soonCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="soonTotal"></span><span class="forward" id="soonForward">></span>
@@ -37,7 +37,7 @@
         </ul>
       </p>
 
-      <div class="d-flex w-100 justify-content-between payments-title">
+      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
         <h2 class="mb-1">Long To Expire Requests</h2>
         <div class="controlContainer" id="longControlsContainer">
           <span class="back" id="longBack"><</span><span class="current" id="longCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="longTotal"></span><span class="forward" id="longForward">></span>
@@ -50,7 +50,7 @@
         </ul>
       </p>
 
-      <div class="d-flex w-100 justify-content-between payments-title">
+      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
         <h2 class="mb-1">Expired Requests</h2>
         <div class="controlContainer" id="expiredControlsContainer">
           <span class="back" id="expiredBack"><</span><span class="current" id="expiredCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="expiredTotal"></span><span class="forward" id="expiredForward">></span>
@@ -73,7 +73,7 @@
     var displayedExpired = filterPayments(expiredPayments);
     var displayedLong = filterPayments(longToExpirePayments);
     var displayedSoon = filterPayments(soonToExpirePayments);
-
+    
     function filterPayments(data , email = null){
       if(email){
         data = data.filter( function(obj){
@@ -114,17 +114,37 @@
     }
 
     function returnFormedElement(obj){
-      var element = '<a href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" class="list-group-item list-group-item-action flex-column align-items-start">'+
-      '<div class="d-flex w-100 justify-content-between">'+
-      '<h5 class="mb-1">'+obj.email+'</h5>'+
-      '<small>'+obj.created_at_moment+'</small>'+
-      '</div>'+
-      '<p class="mb-1">'+obj.description+'</p>'+
+      var req100='https://';
+      var stage = "{{{environment}}}";
+      if(stage === 'staging'){
+        req100 += 'staging.';
+      }
+      req100+= 'venuedriver.com/api/reservations/'+obj.reservation_id+'/payments/request';
+
+      var req50 = req100 + '?percentage=50';
+
+      obj.email = obj.email ? obj.email : "No Email";
+      obj.description = obj.description ? obj.description : "No Description";
+
+      var element = '<div class="list-group-item flex-column align-items-start">'+
+      '<div class="d-flex w-100 justify-content-between align-items-center">'+
+      '<div><h5 class="mb-1">'+obj.email+'</h5>'+
       '<small>$'+obj.amount+'</small>';
       if(obj.paid){
-        element += '<span class="badge badge-success badge-pill">PAID</span>';
+        element += '<span class="badge payment-badge badge-success badge-pill">PAID</span>';
+      } else {
+        element += '<span class="badge payment-badge badge-secondary badge-pill">UNPAID</span>';
       }
-      element += '</a>';
+      element += '<div><small>'+obj.created_at_moment+'</small></div>'+
+      '<div><p class="mb-1">'+obj.description+'</p></div></div>'+
+      '<div class="payment__inner-container">'+
+      '<div><a class="btn btn-primary" href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" role="button">Resend</a></div>'+
+      '<div class="recreate-payment__container">'+
+      '<div><a target="_blank" class="btn btn-info" href="'+req50+'" role="button">Recreate 50%</a></div>'+
+      '<div><a target="_blank" class="btn btn-info" href="'+req100+'" role="button">Recreate 100%</a></div>'+
+      '</div></div>'+
+      '</div>'+
+      '</div>';
       return element; 
     }
 
@@ -159,35 +179,35 @@
 
       
       if(displayedExpired.length > 0){
-        $('#expiredControlsContainer').fadeIn('fast');
+        $('#expiredControlsContainer').css('display','block');
         var max = calculateMax(displayedExpired,increment);
         $('#expiredControlsContainer').find('.value').first().attr('max',max);
         checkArrowAvailability($('#expiredControlsContainer'));
         $('#expiredTotal').empty().append(max);
       } else {
-        $('#expiredControlsContainer').fadeOut('fast');
+        $('#expiredControlsContainer').css('display','none');
         $('#expiredPayments').append('No Payments Found');
       }
 
       if(displayedLong.length > 0){
-        $('#longControlsContainer').fadeIn('fast');
+        $('#longControlsContainer').css('display','block');
         var max = calculateMax(displayedLong,increment);
         $('#longControlsContainer').find('.value').first().attr('max',max);
         $('#longTotal').empty().append(max);
         checkArrowAvailability($('#longControlsContainer'));
       } else {
-        $('#longControlsContainer').fadeOut('fast');
+        $('#longControlsContainer').css('display','none');
         $('#longToExpirePayments').append('No Payments Found');
       }
 
       if(displayedSoon.length > 0){
-        $('#soonControlsContainer').fadeIn('fast');
+        $('#soonControlsContainer').css('display','block');
         var max = calculateMax(displayedSoon,increment);
         $('#soonControlsContainer').find('.value').first().attr('max',max);
         $('#soonTotal').empty().append(max);
         checkArrowAvailability($('#soonControlsContainer'));
       } else {
-        $('#soonControlsContainer').fadeOut('fast');
+        $('#soonControlsContainer').css('display','none');
         $('#soonToExpirePayments').append('No Payments Found');
       }
 

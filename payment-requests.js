@@ -108,7 +108,8 @@ let indexHandler = new BaseHandler("index").willDo(
         templateParameters = {
           'soonToExpirePayments': soonToExpirePayments,
           'longToExpirePayments': longToExpirePayments,
-          'expiredPayments': expiredPayments
+          'expiredPayments': expiredPayments,
+          'environment': process.env.STAGE_NAME
         }
         console.log('dashboard params',templateParameters);
         return new Response('200').send(
