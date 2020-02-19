@@ -13,7 +13,8 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
     paymentRequestRequestPayload = authorizer.decode(accessToken);
     if(paymentRequestRequestPayload){
       global.handler.paymentRequestRequestPayload = paymentRequestRequestPayload;
-      console.log("Token Payload:",global.handler.paymentRequestRequestPayload);
+      if(process.env.DEBUG){
+        console.log("Token Payload:",global.handler.paymentRequestRequestPayload); }
       global.handler.queryParams = `?payment-request-token=${accessToken}`;
       global.handler.skipAuthentication = true;
     }
