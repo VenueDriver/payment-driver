@@ -48,9 +48,9 @@
                   <input type="hidden" value="{{#account}}{{{account}}}{{/account}}" id="account-hidden" />
                   <select class="selectpicker form-control" name="account" id="account" required>
                   <option value="">pick an account...</option>
-                  <option value="hakkasanlv">Hakkasan, Las Vegas</option>
-                  <option value="omnialv">OMNIA, Las Vegas</option>
-                  <option value="jewel">Jewel Nightclub</option>
+                  <option value="insert">Insert</option>
+                  <option value="any">Any</option>
+                  <option value="options">Options</option>
                 </select>
                 </div>
               </div>
@@ -120,35 +120,11 @@
     {{> scripts }}
     <script type="text/javascript">
 
-
-      jQuery(function () {
-        $('#datetimepicker1').datetimepicker();
-        $('#datetimepicker1').on("change.datetimepicker", function (e) {
-          var expiration = new Date($('#display-expiration').val()).toISOString();
-          $('input[name="expiration"]').val(expiration);
-        });
-      });
-
-      jQuery(function () {
-          var account = $('#account-hidden').val().trim();
-          var accountOption = $(`#account option[value="${account}"]`);
-
-          if (account && accountOption.length) {
-              $("#account").val(account);
-          }
-      });
-
       /*
         Notify UI that Amount value has been changed.
         Change event is not fired when value is assigned within the rendering.
        */
       jQuery(document).ready(function(){
-        var amount = $("#amount");
-        var isAmountPresent = amount.val().trim().length > 0;
-        if (isAmountPresent) {
-          amount.trigger('change');
-        }
-
         (function($){
           // JAVASCRIPT SUCKS AND THE OFFSET FOR GMT-3 is = POSITIVE 180 (+180), FOR GMT+3 IT IS NEGATIVE 180 (-180)
           // I'M MULTIPLYING THE OFFSET BY -1 TO INVERT THAT AND DISPLAY THE OFFSET AS -3 FOR GMT-3 AND +3 for GMT+3
@@ -156,6 +132,7 @@
           $('#display-timezone').text("(GMT"+(offset/60)+")");
 
           var loadAdditionalFields = function(){
+            console.log("Trigger additional fields");
             var output = $("#additional-fields-output");
             if($(this).val() === ""){
               output.empty();
@@ -168,7 +145,30 @@
             }
           }
           // CHANGE ADDITIONAL FIELDS IF USER CHANGES OPTION
-          $("#additional_fields").on("change",loadAdditionalFields);
+          var additionalFields = $("#additional_fields");
+          if(additionalFields.length > 0){
+            additionalFields.on("change",loadAdditionalFields);
+            additionalFields.trigger("change");
+          }
+          var amount = $("#amount");
+          var isAmountPresent = amount.val().trim().length > 0;
+          if (isAmountPresent) {
+            amount.trigger('change');
+          }
+
+          $('#datetimepicker1').datetimepicker();
+          $('#datetimepicker1').on("change.datetimepicker", function (e) {
+            var expiration = new Date($('#display-expiration').val()).toISOString();
+            $('input[name="expiration"]').val(expiration);
+          });
+
+          var account = $('#account-hidden').val().trim();
+          var accountOption = $(`#account option[value="${account}"]`);
+
+          if (account && accountOption.length) {
+              $("#account").val(account);
+          }
+          
         })(jQuery)
 
       });

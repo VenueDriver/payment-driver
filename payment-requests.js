@@ -1,6 +1,5 @@
 'use strict'
 
-console.log("payment-requests.js");
 const template = require('./lib/TemplateRenderer')
 const Response = require('./lib/Response')
 const BaseHandler = require('./lib/BaseHandler')
@@ -19,8 +18,6 @@ const Hook      = require('./lib/Hook')
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
 
-console.log("Dependencies Ready");
-
 // * ====================================== *
 // * HANDLERS
 // * ====================================== *
@@ -36,7 +33,8 @@ console.log("Dependencies Ready");
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    console.log("payment-requests.index");
+    if(process.env.DEBUG){
+      console.log("payment-requests.index"); }
     var templateParameters
 
     try {
@@ -74,20 +72,48 @@ let indexHandler = new BaseHandler("index").willDo(
         // causes this page to be revealed to people following links to
         // status pages for existing payment requests.
 
-        // var paymentRequests = await PaymentRequest.index()
+        var paymentRequests = await PaymentRequest.index()
+        
+        //get current date and time to filter payment requests
+        var today = new Date();
+        var time =  ("0" + today.getHours()).slice(-2) + ':' + ("0" + today.getMinutes()).slice(-2);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
 
-        // templateParameters = {
-        //   'paymentRequests': paymentRequests,
-        //   'created_at_escaped': function () {
-        //     return encodeURIComponent(this.created_at)
-        //   },
-        //   "created_at_moment": function () {
-        //     return moment(this.created_at).fromNow()
-        //   }
-        // }
+        today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
+        today = new Date(today).getTime();
+        
+        var expiredPayments = [], soonToExpirePayments = [] , longToExpirePayments = [];
 
-        // return new Response('200').send(
-        //   await template.render('payment-requests', templateParameters))
+        //adding a day to the current date and time to check for soon to expire payment requests
+        var marginDate = new Date(new Date(today).setDate(new Date(today).getDate() + 1)).getTime();
+
+        //filter the payments in three different arrays
+        for( var i = 0 ; i < paymentRequests.length ; i++ ){
+          var paymentDate = new Date(paymentRequests[i].expiration).getTime();
+          paymentRequests[i].created_at_escaped = encodeURIComponent(paymentRequests[i].created_at);
+          paymentRequests[i].created_at_moment = moment(paymentRequests[i].created_at).fromNow();
+
+          if( today > paymentDate ){
+            expiredPayments.push(JSON.stringify(paymentRequests[i]));
+          } else if( today < paymentDate && paymentDate <= marginDate ){
+              soonToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+          else if ( today < paymentDate && paymentDate > marginDate ){
+            longToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+        }        
+
+        templateParameters = {
+          'soonToExpirePayments': soonToExpirePayments,
+          'longToExpirePayments': longToExpirePayments,
+          'expiredPayments': expiredPayments,
+          'environment': process.env.STAGE_NAME
+        }
+        console.log('dashboard params',templateParameters);
+        return new Response('200').send(
+          await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
@@ -109,7 +135,6 @@ indexHandler.middleware([
 
 let newHandler = new BaseHandler("new").willDo(
   async function (event, context) {
-    console.log("\nNew Handler\n");
     let routes = await template.getRoutes();
     if(!routes.forms) route.forms = { partials : {} };
     let fields = Object.keys(routes.forms.partials)
@@ -136,7 +161,8 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    console.log("new.templateParameters",templateParameters);
+    if(process.env.DEBUG){
+      console.log("new.templateParameters",templateParameters); }
 
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
@@ -156,9 +182,8 @@ newHandler.middleware([
 */
 
 
-let postHandler = new BaseHandler("post").willDo(
+let postHandler = new BaseHandler("Post Payment Request").willDo(
   async function (event, context) {
-
     // Create the payment request record
     var paymentRequest = querystring.parse(event.body)
     paymentRequest['id'] = uuidv1()
@@ -169,35 +194,53 @@ let postHandler = new BaseHandler("post").willDo(
     if(decimals.length < 2) decimals.push("00");
     if(decimals[1].length == 0) decimals[1] = "00";
     if(decimals[1].length == 1) decimals[1] = decimals[1] + "0";
-    if(decimals[1].length > 2) decimals[1] = decimals[1].substring(0,2);
     paymentRequest.total = decimals[0] + "." + decimals[1];
 
-    try {
-      await PaymentRequest.put(paymentRequest)
-      var templateParameters = paymentRequest
+    var templateParameters = paymentRequest
 
-      // This notification goes to the customer.
-      templateParameters.subject = "Payment request from " + company
-      templateParameters.to = paymentRequest.email
-      var templateName = 'payment-request-email-to-customer'
-      global.handler.emailToCustomerParameters = templateParameters
-      Hook.execute('before-sending-request-email-to-customer')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
+    //Check if the expiration date is valid
+    var maxDate = new Date(paymentRequest.event_open).toISOString();
+    var formDate = new Date(paymentRequest.expiration);
 
-      // This notification goes to the requestor.
-      templateParameters.subject = "Payment request to " + paymentRequest.email
-      templateParameters.to = paymentRequest.requestor
-      templateName = 'payment-request-email-to-requestor'
-      global.handler.emailToRequestorParameters = templateParameters
-      Hook.execute('before-sending-request-email-to-requestor')
-      await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
-
-      return new Response('200').send(
-        await template.render('payment-request-confirmation', templateParameters))
-    }
-    catch (error) {
-      return new Response('200').send(
-        await template.render('error', { 'error': error }))
+    //If the expiration date is greater than the event date/time, it will render
+    //the rejected payment request template and THEN redirect the user back 
+    //to the form.
+    if(formDate > maxDate){
+      try{
+        templateParameters.queryParams = global.handler.queryParams;
+        return new Response('200').send(
+          await template.render('payment-request-rejected', templateParameters))
+      } catch(error){
+        return new Response('200').send(
+          await template.render('error', { 'error': error }))
+      }
+    } else {
+      try {
+        await PaymentRequest.put(paymentRequest)
+        
+        // This notification goes to the customer.
+        templateParameters.subject = "Payment request from " + company
+        templateParameters.to = paymentRequest.email
+        var templateName = 'payment-request-email-to-customer'
+        global.handler.emailToCustomerParameters = templateParameters
+        await Hook.execute('before-sending-request-email-to-customer')
+        await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
+  
+        // This notification goes to the requestor.
+        templateParameters.subject = "Payment request to " + paymentRequest.email
+        templateParameters.to = paymentRequest.requestor
+        templateName = 'payment-request-email-to-requestor'
+        global.handler.emailToRequestorParameters = templateParameters
+        await Hook.execute('before-sending-request-email-to-requestor')
+        await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
+  
+        return new Response('200').send(
+          await template.render('payment-request-confirmation', templateParameters))
+      }
+      catch (error) {
+        return new Response('200').send(
+          await template.render('error', { 'error': error }))
+      }
     }
   }
 )

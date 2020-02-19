@@ -11,7 +11,8 @@ function sanitizePaymentRequestParamsValue(values) {
 }
 
 async function fetchAdditionalParamsFromNewPaymentRequestTokenPayload(event, context) {
-  console.log("\nFetchAdditionalParamsFromNewPaymentRequestTokenPayload\n");
+  if(process.env.DEBUG){
+    console.log("\nFetchAdditionalParamsFromNewPaymentRequestTokenPayload\n"); }
 
   if (global.handler.paymentRequestRequestPayload) {
     const payload = global.handler.paymentRequestRequestPayload;
@@ -21,7 +22,8 @@ async function fetchAdditionalParamsFromNewPaymentRequestTokenPayload(event, con
     delete global.handler.paymentRequestRequestPayload;
   }
 
-  console.log("additional parameters ", global.handler.additionalParams);
+  if(process.env.DEBUG){
+    console.log("additional parameters ", global.handler.additionalParams); }
 }
 
 module.exports = fetchAdditionalParamsFromNewPaymentRequestTokenPayload;

@@ -32,7 +32,6 @@ let getHandler = new BaseHandler("get").willDo(
     try {
       var paymentRequest = global.handler.paymentRequest;
 
-
       var templateParameters = paymentRequest
       templateParameters.assets_host =
         process.env.ASSETS_HOST ||
@@ -92,9 +91,8 @@ let postHandler = new BaseHandler("post").willDo(
     // Look up the payment request record in DynamoDB.
     const paymentRequest = global.handler.paymentRequest;
 
-
-    console.log("paymentRequest",paymentRequest)
-
+    if(process.env.DEBUG){
+      console.log("paymentRequest",paymentRequest) }
 
     // Create the payment at Stripe.
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
@@ -103,24 +101,26 @@ let postHandler = new BaseHandler("post").willDo(
 
     global.handler.stripeAmount = parseInt( paymentRequest.total.replace(/\./gi,"") )
 
-
-
-
-
     // GATHER ADDITIONAL FIELDS
-    console.log("GATHER ADDITIONAL FIELDS")
+    if(process.env.DEBUG){
+      console.log("GATHER ADDITIONAL FIELDS") }
     if(
       paymentRequest.additional_fields
     ){
       let routes = await template.getRoutes();
-      console.log("routes",routes);
+      if(process.env.DEBUG){
+        console.log("routes",routes); }
       let fieldsPartials = await template.renderPartial("forms/"+paymentRequest.additional_fields,Object.assign({customer_facing : false},paymentRequest));
-      console.log("fieldsPartials",fieldsPartials);
+      if(process.env.DEBUG){
+        console.log("fieldsPartials",fieldsPartials); }
       let fieldsModel = new FormTemplate(fieldsPartials);
-      console.log("fieldsModel",fieldsModel);
-      console.log("fields",fieldsModel.fields);
+      if(process.env.DEBUG){
+        console.log("fieldsModel",fieldsModel);
+        console.log("fields",fieldsModel.fields);
+      }
       let errors = validator.validate(fieldsModel,params);
-      console.log(errors);
+      if(process.env.DEBUG){
+        console.log(errors); }
       if(errors.length == 0){
         fieldsModel.fields.forEach(field =>{
           let key = field.name;
@@ -138,7 +138,8 @@ let postHandler = new BaseHandler("post").willDo(
 
 
     try {
-      console.log("Starting stripe payment");
+      if(process.env.DEBUG){
+        console.log("Starting stripe payment"); }
 
       metadata.payment_request_id = paymentRequest.id;
       metadata.payment_request_created_at = paymentRequest.created_at;
@@ -152,30 +153,31 @@ let postHandler = new BaseHandler("post").willDo(
         source: stripeToken
       };
 
-      Hook.execute('before-sending-to-stripe');
+      await Hook.execute('before-sending-to-stripe');
 
 
 
       paymentRequest.payment = await stripe.charges.create(global.handler.stripePayload);
-      console.log("Payment completed");
+      if(process.env.DEBUG){
+        console.log("Payment completed"); }
 
       paymentRequest.params = params;
 
-      Hook.execute('after-sending-to-stripe');
+      await Hook.execute('after-sending-to-stripe');
 
       if(paymentRequest.payment.status == "succeeded"){
-        Hook.execute('after-successful-payment');
+        await Hook.execute('after-successful-payment');
         paymentRequest.paid = true;
         paymentRequest.paid_at = new Date().toISOString()
       }else{
-        Hook.execute('after-unsuccessful-payment');
+        await Hook.execute('after-unsuccessful-payment');
       }
 
 
       try {
-        Hook.execute('before-updating-dynamodb');
+        await Hook.execute('before-updating-dynamodb');
         await PaymentRequest.putPayment(paymentRequest);
-        Hook.execute('after-updating-dynamodb');
+        await Hook.execute('after-updating-dynamodb');
       }
       catch (error) {
         return new Response('200').send(
@@ -189,7 +191,7 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.email
       var templateName = 'payment-email-to-customer'
       global.handler.emailToCustomerParameters = templateParameters
-      Hook.execute('before-sending-confirmation-email-to-customer')
+      await Hook.execute('before-sending-confirmation-email-to-customer')
       await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
 
       // This notification goes to the requestor.
@@ -197,10 +199,10 @@ let postHandler = new BaseHandler("post").willDo(
       templateParameters.to = paymentRequest.requestor
       templateName = 'payment-email-to-requestor'
       global.handler.emailToRequestorParameters = templateParameters
-      Hook.execute('before-sending-confirmation-email-to-requestor')
+      await Hook.execute('before-sending-confirmation-email-to-requestor')
       await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
 
-      Hook.execute('after-sending-email-notifications');
+      await Hook.execute('after-sending-email-notifications');
 
       return new Response('200').send(
         await template.render('payment-confirmation', templateParameters))
