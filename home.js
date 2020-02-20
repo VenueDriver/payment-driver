@@ -117,15 +117,18 @@ let logoutHandler = new BaseHandler("logout").willDo(
 // * ====================================== *
 
 function redirectToPaymentRequestsResponse(event, accessToken) {
+  console.log("Redirecting to payment-requests")
+
+  // Add the authentication token as a cookie.
+  // This is a session cookie, since it has no expiration set.
+  var cookie = 'access_token = ' + accessToken
+  // Don't specify 'Secure' for local development, or else the
+  // cookie will not be returned to the development functions.
+  if(!process.env.AWS_SAM_LOCAL) {
+    cookie += "; Secure; SameSite=Strict"
+  }
   return new Response('302').redirect('payment-requests',{
-    headers: {
-      // Add the authentication token as a cookie.
-      'Set-Cookie':
-        // This is a session cookie, since it has no expiration set.
-        'access_token = ' + accessToken + (
-          process.env.STAGE_NAME == 'development' ? "" : "; Secure; SameSite=Strict"
-        )
-    }
+    headers: { 'Set-Cookie': cookie }
   })
 }
 
