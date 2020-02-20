@@ -95,3 +95,8 @@ form,
 .indiv-payment__container span.badge{
   margin-left: 5px
 }
+
+.indiv-payment__container small{
+  display: inline-block;
+  text-align: left;
+}
