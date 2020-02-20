@@ -130,6 +130,8 @@ status pages for existing payment requests.
           {{^paid}}
           <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-resend?id={{id}}&created_at={{created_at}}{{/full_app_url}}" role="button">re-send</a>
           {{/paid}}
+          <a target="_blank" class="btn btn-info" href="{{{req50}}}" role="button">Recreate 50%</a>
+          <a target="_blank" class="btn btn-info" href="{{{req100}}}" role="button">Recreate 100%</a>
         </fieldset>
       </form>
 
