@@ -3,12 +3,12 @@ const template = require('../lib/TemplateRenderer')
 const Response = require('../lib/Response')
 const APIGatewayAuthorizer = require('../lib/APIGatewayAuthorizer')
 const CognitoAuthenticator = require('../lib/CognitoAuthenticator')
-const Debugger = require('../lib/Debugger/debug')
+const Logger = require('../lib/Logger/log')
 
 async function authenticate(event, context) {
-  Debugger.debug(["Trying to authenticate"])
+  Logger.debug(["Trying to authenticate"])
   if (global.handler.skipAuthentication) {
-    Debugger.info(["Authenticator Middleware: Skipping authentication."]);
+    Logger.info(["Authenticator Middleware: Skipping authentication."]);
     return;
   }
   // Check for the access token cookie and verify it if it exists.
@@ -17,17 +17,17 @@ async function authenticate(event, context) {
     const authorizer = new APIGatewayAuthorizer()
 
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
-    Debugger.info(["Access token requested..."]);
+    Logger.info(["Access token requested..."]);
   }
   catch (error) {
-    Debugger.printError(["Authenticate error:",error]);
+    Logger.printError(["Authenticate error:",error]);
     // Respond with login form if there is an error getting the access token.
     return new Response('200').send(
       await template.render('login')
     )
   }
   if (!accessToken) {
-    Debugger.info(["No access token, redirecting to login"]);
+    Logger.info(["No access token, redirecting to login"]);
     // Respond with the login form if the access token is missing,
     // so that the user can provide their authentication credentials and
     // get a token.

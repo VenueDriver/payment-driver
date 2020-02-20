@@ -1,5 +1,5 @@
 const MoneySanitizer = require('../lib/money/MoneySanitizer');
-const Debugger = require('../lib/Debugger/debug')
+const Logger = require('../lib/Logger/log')
 
 function collectNewPaymentRequestParams(payload) {
   const { first: first_name, last: last_name, ...otherAttributes } = payload;
@@ -12,17 +12,17 @@ function sanitizePaymentRequestParamsValue(values) {
 }
 
 async function fetchAdditionalParamsFromNewPaymentRequestTokenPayload(event, context) {
-  Debugger.debug(["\nFetchAdditionalParamsFromNewPaymentRequestTokenPayload\n"]);
+  Logger.debug(["\nFetchAdditionalParamsFromNewPaymentRequestTokenPayload\n"]);
 
   if (global.handler.paymentRequestRequestPayload) {
     const payload = global.handler.paymentRequestRequestPayload;
     const paymentRequestParams = collectNewPaymentRequestParams(payload);
     global.handler.newPaymentRequestParams = sanitizePaymentRequestParamsValue(paymentRequestParams);
-    Debugger.info(['New payment request params ', global.handler.newPaymentRequestParams]);
+    Logger.info(['New payment request params ', global.handler.newPaymentRequestParams]);
     delete global.handler.paymentRequestRequestPayload;
   }
 
-  Debugger.debug(["additional parameters ", global.handler.additionalParams]);
+  Logger.debug(["additional parameters ", global.handler.additionalParams]);
 }
 
 module.exports = fetchAdditionalParamsFromNewPaymentRequestTokenPayload;
