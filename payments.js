@@ -32,7 +32,6 @@ let getHandler = new BaseHandler("get").willDo(
     try {
       var paymentRequest = global.handler.paymentRequest;
 
-
       var templateParameters = paymentRequest
       templateParameters.assets_host =
         process.env.ASSETS_HOST ||

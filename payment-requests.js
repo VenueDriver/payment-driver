@@ -72,20 +72,48 @@ let indexHandler = new BaseHandler("index").willDo(
         // causes this page to be revealed to people following links to
         // status pages for existing payment requests.
 
-        // var paymentRequests = await PaymentRequest.index()
+        var paymentRequests = await PaymentRequest.index()
+        
+        //get current date and time to filter payment requests
+        var today = new Date();
+        var time =  ("0" + today.getHours()).slice(-2) + ':' + ("0" + today.getMinutes()).slice(-2);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
 
-        // templateParameters = {
-        //   'paymentRequests': paymentRequests,
-        //   'created_at_escaped': function () {
-        //     return encodeURIComponent(this.created_at)
-        //   },
-        //   "created_at_moment": function () {
-        //     return moment(this.created_at).fromNow()
-        //   }
-        // }
+        today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
+        today = new Date(today).getTime();
+        
+        var expiredPayments = [], soonToExpirePayments = [] , longToExpirePayments = [];
 
-        // return new Response('200').send(
-        //   await template.render('payment-requests', templateParameters))
+        //adding a day to the current date and time to check for soon to expire payment requests
+        var marginDate = new Date(new Date(today).setDate(new Date(today).getDate() + 1)).getTime();
+
+        //filter the payments in three different arrays
+        for( var i = 0 ; i < paymentRequests.length ; i++ ){
+          var paymentDate = new Date(paymentRequests[i].expiration).getTime();
+          paymentRequests[i].created_at_escaped = encodeURIComponent(paymentRequests[i].created_at);
+          paymentRequests[i].created_at_moment = moment(paymentRequests[i].created_at).fromNow();
+
+          if( today > paymentDate ){
+            expiredPayments.push(JSON.stringify(paymentRequests[i]));
+          } else if( today < paymentDate && paymentDate <= marginDate ){
+              soonToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+          else if ( today < paymentDate && paymentDate > marginDate ){
+            longToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+          }
+        }        
+
+        templateParameters = {
+          'soonToExpirePayments': soonToExpirePayments,
+          'longToExpirePayments': longToExpirePayments,
+          'expiredPayments': expiredPayments,
+          'environment': process.env.STAGE_NAME
+        }
+        console.log('dashboard params',templateParameters);
+        return new Response('200').send(
+          await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
