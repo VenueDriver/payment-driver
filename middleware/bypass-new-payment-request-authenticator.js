@@ -1,9 +1,9 @@
 const PaymentRequestAuthorizer = require('../lib/PaymentRequestAuthorizer');
 const Response = require('../lib/Response')
+const Debugger = require('../lib/Debugger/debug')
 
 async function bypassNewPaymentRequestAuthenticator(event, context) {
-  if(process.env.DEBUG){
-  console.log("\nBypassNewPaymentRequestAuthenticator\n"); }
+  Debugger.debug(["\nBypassNewPaymentRequestAuthenticator\n"]);
   const authorizer = new PaymentRequestAuthorizer();
 
   let paymentRequestRequestPayload = null;
@@ -13,14 +13,13 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
     paymentRequestRequestPayload = authorizer.decode(accessToken);
     if(paymentRequestRequestPayload){
       global.handler.paymentRequestRequestPayload = paymentRequestRequestPayload;
-      if(process.env.DEBUG){
-        console.log("Token Payload:",global.handler.paymentRequestRequestPayload); }
+      Debugger.debug(["Token Payload:",global.handler.paymentRequestRequestPayload]);
       global.handler.queryParams = `?payment-request-token=${accessToken}`;
       global.handler.skipAuthentication = true;
     }
   }
   catch (error) {
-    console.log(error);
+    Debugger.printError(['Error getting token from query params: ',error]);
   }
 
   if(!paymentRequestRequestPayload){
