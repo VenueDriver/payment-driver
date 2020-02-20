@@ -22,10 +22,11 @@ describe('Payment Driver', function () {
         callback(null, { 'Item': {} })
       })
 
-      const result = await payments.get({
-        'headers': { 'Host': 'example.com' },
-        'queryStringParameters': { 'id': '1234' }
-      }, {})
+      const result = await payments.get(
+        { 'requestContext': {'httpMethod': 'GET', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
+          'queryStringParameters': { 'id': '1234' }
+        }, {})
 
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');
@@ -49,7 +50,9 @@ describe('Payment Driver', function () {
         .post('/charges')
         .reply(200, { success: true }, []);
 
-      const result = await payments.post({ 'headers': { 'Origin': 'https://paymentdriver.engineering' } }, {})
+      const result = await payments.post(
+        { 'requestContext': {'httpMethod': 'POST', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
 
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');
@@ -75,7 +78,8 @@ describe('Payment Driver', function () {
         .post('/charges')
         .reply(400, { "error": { "type": "invalid_request_error", "message": "Test error message." } }, []);
 
-      const result = await payments.post({}, {})
+      const result = await payments.post({ 'requestContext': {'httpMethod': 'POST', 'path':''},
+        'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
 
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');
