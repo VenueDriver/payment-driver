@@ -20,7 +20,7 @@ async function authenticate(event, context) {
     Logger.info(["Access token requested..."]);
   }
   catch (error) {
-    Logger.printError(["Authenticate error:",error]);
+    Logger.error(["Authenticate error:",error]);
     // Respond with login form if there is an error getting the access token.
     return new Response('200').send(
       await template.render('login')

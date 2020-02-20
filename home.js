@@ -87,7 +87,7 @@ let loginHandler = new BaseHandler("login").willDo(
         authResponse.AuthenticationResult.AccessToken)
     }
     catch (error) {
-      Logger.printError(['Error in login page',error]);
+      Logger.error(['Error in login page',error]);
       return new Response('200').send(
         await template.render('login', {
           'message': error,

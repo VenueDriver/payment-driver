@@ -16,7 +16,7 @@ async function bypassPaymentRequestAuthenticator(event, context) {
     }
   }
   catch (error) {
-    Logger.printError(['Error skipping request authenticator: ',error]);
+    Logger.error(['Error skipping request authenticator: ',error]);
   }
 }
 

@@ -24,7 +24,7 @@ async function loadPaymentRequest(event, context) {
         params.payment_request_created_at)
   }
   catch (error) {
-    Logger.printError(['Error getting payment request: ',error]);
+    Logger.error(['Error getting payment request: ',error]);
     return new Response('200').send(
       await template.render('error', { 'error': error }))
   }

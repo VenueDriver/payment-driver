@@ -22,7 +22,7 @@ const syncAssets = (options) => {
     exec(`aws s3 sync ${themesDirectory} s3://${bucketName}/ --acl public-read --exclude "*.mustache"`,
       (error, stdout, stderr) => {
         if (error) {
-          Logger.printError(['Error syncing assets: ',stderr]);
+          Logger.error(['Error syncing assets: ',stderr]);
           reject(stderr);
         }
         else {

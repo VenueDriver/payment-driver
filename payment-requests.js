@@ -89,7 +89,7 @@ let indexHandler = new BaseHandler("index").willDo(
       }
     }
     catch (error) {
-      Logger.printError(['Error in index handler: ',error]);
+      Logger.error(['Error in index handler: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -183,7 +183,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         return new Response('200').send(
           await template.render('payment-request-rejected', templateParameters))
       } catch(error){
-        Logger.printError(['Error in redirecting user to previous form: ',error]);
+        Logger.error(['Error in redirecting user to previous form: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -211,7 +211,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
           await template.render('payment-request-confirmation', templateParameters))
       }
       catch (error) {
-        Logger.printError(['Error sending payment request emails: ',error]);
+        Logger.error(['Error sending payment request emails: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -250,7 +250,7 @@ let resendHandler = new BaseHandler("resend").willDo(
         await template.render('payment-request-resent', templateParameters))
     }
     catch (error) {
-      Logger.printError(['Error resending payment request: ',error]);
+      Logger.error(['Error resending payment request: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }

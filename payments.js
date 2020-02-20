@@ -70,7 +70,7 @@ let getHandler = new BaseHandler("get").willDo(
         await template.render('payment-form', templateParameters))
     }
     catch (error) {
-      Logger.printError(['Error in payment get handler: ',error]);
+      Logger.error(['Error in payment get handler: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -175,7 +175,7 @@ let postHandler = new BaseHandler("post").willDo(
         await Hook.execute('after-updating-dynamodb');
       }
       catch (error) {
-        Logger.printError(['Error Before Sending Payment confirmation email',error]);
+        Logger.error(['Error Before Sending Payment confirmation email',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -204,7 +204,7 @@ let postHandler = new BaseHandler("post").willDo(
         await template.render('payment-confirmation', templateParameters))
     }
     catch (error) {
-      Logger.printError(['Error starting the process of stripe payment: ',error]);
+      Logger.error(['Error starting the process of stripe payment: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }

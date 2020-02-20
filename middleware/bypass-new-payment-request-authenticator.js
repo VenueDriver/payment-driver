@@ -19,7 +19,7 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
     }
   }
   catch (error) {
-    Logger.printError(['Error getting token from query params: ',error]);
+    Logger.error(['Error getting token from query params: ',error]);
   }
 
   if(!paymentRequestRequestPayload){
