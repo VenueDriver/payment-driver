@@ -2,11 +2,13 @@ const getStack = require('../node_modules/sam-launchpad/scripts/get-stack');
 const exec = require('child_process').exec;
 const getStackName = require('../util/get-stack-name');
 const join = require('path').join;
+const Debugger = require('../lib/Debugger/debug')
+
 
 // Hook script must return a promise
 const syncAssets = (options) => {
   return new Promise(async(resolve, reject) => {
-    console.log("  DEPLOYING ASSETS TO S3:");
+    Debugger.info(["  DEPLOYING ASSETS TO S3:"]);
 
     const { args } = options;
     const appName = "";
@@ -20,11 +22,11 @@ const syncAssets = (options) => {
     exec(`aws s3 sync ${themesDirectory} s3://${bucketName}/ --acl public-read --exclude "*.mustache"`,
       (error, stdout, stderr) => {
         if (error) {
-          console.log(stderr);
+          Debugger.printError(['Error syncing assets: ',stderr]);
           reject(stderr);
         }
         else {
-          console.log("  done.");
+          Debugger.info(["  done."]);
           resolve();
         }
       }

@@ -14,6 +14,7 @@ const bypassPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass
 const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
 const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
 const Hook      = require('./lib/Hook')
+const Debugger = require('./lib/Debugger/debug')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -33,8 +34,7 @@ const company = process.env.COMPANY_NAME
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    if(process.env.DEBUG){
-      console.log("payment-requests.index"); }
+    Debugger.debug(["payment-requests.index"]);
     var templateParameters
 
     try {
@@ -89,6 +89,7 @@ let indexHandler = new BaseHandler("index").willDo(
       }
     }
     catch (error) {
+      Debugger.printError(['Error in index handler: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -133,8 +134,7 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    if(process.env.DEBUG){
-      console.log("new.templateParameters",templateParameters); }
+    Debugger.debug(["new.templateParameters",templateParameters]);
 
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
@@ -183,6 +183,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         return new Response('200').send(
           await template.render('payment-request-rejected', templateParameters))
       } catch(error){
+        Debugger.printError(['Error in redirecting user to previous form: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -210,6 +211,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
           await template.render('payment-request-confirmation', templateParameters))
       }
       catch (error) {
+        Debugger.printError(['Error sending payment request emails: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -248,6 +250,7 @@ let resendHandler = new BaseHandler("resend").willDo(
         await template.render('payment-request-resent', templateParameters))
     }
     catch (error) {
+      Debugger.printError(['Error resending payment request: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
