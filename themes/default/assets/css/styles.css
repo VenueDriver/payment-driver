@@ -88,19 +88,10 @@ form,
   margin-bottom: 10px;
 }
 
-.payment__inner-container{
-  text-align: center;
-}
-.payment__inner-container div:not(:last-child){
-  margin-bottom: 10px;
-}
-.payment-badge{
-  margin-left: 5px;
-}
 #emailSearch{
   border: 1px solid #000;
 }
-.payment__sens-info small{
-  display: inline-block;
-  text-align: left;
+
+.indiv-payment__container span.badge{
+  margin-left: 5px
 }

@@ -114,37 +114,24 @@
     }
 
     function returnFormedElement(obj){
-      var req100='https://';
-      var stage = "{{{environment}}}";
-      if(stage === 'staging'){
-        req100 += 'staging.';
-      }
-      req100+= 'venuedriver.com/api/reservations/'+obj.reservation_id+'/payments/request';
-
-      var req50 = req100 + '?percentage=50';
-
       obj.email = obj.email ? obj.email : "No Email";
       obj.description = obj.description ? obj.description : "No Description";
 
-      var element = '<div class="list-group-item flex-column align-items-start">'+
-      '<div class="d-flex w-100 justify-content-between align-items-center">'+
-      '<div class="payment__sens-info"><h5 class="mb-1">'+obj.email+'</h5>'+
+      var element = '<a href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" class="list-group-item list-group-item-action indiv-payment__container flex-column align-items-start">'+
+      '<div class="d-flex w-100 justify-content-between">'+
+      '<h5 class="mb-1">'+obj.email+'</h5>'+
+      '<small>'+obj.created_at_moment+'</small>'+
+      '</div>'+
+      '<p class="mb-1">'+obj.description+'</p>'+
       '<small>$'+obj.amount+'</small>';
       if(obj.paid){
-        element += '<span class="badge payment-badge badge-success badge-pill">PAID</span>';
-      } else {
+        element += '<span class="badge badge-success badge-pill">PAID</span>';
+      }
+      else {
         element += '<span class="badge payment-badge badge-secondary badge-pill">UNPAID</span>';
       }
-      element += '<div><small>'+obj.created_at_moment+'</small></div>'+
-      '<div><p class="mb-1">'+obj.description+'</p></div></div>'+
-      '<div class="payment__inner-container">'+
-      '<div><a class="btn btn-primary" href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" role="button">Resend</a></div>'+
-      '<div class="recreate-payment__container">'+
-      '<div><a target="_blank" class="btn btn-info" href="'+req50+'" role="button">Recreate 50%</a></div>'+
-      '<div><a target="_blank" class="btn btn-info" href="'+req100+'" role="button">Recreate 100%</a></div>'+
-      '</div></div>'+
-      '</div>'+
-      '</div>';
+      element += '</a>';
+
       return element; 
     }
 

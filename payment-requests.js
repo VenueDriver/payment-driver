@@ -47,6 +47,16 @@ let indexHandler = new BaseHandler("index").willDo(
         var created_at = event.queryStringParameters.created_at
         templateParameters = await PaymentRequest.get(id, created_at)
         templateParameters.payment_id = templateParameters.payment.id
+        var req100='https://';
+        var stage = process.env.STAGE_NAME;
+        if(stage === 'staging'){
+          req100 += 'staging.';
+        }
+        req100+= 'venuedriver.com/api/reservations/'+templateParameters.reservation_id+'/payments/request';
+
+        var req50 = req100 + '?percentage=50';
+        templateParameters.req50 = req50;
+        templateParameters.req100 = req100;
         templateParameters.paid_at_moment = function () {
           return moment(this.paid_at).fromNow()
         }
@@ -110,8 +120,7 @@ let indexHandler = new BaseHandler("index").willDo(
         templateParameters = {
           'soonToExpirePayments': soonToExpirePayments,
           'longToExpirePayments': longToExpirePayments,
-          'expiredPayments': expiredPayments,
-          'environment': process.env.STAGE_NAME
+          'expiredPayments': expiredPayments
         }
         console.log('dashboard params',templateParameters);
         return new Response('200').send(
