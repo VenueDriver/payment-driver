@@ -97,8 +97,6 @@ let indexHandler = new BaseHandler("index").willDo(
 
           if( today > paymentDate ){
             expiredPayments.push(JSON.stringify(paymentRequests[i]));
-            expiredPayments.push(JSON.stringify(paymentRequests[i]));
-            expiredPayments.push(JSON.stringify(paymentRequests[i]));
 
           } else if( today < paymentDate && paymentDate <= marginDate ){
               soonToExpirePayments.push(JSON.stringify(paymentRequests[i]));
