@@ -24,7 +24,7 @@
       </label>
 
       <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h2 class="mb-1">Soon To Expire Requests</h2>
+        <h3 class="mb-1">Soon To Expire Requests</h3>
         <div class="controlContainer" id="soonControlsContainer">
           <span class="back" id="soonBack"><</span><span class="current" id="soonCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="soonTotal"></span><span class="forward" id="soonForward">></span>
           <input style="display:none" class="value"  id="soonValue" type="number" min="1">
@@ -38,7 +38,7 @@
       </p>
 
       <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h2 class="mb-1">Long To Expire Requests</h2>
+        <h3 class="mb-1">Long To Expire Requests</h3>
         <div class="controlContainer" id="longControlsContainer">
           <span class="back" id="longBack"><</span><span class="current" id="longCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="longTotal"></span><span class="forward" id="longForward">></span>
           <input style="display:none" class="value" id="longValue" type="number" min="1">
@@ -51,7 +51,7 @@
       </p>
 
       <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h2 class="mb-1">Expired Requests</h2>
+        <h3 class="mb-1">Expired Requests</h3>
         <div class="controlContainer" id="expiredControlsContainer">
           <span class="back" id="expiredBack"><</span><span class="current" id="expiredCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="expiredTotal"></span><span class="forward" id="expiredForward">></span>
           <input style="display:none" class="value" min="1" id="expiredValue" type="number">
@@ -128,7 +128,7 @@
 
       var element = '<div class="list-group-item flex-column align-items-start">'+
       '<div class="d-flex w-100 justify-content-between align-items-center">'+
-      '<div><h5 class="mb-1">'+obj.email+'</h5>'+
+      '<div class="payment__sens-info"><h5 class="mb-1">'+obj.email+'</h5>'+
       '<small>$'+obj.amount+'</small>';
       if(obj.paid){
         element += '<span class="badge payment-badge badge-success badge-pill">PAID</span>';
@@ -149,14 +149,15 @@
     }
 
     function checkArrowAvailability(container){
-      var val = container.find('.value').first().val();
+      var val = parseInt(container.find('.value').first().val());
+      var max = parseInt(container.find('.value').first().attr('max'));
+
       if(val <= 1){
         container.find('.back').first().addClass('disabled');
       } else {
         container.find('.back').first().removeClass('disabled');
       }
-
-      if( val >= container.find('.value').first().attr('max')){
+      if( val >= max){
         container.find('.forward').first().addClass('disabled');
       } else {
         container.find('.forward').first().removeClass('disabled');

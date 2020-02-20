@@ -100,3 +100,7 @@ form,
 #emailSearch{
   border: 1px solid #000;
 }
+.payment__sens-info small{
+  display: inline-block;
+  text-align: left;
+}
