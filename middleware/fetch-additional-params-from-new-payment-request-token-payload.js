@@ -14,12 +14,12 @@ function sanitizePaymentRequestParamsValue(values) {
 async function fetchAdditionalParamsFromNewPaymentRequestTokenPayload(event, context) {
   Logger.debug(["\nFetchAdditionalParamsFromNewPaymentRequestTokenPayload\n"]);
 
-  if (global.handler.paymentRequestRequestPayload) {
-    const payload = global.handler.paymentRequestRequestPayload;
+  if (global.handler.paymentRequestAccessToken) {
+    const payload = global.handler.paymentRequestAccessToken;
     const paymentRequestParams = collectNewPaymentRequestParams(payload);
     global.handler.newPaymentRequestParams = sanitizePaymentRequestParamsValue(paymentRequestParams);
     Logger.info(['New payment request params ', global.handler.newPaymentRequestParams]);
-    delete global.handler.paymentRequestRequestPayload;
+    delete global.handler.paymentRequestAccessToken;
   }
 
   Logger.debug(["additional parameters ", global.handler.additionalParams]);
