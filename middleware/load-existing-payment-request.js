@@ -1,7 +1,7 @@
 const querystring = require('querystring');
 const Response = require('../lib/Response');
 const PaymentRequest = require('../lib/PaymentRequest.js').PaymentRequest;
-const Debugger = require('../lib/Debugger/debug')
+const Logger = require('../lib/Logger/log')
 
 async function loadPaymentRequest(event, context) {
 
@@ -24,7 +24,7 @@ async function loadPaymentRequest(event, context) {
         params.payment_request_created_at)
   }
   catch (error) {
-    Debugger.printError(['Error getting payment request: ',error]);
+    Logger.error(['Error getting payment request: ',error]);
     return new Response('200').send(
       await template.render('error', { 'error': error }))
   }
