@@ -5,6 +5,7 @@ const BaseHandler = require('./lib/BaseHandler')
 const querystring = require('querystring')
 const urljoin     = require('url-join')
 const APIGatewayAuthorizer = require('./lib/APIGatewayAuthorizer.js')
+const Logger = require('./lib/Logger/log')
 
 
 // The company name from the settings, for the email notifications.
@@ -40,10 +41,10 @@ indexHandler.middleware(authenticatorMiddleware);
 // then you will be redirected to the management UI.
 let loginHandler = new BaseHandler("login").willDo(
   async function (event, context) {
-    console.log("Login in")
-    console.log(process.env.AWS_REGION,
+    Logger.info(["Login in"])
+    Logger.info([process.env.AWS_REGION,
     process.env.USER_POOL_ID,
-    process.env.CLIENT_ID);
+    process.env.CLIENT_ID]);
     const params = querystring.parse(event.body)
 
     const authenticator =
@@ -86,6 +87,7 @@ let loginHandler = new BaseHandler("login").willDo(
         authResponse.AuthenticationResult.AccessToken)
     }
     catch (error) {
+      Logger.error(['Error in login page',error]);
       return new Response('200').send(
         await template.render('login', {
           'message': error,

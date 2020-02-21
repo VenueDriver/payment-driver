@@ -14,6 +14,7 @@ const bypassPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass
 const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
 const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
 const Hook      = require('./lib/Hook')
+const Logger = require('./lib/Logger/log')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -33,8 +34,7 @@ const company = process.env.COMPANY_NAME
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    if(process.env.DEBUG){
-      console.log("payment-requests.index"); }
+    Logger.debug(["payment-requests.index"]);
     var templateParameters
 
     try {
@@ -128,6 +128,7 @@ let indexHandler = new BaseHandler("index").willDo(
       }
     }
     catch (error) {
+      Logger.error(['Error in index handler: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -172,8 +173,7 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    if(process.env.DEBUG){
-      console.log("new.templateParameters",templateParameters); }
+    Logger.debug(["new.templateParameters",templateParameters]);
 
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
@@ -214,7 +214,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     var formDate = new Date(paymentRequest.expiration);
 
     //If the expiration date is greater than the event date/time, it will render
-    //the rejected payment request template and THEN redirect the user back 
+    //the rejected payment request template and THEN redirect the user back
     //to the form.
     if(formDate > maxDate){
       try{
@@ -222,13 +222,14 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         return new Response('200').send(
           await template.render('payment-request-rejected', templateParameters))
       } catch(error){
+        Logger.error(['Error in redirecting user to previous form: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
     } else {
       try {
         await PaymentRequest.put(paymentRequest)
-        
+
         // This notification goes to the customer.
         templateParameters.subject = "Payment request from " + company
         templateParameters.to = paymentRequest.email
@@ -236,7 +237,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToCustomerParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-customer')
         await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
-  
+
         // This notification goes to the requestor.
         templateParameters.subject = "Payment request to " + paymentRequest.email
         templateParameters.to = paymentRequest.requestor
@@ -244,11 +245,12 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToRequestorParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-requestor')
         await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
-  
+
         return new Response('200').send(
           await template.render('payment-request-confirmation', templateParameters))
       }
       catch (error) {
+        Logger.error(['Error sending payment request emails: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -287,6 +289,7 @@ let resendHandler = new BaseHandler("resend").willDo(
         await template.render('payment-request-resent', templateParameters))
     }
     catch (error) {
+      Logger.error(['Error resending payment request: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
