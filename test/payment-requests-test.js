@@ -7,10 +7,24 @@ var AWS = require('aws-sdk-mock')
 process.env.DYNAMODB_ENDPOINT = 'http://localhost:8000'
 var paymentRequests = require('../payment-requests')
 
-describe('Payment Driver', function () {
+describe('payment requests list', function () {
 
   afterEach(function () {
     AWS.restore()
+  })
+
+  describe('unauthorized, un-authenticated visitor', function() {
+
+      it('should redirect me to the login form when I request the list', async() => {
+        const result = await paymentRequests.new({
+          'requestContext': {'httpMethod': 'GET', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
+        },{})
+        expect(result.statusCode).to.equal(302)
+        expect(result.headers['location']).
+          to.equal('https://example.com/')
+      })
+
   })
 
   describe('payment requests REST resource', function () {
