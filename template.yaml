@@ -212,6 +212,49 @@ Resources:
             Path: /payment-requests-resend
             Method: get
 
+  EditPaymentRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.edit
+      Runtime: nodejs10.x
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
+         Statement:
+           - Effect: Allow
+             Action:
+               - ses:*
+             Resource: '*'
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payment-requests-edit
+            Method: get
+
+  PostEditPaymentRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.postEdit
+      Runtime: nodejs10.x
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
+         Statement:
+           - Effect: Allow
+             Action:
+               - ses:*
+             Resource: '*'
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /payment-requests-edit
+            Method: post
+
+
   PaymentForm:
     Type: AWS::Serverless::Function
     Properties:

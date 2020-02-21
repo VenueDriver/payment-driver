@@ -33,7 +33,6 @@ let getHandler = new BaseHandler("get").willDo(
     try {
       var paymentRequest = global.handler.paymentRequest;
 
-
       var templateParameters = paymentRequest
       templateParameters.assets_host =
         process.env.ASSETS_HOST ||
@@ -168,10 +167,9 @@ let postHandler = new BaseHandler("post").willDo(
         await Hook.execute('after-unsuccessful-payment');
       }
 
-
       try {
         await Hook.execute('before-updating-dynamodb');
-        await PaymentRequest.putPayment(paymentRequest);
+        await PaymentRequest.upsertRecord(paymentRequest);
         await Hook.execute('after-updating-dynamodb');
       }
       catch (error) {

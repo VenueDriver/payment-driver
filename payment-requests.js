@@ -47,16 +47,7 @@ let indexHandler = new BaseHandler("index").willDo(
         var created_at = event.queryStringParameters.created_at
         templateParameters = await PaymentRequest.get(id, created_at)
         templateParameters.payment_id = templateParameters.payment.id
-        var req100='https://';
-        var stage = process.env.STAGE_NAME;
-        if(stage === 'staging'){
-          req100 += 'staging.';
-        }
-        req100+= 'venuedriver.com/api/reservations/'+templateParameters.reservation_id+'/payments/request';
-
-        var req50 = req100 + '?percentage=50';
-        templateParameters.req50 = req50;
-        templateParameters.req100 = req100;
+        
         templateParameters.paid_at_moment = function () {
           return moment(this.paid_at).fromNow()
         }
@@ -122,7 +113,7 @@ let indexHandler = new BaseHandler("index").willDo(
           'longToExpirePayments': longToExpirePayments,
           'expiredPayments': expiredPayments
         }
-        console.log('dashboard params',templateParameters);
+        Logger.info(['dashboard params',templateParameters]);
         return new Response('200').send(
           await template.render('payment-requests', templateParameters))
       }
@@ -208,13 +199,13 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     paymentRequest.total = decimals[0] + "." + decimals[1];
 
     var templateParameters = paymentRequest
-
+      
     //Check if the expiration date is valid
     var maxDate = new Date(paymentRequest.event_open).toISOString();
     var formDate = new Date(paymentRequest.expiration);
 
     //If the expiration date is greater than the event date/time, it will render
-    //the rejected payment request template and THEN redirect the user back
+    //the rejected payment request template and THEN redirect the user back 
     //to the form.
     if(formDate > maxDate){
       try{
@@ -229,7 +220,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     } else {
       try {
         await PaymentRequest.put(paymentRequest)
-
+        
         // This notification goes to the customer.
         templateParameters.subject = "Payment request from " + company
         templateParameters.to = paymentRequest.email
@@ -237,7 +228,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToCustomerParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-customer')
         await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
-
+  
         // This notification goes to the requestor.
         templateParameters.subject = "Payment request to " + paymentRequest.email
         templateParameters.to = paymentRequest.requestor
@@ -245,7 +236,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToRequestorParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-requestor')
         await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
-
+  
         return new Response('200').send(
           await template.render('payment-request-confirmation', templateParameters))
       }
@@ -299,6 +290,72 @@ let resendHandler = new BaseHandler("resend").willDo(
 resendHandler.middleware(authenticatorMiddleware);
 
 
+
+/*
+=================================================
+ [GET] EDIT PAYMENT REQUEST HANDLER
+=================================================
+*/
+
+
+let editHandler = new BaseHandler("Edit Request").willDo(
+  async function (event, context) {
+    try {
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
+      var templateParameters = paymentRequest
+
+      return new Response('200').send(
+        await template.render('payment-request-edit', templateParameters))
+    }
+    catch (error) {
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
+    }
+  }
+)
+
+editHandler.middleware(authenticatorMiddleware);
+
+
+/*
+=================================================
+ [POST] EDIT PAYMENT REQUEST HANDLER
+=================================================
+*/
+
+
+let postEditHandler = new BaseHandler("Post Edit Request").willDo(
+  async function (event, context) {
+    var paymentNewData = querystring.parse(event.body);
+
+    try {
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
+      
+      if(paymentNewData.expiration){
+        paymentRequest.expiration = paymentNewData.expiration;
+      }
+
+      await PaymentRequest.upsertRecord(paymentRequest);
+
+      return new Response('302').redirect('payment-requests-resend?id='+event.queryStringParameters.id+'&created_at='+event.queryStringParameters.created_at);
+    }
+    catch (error) {
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
+    }
+  }
+)
+
+postEditHandler.middleware(authenticatorMiddleware);
+
+
+
 // * ====================================== *
 // * EXPORTS
 // * ====================================== *
@@ -307,3 +364,5 @@ exports.index  = indexHandler.do
 exports.new    = newHandler.do
 exports.post   = postHandler.do
 exports.resend = resendHandler.do
+exports.edit   = editHandler.do
+exports.postEdit = postEditHandler.do
