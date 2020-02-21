@@ -25,6 +25,16 @@ describe('payment requests list', function () {
           to.equal('https://example.com/')
       })
 
+      it('should redirect me to the login form when I request a form', async() => {
+        const result = await paymentRequests.new({
+          'requestContext': {'httpMethod': 'GET', 'path':'/payment-requests-new'},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
+        },{})
+        expect(result.statusCode).to.equal(302)
+        expect(result.headers['location']).
+          to.equal('https://example.com/')
+      })
+
       it('should redirect me to the login form when I try to post a request', async() => {
         const result = await paymentRequests.post({
           'requestContext': {'httpMethod': 'POST', 'path':''},
