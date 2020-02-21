@@ -25,6 +25,15 @@ describe('payment requests list', function () {
           to.equal('https://example.com/')
       })
 
+      it('should redirect me to the login form when I try to post a request', async() => {
+        const result = await paymentRequests.post({
+          'requestContext': {'httpMethod': 'POST', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+          expect(result.statusCode).to.equal(302)
+          expect(result.headers['location']).
+            to.equal('https://example.com/')
+      })
+
   })
 
   describe('payment requests REST resource', function () {
@@ -50,7 +59,7 @@ describe('payment requests list', function () {
       })
 
       const result = await paymentRequests.post(
-        { 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 
@@ -65,7 +74,7 @@ describe('payment requests list', function () {
         callback("The sprockets have caught on fire!");
       })
       const result = await paymentRequests.post(
-        { 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html')
 
