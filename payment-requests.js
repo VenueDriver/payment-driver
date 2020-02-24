@@ -64,6 +64,8 @@ let indexHandler = new BaseHandler("index").willDo(
           templateParameters.additional_fields_partial = await template.renderPartial("forms/"+templateParameters.additional_fields,templateParameters);
         }
 
+        templateParameters.isUserAuthenticated = global.handler.authenticated;
+
         return new Response('200').send(
           await template.render('payment-request', templateParameters))
       }
