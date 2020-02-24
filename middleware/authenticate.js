@@ -6,9 +6,11 @@ const CognitoAuthenticator = require('../lib/CognitoAuthenticator')
 const Logger = require('../lib/Logger/log')
 
 async function authenticate(event, context) {
+  global.handler.authenticated = true;
   Logger.debug(["Trying to authenticate"])
   if (global.handler.skipAuthentication) {
     Logger.info(["Authenticator Middleware: Skipping authentication."]);
+    global.handler.authenticated = true;
     return;
   }
   // Check for the access token cookie and verify it if it exists.
@@ -18,6 +20,7 @@ async function authenticate(event, context) {
 
     accessToken = await authorizer.getValidAccessTokenFromCookie(event)
     Logger.info(["Access token requested..."]);
+
   }
   catch (error) {
     Logger.error(["Authenticate error:",error]);
@@ -34,6 +37,8 @@ async function authenticate(event, context) {
     return new Response('200').send(
       await template.render('login')
     )
+  } else {
+    global.handler.authenticated = true;
   }
 
 }
