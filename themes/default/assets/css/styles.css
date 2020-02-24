@@ -100,3 +100,7 @@ form,
   display: inline-block;
   text-align: left;
 }
+
+.submit-edit{
+  color: white;
+}

@@ -73,7 +73,7 @@
           {{/paid}}
 
           {{^paid}}
-          <a class="btn btn-primary submit-edit" role="button">re-send</a>
+          <a href="javascript:void(0)" class="btn btn-primary submit-edit" role="button">re-send</a>
           {{/paid}}
         
         </fieldset>
@@ -88,8 +88,6 @@
     jQuery(document).ready(function(){
         (function($){ 
 
-        var offset = (new Date().getTimezoneOffset()) * -1;
-        $('#display-timezone').text("(GMT"+(offset/60)+")");
 
 
         var originalDate = new Date($('input[name="expiration"]').val());
