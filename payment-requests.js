@@ -14,7 +14,8 @@ const bypassPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass
 const bypassNewPaymentRequestAuthenticatorMiddleware = require('./middleware/bypass-new-payment-request-authenticator')
 const fetchAdditionalParamsFromNewPaymentRequestTokenPayloadMiddleware = require('./middleware/fetch-additional-params-from-new-payment-request-token-payload')
 const Hook      = require('./lib/Hook')
-const Debugger = require('./lib/Debugger/debug')
+const Logger = require('./lib/Logger/log')
+const validExpirationDate = require('./lib/ExpirationValidator/validate-expiration')
 
 // The company name from the settings, for the email notifications.
 const company = process.env.COMPANY_NAME
@@ -34,7 +35,7 @@ const company = process.env.COMPANY_NAME
 let indexHandler = new BaseHandler("index").willDo(
   async function (event, context) {
 
-    Debugger.debug(["payment-requests.index"]);
+    Logger.debug(["payment-requests.index"]);
     var templateParameters
 
     try {
@@ -47,16 +48,7 @@ let indexHandler = new BaseHandler("index").willDo(
         var created_at = event.queryStringParameters.created_at
         templateParameters = await PaymentRequest.get(id, created_at)
         templateParameters.payment_id = templateParameters.payment.id
-        var req100='https://';
-        var stage = process.env.STAGE_NAME;
-        if(stage === 'staging'){
-          req100 += 'staging.';
-        }
-        req100+= 'venuedriver.com/api/reservations/'+templateParameters.reservation_id+'/payments/request';
-
-        var req50 = req100 + '?percentage=50';
-        templateParameters.req50 = req50;
-        templateParameters.req100 = req100;
+        
         templateParameters.paid_at_moment = function () {
           return moment(this.paid_at).fromNow()
         }
@@ -122,13 +114,13 @@ let indexHandler = new BaseHandler("index").willDo(
           'longToExpirePayments': longToExpirePayments,
           'expiredPayments': expiredPayments
         }
-        console.log('dashboard params',templateParameters);
+        Logger.info(['dashboard params',templateParameters]);
         return new Response('200').send(
           await template.render('payment-requests', templateParameters))
       }
     }
     catch (error) {
-      Debugger.printError(['Error in index handler: ',error]);
+      Logger.error(['Error in index handler: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -173,7 +165,7 @@ let newHandler = new BaseHandler("new").willDo(
 
     templateParameters = { ...templateParameters, fields };
 
-    Debugger.debug(["new.templateParameters",templateParameters]);
+    Logger.debug(["new.templateParameters",templateParameters]);
 
     return new Response('200').send(
       await template.render('payment-request-form',templateParameters))
@@ -208,21 +200,14 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     paymentRequest.total = decimals[0] + "." + decimals[1];
 
     var templateParameters = paymentRequest
-
-    //Check if the expiration date is valid
-    var maxDate = new Date(paymentRequest.event_open).toISOString();
-    var formDate = new Date(paymentRequest.expiration);
-
-    //If the expiration date is greater than the event date/time, it will render
-    //the rejected payment request template and THEN redirect the user back 
-    //to the form.
-    if(formDate > maxDate){
+      
+    if(!validExpirationDate(paymentRequest)){
       try{
         templateParameters.queryParams = global.handler.queryParams;
         return new Response('200').send(
           await template.render('payment-request-rejected', templateParameters))
       } catch(error){
-        Debugger.printError(['Error in redirecting user to previous form: ',error]);
+        Logger.error(['Error in redirecting user to previous form: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -250,7 +235,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
           await template.render('payment-request-confirmation', templateParameters))
       }
       catch (error) {
-        Debugger.printError(['Error sending payment request emails: ',error]);
+        Logger.error(['Error sending payment request emails: ',error]);
         return new Response('200').send(
           await template.render('error', { 'error': error }))
       }
@@ -289,7 +274,7 @@ let resendHandler = new BaseHandler("resend").willDo(
         await template.render('payment-request-resent', templateParameters))
     }
     catch (error) {
-      Debugger.printError(['Error resending payment request: ',error]);
+      Logger.error(['Error resending payment request: ',error]);
       return new Response('200').send(
         await template.render('error', { 'error': error }))
     }
@@ -297,6 +282,80 @@ let resendHandler = new BaseHandler("resend").willDo(
 )
 
 resendHandler.middleware(authenticatorMiddleware);
+
+
+
+/*
+=================================================
+ [GET] EDIT PAYMENT REQUEST HANDLER
+=================================================
+*/
+
+
+let editHandler = new BaseHandler("Edit Request").willDo(
+  async function (event, context) {
+    try {
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
+      var templateParameters = paymentRequest
+
+      return new Response('200').send(
+        await template.render('payment-request-edit', templateParameters))
+    }
+    catch (error) {
+      Logger.error(['error in edit get handler', error]);
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
+    }
+  }
+)
+
+editHandler.middleware(authenticatorMiddleware);
+
+
+/*
+=================================================
+ [POST] EDIT PAYMENT REQUEST HANDLER
+=================================================
+*/
+
+
+let postEditHandler = new BaseHandler("Post Edit Request").willDo(
+  async function (event, context) {
+    var paymentNewData = querystring.parse(event.body);
+
+    try {
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
+
+      if(paymentNewData.expiration){
+        paymentRequest.expiration = paymentNewData.expiration;
+      }
+
+      if(!validExpirationDate(paymentRequest)){
+        Logger.error(['error in edit post handler, the date of the form was older than the event open date/time']);
+        return new Response('200').send(
+          await template.render('error', { 'error': 'The expiration date is older than the event open date/time.' }))
+      } else {
+        await PaymentRequest.upsertRecord(paymentRequest);
+        return new Response('302').redirect('payment-requests-resend?id='+event.queryStringParameters.id+'&created_at='+event.queryStringParameters.created_at);
+      }
+    }
+    catch (error) {
+      Logger.error(['error in post handler try catch',error]);
+      return new Response('200').send(
+        await template.render('error', { 'error': error }))
+    }
+  }
+)
+
+postEditHandler.middleware(authenticatorMiddleware);
+
+
 
 
 // * ====================================== *
@@ -307,3 +366,5 @@ exports.index  = indexHandler.do
 exports.new    = newHandler.do
 exports.post   = postHandler.do
 exports.resend = resendHandler.do
+exports.edit   = editHandler.do
+exports.postEdit = postEditHandler.do

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Payment Request - Payment Driver</title>
+    {{> head }}
+  </head>
+
+  <body>
+
+    <div class="container">
+      {{> logo }}
+
+      <form method="POST" action="{{#full_app_url}}/payment-requests-edit?id={{{id}}}&created_at={{{created_at}}}{{/full_app_url}}" data-toggle="validator">
+        <fieldset>
+          <div class="d-flex w-100 justify-content-between">
+            <legend>Payment request</legend>
+          </div>
+
+        <label for="expiration" class="cols-sm-2 control-label">Expiration <span id="display-timezone"></span></label>
+        <div class="input-group mb-3">
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                <input type="text" id="display-expiration" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                  <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <input name="expiration" {{#expiration}}value="{{expiration}}"{{/expiration}} type="hidden" style="display:none" />
+
+          <div class="form-group has-feedback">
+            <label for="amount" class="cols-sm-2 control-label">Payment amount</label>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input type="text" class="form-control" name="amount" id="amount" value="{{amount}}" readonly />
+            </div>
+          </div>
+
+          <label for="firstname" class="cols-sm-2 control-label">Customer first name</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" name="firstname" id="firstname" value="{{firstname}}" readonly />
+          </div>
+
+          <label for="lastname " class="cols-sm-2 control-label">Customer last name</label>
+          <div class="input-group mb-3">
+            <input type="text " class="form-control" name="lastname" id="lastname " value="{{lastname}}" readonly />
+          </div>
+
+          <label for="email " class="cols-sm-2 control-label ">Customer email</label>
+          <div class="input-group mb-3">
+            <input type="email " class="form-control" name="email" id="email" value="{{email}}" readonly />
+          </div>
+
+
+
+          {{#paid}}
+          <div class="form-group has-feedback">
+            <label for="amount" class="cols-sm-2 control-label">Payment ID</label>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" name="payment_id" id="payment_id" value="{{payment_id}}" readonly />
+            </div>
+          </div>
+
+          <div class="form-group has-feedback">
+            <label for="amount" class="cols-sm-2 control-label">Payment timestamp</label>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" name="paid_at_moment" id="paid_at" value="{{paid_at}}" readonly />
+            </div>
+          </div>
+          {{/paid}}
+
+          {{^paid}}
+          <a href="javascript:void(0)" class="btn btn-primary submit-edit" role="button">re-send</a>
+          {{/paid}}
+        
+        </fieldset>
+      </form>
+
+      {{> footer }}
+    </div>
+
+    {{> scripts }}
+    <script type="text/javascript">
+
+    jQuery(document).ready(function(){
+        (function($){ 
+
+
+
+        var originalDate = new Date($('input[name="expiration"]').val());
+        var date = originalDate.toLocaleDateString(undefined, {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                  });
+        var time = originalDate.toLocaleTimeString();
+        var fullDateAndTime = date + ' ' + time;
+        $('input[name="expiration"]').val(new Date(fullDateAndTime).toISOString());
+
+
+        $('#datetimepicker1').datetimepicker();
+        $('#display-expiration').val(fullDateAndTime);
+
+      
+        var maxDate = new Date("{{{event_open}}}").toLocaleDateString(undefined, {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                  });
+
+        var maxTime = new Date("{{{event_open}}}").toLocaleTimeString();
+        var fullMaxDateAndTime = maxDate + ' ' + maxTime;
+
+        $('#datetimepicker1').on("change.datetimepicker", function (e) {
+            var displayDate = new Date($('#display-expiration').val()).toISOString();
+            
+            if(displayDate > new Date(fullMaxDateAndTime).toISOString()){
+              $('#display-expiration').val(fullMaxDateAndTime);
+            }
+            var expiration = new Date($('#display-expiration').val()).toISOString();
+            $('input[name="expiration"]').val(expiration);
+        });
+
+        $('.submit-edit').on('click',function(){
+          $('form').submit();
+        })
+        })(jQuery)
+      });
+    </script>
+  </body>
+
+</html>

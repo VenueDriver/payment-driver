@@ -7,16 +7,50 @@ var AWS = require('aws-sdk-mock')
 process.env.DYNAMODB_ENDPOINT = 'http://localhost:8000'
 var paymentRequests = require('../payment-requests')
 
-describe('Payment Driver', function () {
+describe('payment requests list', function () {
 
   afterEach(function () {
     AWS.restore()
   })
 
+  describe('unauthorized, un-authenticated visitor', function() {
+
+      it('should redirect me to the login form when I request the list', async() => {
+        const result = await paymentRequests.new({
+          'requestContext': {'httpMethod': 'GET', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
+        },{})
+        expect(result.statusCode).to.equal(302)
+        expect(result.headers['location']).
+          to.equal('https://example.com/')
+      })
+
+      it('should redirect me to the login form when I request a form', async() => {
+        const result = await paymentRequests.new({
+          'requestContext': {'httpMethod': 'GET', 'path':'/payment-requests-new'},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
+        },{})
+        expect(result.statusCode).to.equal(302)
+        expect(result.headers['location']).
+          to.equal('https://example.com/')
+      })
+
+      it('should redirect me to the login form when I try to post a request', async() => {
+        const result = await paymentRequests.post({
+          'requestContext': {'httpMethod': 'POST', 'path':''},
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+          expect(result.statusCode).to.equal(302)
+          expect(result.headers['location']).
+            to.equal('https://example.com/')
+      })
+
+  })
+
   describe('payment requests REST resource', function () {
 
     it('should send a payment request form when the index is requested', async() => {
-      const result = await paymentRequests.new({ 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+      const result = await paymentRequests.new(
+        { 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 
@@ -34,7 +68,8 @@ describe('Payment Driver', function () {
         callback(null, 'Success!')
       })
 
-      const result = await paymentRequests.post({ 'headers': { 'Origin': 'https://paymentdriver.engineering' } }, {})
+      const result = await paymentRequests.post(
+        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 
@@ -48,7 +83,8 @@ describe('Payment Driver', function () {
       AWS.mock('DynamoDB.DocumentClient', 'put', function (params, callback) {
         callback("The sprockets have caught on fire!");
       })
-      const result = await paymentRequests.post({ 'headers': { 'Origin': 'https://paymentdriver.engineering' } }, {})
+      const result = await paymentRequests.post(
+        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html')
 
