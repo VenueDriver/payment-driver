@@ -1,5 +1,5 @@
+require('./test-helper.js')
 var chai = require('chai')
-// var sinon = require('sinon')
 var expect = chai.expect
 const cheerio = require('cheerio')
 var AWS = require('aws-sdk-mock')
@@ -47,25 +47,24 @@ describe('payment requests REST resource', function () {
       it('should be shown an individual request if they have a valid ID', async() => {
 
         AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback){
-          console.log('DynamoDB.DocumentClient', 'get', 'mock called');
           callback(null,
-            {
-              id: "1234", created_at: "now",
-              amountString:	'7500.00',
-              amount_paidString: '7500.00',
-	            created_atString:	'2020-02-13T23:39:11.403Z',
-              descriptionString: 'DESCRIPTION GOES HERE',
-	            emailString: 'test@example.com',
-              expirationString:	'2020-02-17T00:00:00.000Z',
-              firstnameString: 'Testy',
-              lastnameString:	'Testerson',
-              paidBoolean: 'true',
-              paid_atString: '2020-02-14T08:43:54.966Z',
-              requestorString: 'requestor@example.com',
-              totalString: '8992.15',
-              updated_atString:	'2020-02-13T23:39:11.403Z',
-              payment: {
-                'foo':'bar'
+            {Item:
+              {
+                id: "1234",
+                created_at:	'2020-02-13T23:39:11.403Z',
+                updated_at:	'2020-02-13T23:39:11.403Z',
+                firstname: 'Testy',
+                lastname:	'Testerson',
+  	            email: 'test@example.com',
+                requestor: 'requestor@example.com',
+                amount:	'7500.00',
+                paid: 'true',
+                paid_at: '2020-02-14T08:43:54.966Z',
+                description: 'DESCRIPTION GOES HERE',
+                expiration:	'2020-02-17T00:00:00.000Z',
+                payment: {
+                  'foo':'bar'
+                }
               }
             });
         })
@@ -73,10 +72,17 @@ describe('payment requests REST resource', function () {
         const result = await paymentRequests.index({
           'requestContext': {'httpMethod': 'GET', 'path':'/payment-requests'},
           'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
-          'queryStringParameters': {'id':'1234', 'created_at':'now'}
+          'queryStringParameters': {'id':'1234', 'created_at':'2020-02-13T23:39:11.403Z'}
         },{})
-        console.log(JSON.stringify(result))
+        const $ = cheerio.load(result.body)
+
         expect(result.statusCode).to.equal(200)
+        expect(result.headers['Content-Type']).to.equal('text/html');
+        expect($('#firstname').attr('value')).to.have.string('Testy')
+        expect($('#lastname').attr('value')).to.have.string('Testerson')
+        expect($('#email').attr('value')).to.have.string('test@example.com')
+        expect($('#amount').attr('value')).to.have.string('7500.00')
+        expect($('#description').text()).to.have.string('DESCRIPTION GOES HERE')
       })
 
   })

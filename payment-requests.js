@@ -48,7 +48,7 @@ let indexHandler = new BaseHandler("index").willDo(
         var created_at = event.queryStringParameters.created_at
         templateParameters = await PaymentRequest.get(id, created_at)
         templateParameters.payment_id = templateParameters.payment.id
-        
+
         templateParameters.paid_at_moment = function () {
           return moment(this.paid_at).fromNow()
         }
@@ -77,7 +77,7 @@ let indexHandler = new BaseHandler("index").willDo(
         // status pages for existing payment requests.
 
         var paymentRequests = await PaymentRequest.index()
-        
+
         //get current date and time to filter payment requests
         var today = new Date();
         var time =  ("0" + today.getHours()).slice(-2) + ':' + ("0" + today.getMinutes()).slice(-2);
@@ -85,9 +85,9 @@ let indexHandler = new BaseHandler("index").willDo(
         var mm = String(today.getMonth() + 1).padStart(2, '0');
         var yyyy = today.getFullYear();
 
-        today = mm + '/' + dd + '/' + yyyy + ' ' + time; 
+        today = mm + '/' + dd + '/' + yyyy + ' ' + time;
         today = new Date(today).getTime();
-        
+
         var expiredPayments = [], soonToExpirePayments = [] , longToExpirePayments = [];
 
         //adding a day to the current date and time to check for soon to expire payment requests
@@ -108,8 +108,8 @@ let indexHandler = new BaseHandler("index").willDo(
           else if ( today < paymentDate && paymentDate > marginDate ){
             longToExpirePayments.push(JSON.stringify(paymentRequests[i]));
           }
-        }  
-        
+        }
+
 
         templateParameters = {
           'soonToExpirePayments': soonToExpirePayments,
@@ -202,7 +202,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     paymentRequest.total = decimals[0] + "." + decimals[1];
 
     var templateParameters = paymentRequest
-      
+
     if(!validExpirationDate(paymentRequest)){
       try{
         templateParameters.queryParams = global.handler.queryParams;
@@ -216,7 +216,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
     } else {
       try {
         await PaymentRequest.put(paymentRequest)
-        
+
         // This notification goes to the customer.
         templateParameters.subject = "Payment request from " + company
         templateParameters.to = paymentRequest.email
@@ -224,7 +224,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToCustomerParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-customer')
         await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters)
-  
+
         // This notification goes to the requestor.
         templateParameters.subject = "Payment request to " + paymentRequest.email
         templateParameters.to = paymentRequest.requestor
@@ -232,7 +232,7 @@ let postHandler = new BaseHandler("Post Payment Request").willDo(
         global.handler.emailToRequestorParameters = templateParameters
         await Hook.execute('before-sending-request-email-to-requestor')
         await EmailNotification.sendEmail(templateName, global.handler.emailToRequestorParameters)
-  
+
         return new Response('200').send(
           await template.render('payment-request-confirmation', templateParameters))
       }
