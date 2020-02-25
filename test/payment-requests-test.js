@@ -15,33 +15,41 @@ describe('payment requests REST resource', function () {
 
   describe('an unauthorized, un-authenticated visitor', function() {
 
-      it('should be redirected to the login form when they request the list', async() => {
+      it('should see the login form when they request the list', async() => {
         const result = await paymentRequests.index({
           'requestContext': {'httpMethod': 'GET', 'path':'/payment-requests'},
           'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
         },{})
-        expect(result.statusCode).to.equal(302)
-        expect(result.headers['location']).
-          to.equal('https://example.com/')
+        const $ = cheerio.load(result.body)
+        expect(result.statusCode).to.equal(200)
+        expect($('#loginForm')).to.exist
       })
 
-      it('should be redirected to the login form when they request a form', async() => {
+      it('should see the login form when they request a form', async() => {
         const result = await paymentRequests.new({
           'requestContext': {'httpMethod': 'GET', 'path':'/payment-requests-new'},
           'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'}
         },{})
-        expect(result.statusCode).to.equal(302)
-        expect(result.headers['location']).
-          to.equal('https://example.com/')
+
+        // This shows why this test is failing:
+        console.log("RESULT: " + JSON.stringify(result))
+
+        const $ = cheerio.load(result.body)
+        expect(result.statusCode).to.equal(200)
+        expect($('#loginForm')).to.exist
       })
 
-      it('should be redirected to the login form when they try to post a request', async() => {
+      it('should see the login form when they try to post a request', async() => {
         const result = await paymentRequests.post({
           'requestContext': {'httpMethod': 'POST', 'path':'/payment-requests'},
           'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
-          expect(result.statusCode).to.equal(302)
-          expect(result.headers['location']).
-            to.equal('https://example.com/')
+
+        // This shows why this test is failing:
+        console.log("RESULT: " + JSON.stringify(result))
+
+        const $ = cheerio.load(result.body)
+        expect(result.statusCode).to.equal(200)
+        expect($('#loginForm')).to.exist
       })
 
       it('should be shown an individual request if they have a valid ID', async() => {

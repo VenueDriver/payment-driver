@@ -11,7 +11,7 @@
     <div class="container">
       {{> logo }}
 
-      <form method="post" action="{{#full_app_url}}login{{/full_app_url}}" data-toggle="validator">
+      <form method="post" action="{{#full_app_url}}login{{/full_app_url}}" data-toggle="validator" id="loginForm">
         <fieldset>
           {{^ message }}
           <legend>Please log in</legend>
