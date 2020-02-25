@@ -2,12 +2,12 @@
 <html>
 
   <head>
-    <title>Send Payment Request - Payment Driver</title>
+    <title>Payment Requests - Payment Driver</title>
     {{> head }}
   </head>
-  
+
   <body>
-    
+
     <div class="container">
       {{> logo }}
       {{> navbar }}
@@ -46,7 +46,7 @@
       </div>
       <p id="longToExpirePaymentsContainer">
         <ul id="longToExpirePayments" class="list-group">
-        
+
         </ul>
       </p>
 
@@ -73,7 +73,7 @@
     var displayedExpired = filterPayments(expiredPayments);
     var displayedLong = filterPayments(longToExpirePayments);
     var displayedSoon = filterPayments(soonToExpirePayments);
-    
+
     function filterPayments(data , email = null){
       if(email){
         data = data.filter( function(obj){
@@ -95,7 +95,7 @@
     function returnArrayPortion(index, data , quantity ){
       var resultingData = "";
 
-      
+
       if( index === 1){
         var diffIndex = 0;
       } else {
@@ -109,7 +109,7 @@
           }
         }
       }
-      
+
       return resultingData;
     }
 
@@ -132,7 +132,7 @@
       }
       element += '</a>';
 
-      return element; 
+      return element;
     }
 
     function checkArrowAvailability(container){
@@ -165,7 +165,7 @@
       $('#longToExpirePayments').append(returnArrayPortion($('#longValue').val(),displayedLong,increment));
       $('#soonToExpirePayments').append(returnArrayPortion($('#soonValue').val(),displayedSoon,increment));
 
-      
+
       if(displayedExpired.length > 0){
         $('#expiredControlsContainer').css('display','block');
         var max = calculateMax(displayedExpired,increment);

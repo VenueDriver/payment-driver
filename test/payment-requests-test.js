@@ -3,6 +3,7 @@ var chai = require('chai')
 var expect = chai.expect
 const cheerio = require('cheerio')
 var AWS = require('aws-sdk-mock')
+var jwt = require('jsonwebtoken')
 
 process.env.DYNAMODB_ENDPOINT = 'http://localhost:8000'
 var paymentRequests = require('../payment-requests')
@@ -91,9 +92,31 @@ describe('payment requests REST resource', function () {
 
   describe('an authorized admin user', function () {
 
-    it('should be sent a payment request form when the index is requested', async() => {
-      const result = await paymentRequests.new(
-        { 'requestContext': {'httpMethod': 'GET', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+    it('should see the payment request list when they request it', async() => {
+      const result = await paymentRequests.index({
+        'requestContext': {'httpMethod': 'GET', 'path':''},
+        'headers': {
+          'X-Forwarded-Proto':'https',
+          'Host': 'example.com',
+          'Cookie': 'authentication_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
+        }
+      },{})
+      expect(result.statusCode).to.equal(200)
+      expect(result.headers['Content-Type']).to.equal('text/html')
+
+      const $ = cheerio.load(result.body)
+      expect($('title').text()).to.have.string('Payment Requests - Payment Driver')
+    })
+
+    it('should see a payment request form when they request it', async() => {
+      const result = await paymentRequests.new({
+        'requestContext': {'httpMethod': 'GET', 'path':''},
+        'headers': {
+          'X-Forwarded-Proto':'https',
+          'Host': 'example.com',
+          'Cookie': 'auth_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
+        }
+      },{})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 
