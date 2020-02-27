@@ -107,7 +107,7 @@ let logoutHandler = new BaseHandler("logout").willDo(
       headers: {
         location: global.handler.base_url,
         // Remove the access token cookie.
-        'Set-Cookie': 'access_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
+        'Set-Cookie': 'authentication_token=; Expires=Mon, 30 Apr 2012 22:00:00 EDT'
       }
     })
   }
@@ -123,7 +123,7 @@ function redirectToPaymentRequestsResponse(event, accessToken) {
 
   // Add the authentication token as a cookie.
   // This is a session cookie, since it has no expiration set.
-  var cookie = 'access_token = ' + accessToken
+  var cookie = 'authentication_token = ' + accessToken
   // Don't specify 'Secure' for local development, or else the
   // cookie will not be returned to the development functions.
   if(!process.env.AWS_SAM_LOCAL) {
