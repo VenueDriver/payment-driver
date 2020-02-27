@@ -44,6 +44,8 @@ let indexHandler = new BaseHandler("index").willDo(
       if (event.queryStringParameters &&
         event.queryStringParameters.id &&
         event.queryStringParameters.created_at) {
+
+          
         var id = event.queryStringParameters.id
         var created_at = event.queryStringParameters.created_at
         templateParameters = await PaymentRequest.get(id, created_at)
@@ -76,7 +78,14 @@ let indexHandler = new BaseHandler("index").willDo(
         // causes this page to be revealed to people following links to
         // status pages for existing payment requests.
 
-        var paymentRequests = await PaymentRequest.index()
+        var paymentRequests = await PaymentRequest.index();
+
+        //set default quantity and page number for the pagination of the 
+        //payment requests
+        var quantity = (event.queryStringParameters && event.queryStringParameters.quantity) ? event.queryStringParameters.quantity : 5;
+        var expiredIndex = (event.queryStringParameters && event.queryStringParameters.expiredIndex) ? event.queryStringParameters.expiredIndex : 1;
+        var longIndex = (event.queryStringParameters && event.queryStringParameters.longIndex) ? event.queryStringParameters.longIndex : 1;
+        var soonIndex = (event.queryStringParameters && event.queryStringParameters.soonIndex) ? event.queryStringParameters.soonIndex : 1;
 
         //get current date and time to filter payment requests
         var today = new Date();
@@ -100,25 +109,59 @@ let indexHandler = new BaseHandler("index").willDo(
           paymentRequests[i].created_at_moment = moment(paymentRequests[i].created_at).fromNow();
 
           if( today > paymentDate ){
-            expiredPayments.push(JSON.stringify(paymentRequests[i]));
+            expiredPayments.push(paymentRequests[i]);
 
           } else if( today < paymentDate && paymentDate <= marginDate ){
-              soonToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+              soonToExpirePayments.push(paymentRequests[i]);
           }
           else if ( today < paymentDate && paymentDate > marginDate ){
-            longToExpirePayments.push(JSON.stringify(paymentRequests[i]));
+            longToExpirePayments.push(paymentRequests[i]);
           }
+        }  
+
+
+        if(event.queryStringParameters && event.queryStringParameters.email){
+          expiredPayments = filterPayments(expiredPayments , event.queryStringParameters.email);
+          soonToExpirePayments = filterPayments(soonToExpirePayments , event.queryStringParameters.email);
+          longToExpirePayments = filterPayments(longToExpirePayments , event.queryStringParameters.email);
         }
 
+        var expiredPages = calculateMax(expiredPayments,quantity);
+        var longPages = calculateMax(longToExpirePayments,quantity);
+        var soonPages = calculateMax(soonToExpirePayments,quantity);
+        
+        
+        expiredPayments = returnArrayPortion(expiredIndex, expiredPayments , quantity );
+        soonToExpirePayments = returnArrayPortion(soonIndex, soonToExpirePayments , quantity );
+        longToExpirePayments = returnArrayPortion(longIndex, longToExpirePayments , quantity );
+
+        expiredPayments = expiredPayments.map(function(obj){
+          return JSON.stringify(obj);
+        });
+        soonToExpirePayments = soonToExpirePayments.map(function(obj){
+          return JSON.stringify(obj);
+        });
+        longToExpirePayments = longToExpirePayments.map(function(obj){
+          return JSON.stringify(obj);
+        });
 
         templateParameters = {
           'soonToExpirePayments': soonToExpirePayments,
           'longToExpirePayments': longToExpirePayments,
-          'expiredPayments': expiredPayments
+          'expiredPayments': expiredPayments,
+          'expiredPages': expiredPages,
+          'longPages': longPages,
+          'soonPages': soonPages
         }
-        Logger.info(['dashboard params',templateParameters]);
-        return new Response('200').send(
-          await template.render('payment-requests', templateParameters))
+        // Logger.info(['dashboard params',templateParameters]);
+        if(event.queryStringParameters && event.queryStringParameters.data){
+          Logger.info(['Data succesfully returned'],templateParameters);
+          return new Response('200').send(JSON.stringify(templateParameters));
+        } else {
+          Logger.info(['Index succesfully rendered with this data: '],templateParameters);
+          return new Response('200').send(
+            await template.render('payment-requests', templateParameters));
+        } 
       }
     }
     catch (error) {
@@ -358,6 +401,44 @@ let postEditHandler = new BaseHandler("Post Edit Request").willDo(
 postEditHandler.middleware(authenticatorMiddleware);
 
 
+//complementary functions
+
+function returnArrayPortion(index, data , quantity ){
+  var resultingData = [];
+  
+  if( index === 1){
+    var diffIndex = 0;
+  } else {
+    var diffIndex = index - 1;
+  }
+
+  if(data.length >= (diffIndex*quantity)){
+    for( var i = (quantity*diffIndex) ; i < (quantity*index) ; i++){
+      if(data[i]){
+        resultingData.push(data[i]);
+      }
+    }
+  }
+  
+  return resultingData;
+}
+
+function filterPayments(data , email = null){
+  if(data.length > 0 && email){
+      data = data.filter( function(obj){
+        var result = false;
+        if (obj.email && obj.email.includes(email)){
+          result = true;
+        }
+        return result;
+      });
+  }
+  return data;
+}
+
+function calculateMax(data,increment){
+  return Math.ceil(data.length/increment);
+}
 
 
 // * ====================================== *
