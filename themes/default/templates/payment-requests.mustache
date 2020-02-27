@@ -18,50 +18,57 @@
           <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-new{{/full_app_url}}" role="button">create new</a>
         </div>
       </div>
-      <label>Search for payments by email
-      <input type="text" id="emailSearch">
-
+      <div class="email-search__container">
+        <label>Search for payments by email
+        <input type="text" id="emailSearch">
+        <button class="goSearch">Go!</button>
+      </div>
       </label>
 
-      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h3 class="mb-1">Soon To Expire Requests</h3>
-        <div class="controlContainer" id="soonControlsContainer">
-          <span class="back" id="soonBack"><</span><span class="current" id="soonCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="soonTotal"></span><span class="forward" id="soonForward">></span>
-          <input style="display:none" class="value"  id="soonValue" type="number" min="1">
+      <div id="soonOuterContainer">
+        <div class="d-flex w-100 justify-content-between payments-title align-items-center">
+          <h3 class="mb-1">Soon To Expire Requests</h3>
+          <div class="controlContainer" id="soonControlsContainer">
+            <span class="back" id="soonBack"><</span><span class="current" id="soonCurrent">1</span><span class="separator">/</span><span class="paymentsTotal" id="soonTotal">{{soonPages}}</span><span class="forward" id="soonForward">></span>
+            <input style="display:none" class="value"  id="soonValue" type="number" min="1" max="{{soonPages}}">
+          </div>
         </div>
+
+        <p id="soonToExpirePaymentsContainer">
+          <ul id="soonToExpirePayments" class="payments-list list-group">
+
+          </ul>
+        </p>
       </div>
 
-      <p id="soonToExpirePaymentsContainer">
-        <ul id="soonToExpirePayments" class="list-group">
-
-        </ul>
-      </p>
-
-      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h3 class="mb-1">Long To Expire Requests</h3>
-        <div class="controlContainer" id="longControlsContainer">
-          <span class="back" id="longBack"><</span><span class="current" id="longCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="longTotal"></span><span class="forward" id="longForward">></span>
-          <input style="display:none" class="value" id="longValue" type="number" min="1">
+      <div id="longOuterContainer">
+        <div class="d-flex w-100 justify-content-between payments-title align-items-center">
+          <h3 class="mb-1">Long To Expire Requests</h3>
+          <div class="controlContainer" id="longControlsContainer">
+            <span class="back" id="longBack"><</span><span class="current" id="longCurrent">1</span><span class="separator">/</span><span class="paymentsTotal" id="longTotal">{{longPages}}</span><span class="forward" id="longForward">></span>
+            <input style="display:none" class="value" id="longValue" type="number" min="1" max="{{longPages}}">
+          </div>
         </div>
+        <p id="longToExpirePaymentsContainer">
+          <ul id="longToExpirePayments" class="payments-list list-group">
+          
+          </ul>
+        </p>
       </div>
-      <p id="longToExpirePaymentsContainer">
-        <ul id="longToExpirePayments" class="list-group">
-        
-        </ul>
-      </p>
 
-      <div class="d-flex w-100 justify-content-between payments-title align-items-center">
-        <h3 class="mb-1">Expired Requests</h3>
-        <div class="controlContainer" id="expiredControlsContainer">
-          <span class="back" id="expiredBack"><</span><span class="current" id="expiredCurrent"></span><span class="separator">/</span><span class="paymentsTotal" id="expiredTotal"></span><span class="forward" id="expiredForward">></span>
-          <input style="display:none" class="value" min="1" id="expiredValue" type="number">
+      <div id="expiredOuterContainer">
+        <div class="d-flex w-100 justify-content-between payments-title align-items-center">
+          <h3 class="mb-1">Expired Requests</h3>
+          <div class="controlContainer" id="expiredControlsContainer">
+            <span class="back" id="expiredBack"><</span><span class="current" id="expiredCurrent">1</span><span class="separator">/</span><span class="paymentsTotal" id="expiredTotal">{{expiredPages}}</span><span class="forward" id="expiredForward">></span>
+            <input style="display:none" class="value" min="1" id="expiredValue" type="number" max="{{expiredPages}}">
+          </div>
         </div>
+        <p id="expiredPaymentsContainer">
+          <ul id="expiredPayments" class="payments-list list-group">
+          </ul>
+        </p>
       </div>
-      <p id="expiredPaymentsContainer">
-        <ul id="expiredPayments" class="list-group">
-        </ul>
-      </p>
-
       {{> footer }}
     </div>
 
@@ -69,55 +76,12 @@
 
     <script type="text/javascript">
     var expiredPayments = [{{{expiredPayments}}}], longToExpirePayments = [{{{longToExpirePayments}}}], soonToExpirePayments = [{{{soonToExpirePayments}}}];
-    var increment = 5;
-    var displayedExpired = filterPayments(expiredPayments);
-    var displayedLong = filterPayments(longToExpirePayments);
-    var displayedSoon = filterPayments(soonToExpirePayments);
-    
-    function filterPayments(data , email = null){
-      if(email){
-        data = data.filter( function(obj){
-          var result = false;
-          if (obj.email && obj.email.includes(email)){
-            result = true;
-          }
-          return result;
-        });
-      }
-
-      data = data.map( obj => {
-        return returnFormedElement(obj);
-      });
-
-      return data;
-    }
-
-    function returnArrayPortion(index, data , quantity ){
-      var resultingData = "";
-
-      
-      if( index === 1){
-        var diffIndex = 0;
-      } else {
-        var diffIndex = index - 1;
-      }
-
-      if(data.length >= (diffIndex*quantity)){
-        for( var i = (quantity*diffIndex) ; i < (quantity*index) ; i++){
-          if(data[i]){
-            resultingData += data[i];
-          }
-        }
-      }
-      
-      return resultingData;
-    }
 
     function returnFormedElement(obj){
       obj.email = obj.email ? obj.email : "No Email";
       obj.description = obj.description ? obj.description : "No Description";
 
-      var element = '<a href="{{#full_app_url}}payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'{{/full_app_url}}" class="list-group-item list-group-item-action indiv-payment__container flex-column align-items-start">'+
+      var element = '<a href="payment-requests?id='+obj.id+'&created_at='+obj.created_at_escaped+'" class="list-group-item list-group-item-action indiv-payment__container flex-column align-items-start">'+
       '<div class="d-flex w-100 justify-content-between">'+
       '<h5 class="mb-1">'+obj.email+'</h5>'+
       '<small>'+obj.created_at_moment+'</small>'+
@@ -151,63 +115,83 @@
       }
     }
 
-    function calculateMax(data,increment){
-      return Math.ceil(data.length/increment);
+    function rewriteMaxPages(data){
+      $('#soonTotal').empty().append(data.soonPages); 
+      $('#longTotal').empty().append(data.longPages);
+      $('#expiredTotal').empty().append(data.expiredPages);
+
+      $('#soonValue').attr('max',data.soonPages);
+      $('#longValue').attr('max',data.longPages);
+      $('#expiredValue').attr('max',data.expiredPages);
     }
 
-    function updatePaymentsDisplayed(){
-      $('.value').each(function(){
-        $(this).val(1);
-      })
 
-      $('#expiredPayments,#longToExpirePayments,#soonToExpirePayments').empty();
-      $('#expiredPayments').append(returnArrayPortion($('#expiredValue').val(),displayedExpired,increment));
-      $('#longToExpirePayments').append(returnArrayPortion($('#longValue').val(),displayedLong,increment));
-      $('#soonToExpirePayments').append(returnArrayPortion($('#soonValue').val(),displayedSoon,increment));
-
+    function updatePaymentsDisplayed(container,data,pagination){
+      var list = container.find('.payments-list').first();
+      var controls = container.find('.controlContainer').first();
       
-      if(displayedExpired.length > 0){
-        $('#expiredControlsContainer').css('display','block');
-        var max = calculateMax(displayedExpired,increment);
-        $('#expiredControlsContainer').find('.value').first().attr('max',max);
-        checkArrowAvailability($('#expiredControlsContainer'));
-        $('#expiredTotal').empty().append(max);
-      } else {
-        $('#expiredControlsContainer').css('display','none');
-        $('#expiredPayments').append('No Payments Found');
+      $(list).empty();
+
+      if(!pagination){
+        $(controls).find('.value').first().val(1);
+        $(controls).find('.current').first().empty().append('1');
       }
 
-      if(displayedLong.length > 0){
-        $('#longControlsContainer').css('display','block');
-        var max = calculateMax(displayedLong,increment);
-        $('#longControlsContainer').find('.value').first().attr('max',max);
-        $('#longTotal').empty().append(max);
-        checkArrowAvailability($('#longControlsContainer'));
-      } else {
-        $('#longControlsContainer').css('display','none');
-        $('#longToExpirePayments').append('No Payments Found');
-      }
 
-      if(displayedSoon.length > 0){
-        $('#soonControlsContainer').css('display','block');
-        var max = calculateMax(displayedSoon,increment);
-        $('#soonControlsContainer').find('.value').first().attr('max',max);
-        $('#soonTotal').empty().append(max);
-        checkArrowAvailability($('#soonControlsContainer'));
-      } else {
-        $('#soonControlsContainer').css('display','none');
-        $('#soonToExpirePayments').append('No Payments Found');
+      if(data.length > 0){
+        $(controls).css('display','block');
+        $(list).append(data);
+      } else { 
+        $(controls).css('display','none');
+        $(list).append("No payments found");
       }
+    }
 
-      $('.current').each(function(){
-        $(this).empty().append('1');
-      })
+    function updateArrays(data, parseFromJSON = false){
+      if (data){
+        if(parseFromJSON){
+          data.expiredPayments = data.expiredPayments.map(function(obj){
+            return JSON.parse(obj);
+          });
+          data.longToExpirePayments = data.longToExpirePayments.map(function(obj){
+            return JSON.parse(obj);
+          });
+          data.soonToExpirePayments = data.soonToExpirePayments.map(function(obj){
+            return JSON.parse(obj);
+          });
+        }
+
+        expiredPayments = data.expiredPayments;
+        longToExpirePayments = data.longToExpirePayments;
+        soonToExpirePayments = data.soonToExpirePayments;
+      }
+    }
+
+    function reformElements(data){
+        data = data.map( obj => {
+          return returnFormedElement(obj);
+        });
+
+        return data;
     }
 
     jQuery(document).ready(function(){
+
         (function($){
 
-          updatePaymentsDisplayed();
+          var originalURL = "{{{#full_app_url}}}/payment-requests?data=true{{{/full_app_url}}}";
+
+          expiredPayments = reformElements(expiredPayments);
+          longToExpirePayments = reformElements(longToExpirePayments);
+          soonToExpirePayments = reformElements(soonToExpirePayments);
+          
+          updatePaymentsDisplayed($('#expiredOuterContainer'),expiredPayments,false);
+          updatePaymentsDisplayed($('#longOuterContainer'),longToExpirePayments,false);
+          updatePaymentsDisplayed($('#soonOuterContainer'),soonToExpirePayments,false);
+
+          checkArrowAvailability($('#expiredOuterContainer .controlContainer'));
+          checkArrowAvailability($('#longOuterContainer .controlContainer'));
+          checkArrowAvailability($('#soonOuterContainer .controlContainer'));
 
           $('.back').on('click',function(){
             var container = $(this).closest('.controlContainer');
@@ -241,25 +225,135 @@
 
 
           $('#soonValue').on('change',function(){
-            $('#soonToExpirePayments').empty().append(returnArrayPortion($('#soonValue').val(),displayedSoon,increment));
+            var currentVal = $(this).val();
+            var url = originalURL + '?data=true&soonIndex=' + currentVal;
+            var self = $(this);
+
+            if($('#emailSearch').val().length > 0){
+              url+= '&email=' + $('#emailSearch').val();
+            }
+
+            $('#soonOuterContainer .back,#soonOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+            $('#emailSearch').attr('disabled','disabled');
+            $('#soonToExpirePayments').empty().append('<div class="loader">Loading...</div>');
+
+            $.ajax({
+              url: url,
+              headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+              crossDomain: true,
+              type: 'GET',
+              success: function(data){
+                data = JSON.parse(data);
+                updateArrays(data,true);              
+                soonToExpirePayments = reformElements(soonToExpirePayments);
+                rewriteMaxPages(data);
+                updatePaymentsDisplayed($('#soonOuterContainer'),soonToExpirePayments,true);
+                $('#soonOuterContainer .back,#soonOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+                $('#emailSearch').removeAttr('disabled');
+                checkArrowAvailability(self);
+              }
+            });
           });
 
           $('#longValue').on('change',function(){
-            $('#longToExpirePayments').empty().append(returnArrayPortion($('#longValue').val(),displayedLong,increment));
+            var currentVal = $(this).val();
+            var url = originalURL + '?data=true&longIndex=' + currentVal;
+            var self = $(this);
+
+            if($('#emailSearch').val().length > 0){
+              url+= '&email=' + $('#emailSearch').val();
+            }
+
+            $('#longOuterContainer .back,#longOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+            $('#emailSearch').attr('disabled','disabled');
+            $('#longToExpirePayments').empty().append('<div class="loader">Loading...</div>');
+
+            $.ajax({
+              url: url,
+              headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+              crossDomain: true,
+              type: 'GET',
+              success: function(data){
+                data = JSON.parse(data);
+                updateArrays(data,true);              
+                longToExpirePayments = reformElements(longToExpirePayments);
+                rewriteMaxPages(data);
+                updatePaymentsDisplayed($('#longOuterContainer'),longToExpirePayments,true);
+                $('#longOuterContainer .back,#longOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+                $('#emailSearch').removeAttr('disabled');
+                checkArrowAvailability(self);
+              }
+            });
           });
 
           $('#expiredValue').on('change',function(){
-            $('#expiredPayments').empty().append(returnArrayPortion($('#expiredValue').val(),displayedExpired,increment));
+            var currentVal = $(this).val();
+            var url = originalURL + '?data=true&expiredIndex=' + currentVal;
+            var self = $(this);
+
+            if($('#emailSearch').val().length > 0){
+              url+= '&email=' + $('#emailSearch').val();
+            }
+            $('#expiredOuterContainer .back,#expiredOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+            $('#emailSearch').attr('disabled','disabled');
+            $('#expiredPayments').empty().append('<div class="loader">Loading...</div>');
+
+            $.ajax({
+              url: url,
+              headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+              crossDomain: true,
+              type: 'GET',
+              success: function(data){
+                data = JSON.parse(data);
+                updateArrays(data,true);              
+                expiredPayments = reformElements(expiredPayments);
+                rewriteMaxPages(data);
+                updatePaymentsDisplayed($('#expiredOuterContainer'),expiredPayments,true);
+                $('#expiredOuterContainer .back,#expiredOuterContainer .forward,.goSearch').toggleClass('pause-ajax-calls');
+                $('#emailSearch').removeAttr('disabled');
+                checkArrowAvailability(self);
+              }
+            });
           });
 
-          $('#emailSearch').on('input change',function(){
-            var val = $(this).val();
+          $('.goSearch').on('click',function(){
+            var val = $('#emailSearch').val();
+            
+            var url = originalURL + '&email=' + val;
 
-            displayedExpired = filterPayments(expiredPayments,val);
-            displayedLong = filterPayments(longToExpirePayments,val);
-            displayedSoon = filterPayments(soonToExpirePayments,val);
+            $('#emailSearch').attr('disabled','disabled');
+            $('.back,.forward,.goSearch').toggleClass('pause-ajax-calls');
+            $('#longToExpirePayments,#expiredPayments,#soonToExpirePayments').empty().append('<div class="loader">Loading...</div>');
 
-            updatePaymentsDisplayed();
+
+            $.ajax({
+              url: url,
+              headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+              crossDomain: true,
+              type: 'GET',
+              success: function(data){
+                data = JSON.parse(data);
+                updateArrays(data,true);              
+
+                expiredPayments = reformElements(expiredPayments);
+                longToExpirePayments = reformElements(longToExpirePayments);
+                soonToExpirePayments = reformElements(soonToExpirePayments);
+
+                rewriteMaxPages(data);
+
+                updatePaymentsDisplayed($('#expiredOuterContainer'),expiredPayments,false);
+                updatePaymentsDisplayed($('#longOuterContainer'),longToExpirePayments,false);
+                updatePaymentsDisplayed($('#soonOuterContainer'),soonToExpirePayments,false);
+
+                $('.back,.forward,.goSearch').toggleClass('pause-ajax-calls');
+                $('#emailSearch').removeAttr('disabled');
+                  
+                checkArrowAvailability($('#expiredOuterContainer .controlContainer'));
+                checkArrowAvailability($('#longOuterContainer .controlContainer'));
+                checkArrowAvailability($('#soonOuterContainer .controlContainer'));
+
+              }
+            });
           });
 
         })(jQuery)

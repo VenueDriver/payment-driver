@@ -14,11 +14,11 @@ async function authenticate(event, context) {
     return;
   }
   // Check for the access token cookie and verify it if it exists.
-  var accessToken
+  var authenticationToken
   try {
     const authorizer = new APIGatewayAuthorizer()
 
-    accessToken = await authorizer.getValidAccessTokenFromCookie(event)
+    authenticationToken = await authorizer.getValidAuthenticationTokenFromCookie(event)
     Logger.info(["Access token requested..."]);
 
   }
@@ -29,7 +29,7 @@ async function authenticate(event, context) {
       await template.render('login')
     )
   }
-  if (!accessToken) {
+  if (!authenticationToken) {
     Logger.info(["No access token, redirecting to login"]);
     // Respond with the login form if the access token is missing,
     // so that the user can provide their authentication credentials and

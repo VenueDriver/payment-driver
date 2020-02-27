@@ -23,6 +23,7 @@ async function bypassNewPaymentRequestAuthenticator(event, context) {
   }
 
   if(!paymentRequestRequestPayload){
+    Logger.info(["\nNo authorization token.  Redirecting to payment-requests.\n"]);
     return new Response('302').redirect('payment-requests')
   }
 }

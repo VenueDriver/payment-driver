@@ -54,7 +54,7 @@
 
           <label for="lastname " class="cols-sm-2 control-label">Customer last name</label>
           <div class="input-group mb-3">
-            <input type="text " class="form-control" name="lastname" id="lastname " value="{{lastname}}" readonly />
+            <input type="text " class="form-control" name="lastname" id="lastname" value="{{lastname}}" readonly />
           </div>
 
           <label for="email " class="cols-sm-2 control-label ">Customer email</label>
@@ -105,14 +105,14 @@
 
           {{#paid}}
           <div class="form-group has-feedback">
-            <label for="amount" class="cols-sm-2 control-label">Payment ID</label>
+            <label for="payment_id" class="cols-sm-2 control-label">Payment ID</label>
             <div class="input-group mb-3">
               <input type="text" class="form-control" name="payment_id" id="payment_id" value="{{payment_id}}" readonly />
             </div>
           </div>
 
           <div class="form-group has-feedback">
-            <label for="amount" class="cols-sm-2 control-label">Payment timestamp</label>
+            <label for="paid_at_moment" class="cols-sm-2 control-label">Payment timestamp</label>
             <div class="input-group mb-3">
               <input type="text" class="form-control" name="paid_at_moment" id="paid_at" value="{{paid_at}}" readonly />
             </div>
@@ -132,7 +132,7 @@ status pages for existing payment requests.
           <a class="btn btn-primary" href="{{#full_app_url}}/payment-requests-edit?id={{id}}&created_at={{created_at}}{{/full_app_url}}" role="button">Edit</a>
           {{/isUserAuthenticated}}
           {{/paid}}
-        
+
         </fieldset>
       </form>
 
