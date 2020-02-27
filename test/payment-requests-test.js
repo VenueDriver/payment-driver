@@ -114,7 +114,7 @@ describe('payment requests REST resource', function () {
         'headers': {
           'X-Forwarded-Proto':'https',
           'Host': 'example.com',
-          'Cookie': 'auth_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
+          'Cookie': 'authentication_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
         }
       },{})
       expect(result.statusCode).to.equal(200)
