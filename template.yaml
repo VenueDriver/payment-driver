@@ -13,6 +13,7 @@ Parameters:
     Type: String
   Environment:
     Type: String
+    Default: local
   ProjectName:
     Type: String
   ProjectId:
