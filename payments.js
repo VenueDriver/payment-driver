@@ -99,10 +99,9 @@ let postHandler = new BaseHandler("post").willDo(
     const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
     const stripeToken = params.stripeToken
     const metadata = {};
-
     global.handler.stripeAmount = parseInt( paymentRequest.total.replace(/\./gi,"") )
 
-    // GATHER ADDITIONAL FIELDS
+      // GATHER ADDITIONAL FIELDS
     Logger.debug(["GATHER ADDITIONAL FIELDS"]);
     if(
       paymentRequest.additional_fields
@@ -204,7 +203,7 @@ let postHandler = new BaseHandler("post").willDo(
     catch (error) {
       Logger.error(['Error starting the process of stripe payment: ',error]);
       return new Response('200').send(
-        await template.render('error', { 'error': error }))
+        await template.render('payment-error', { 'error': error }))
     }
 
   }
