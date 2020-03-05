@@ -31,16 +31,36 @@ describe('Payment Driver', function () {
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');
       const $ = cheerio.load(result.body)
-      expect($('legend').text()).to.have.string('Please provide payment')
+      expect($('title').text()).to.have.string('Send Payment - Payment Driver')
     })
 
     it('should process a payment with Stripe when the payment form is posted', async() => {
 
-      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
-        callback(null, { 'Item': { 'Key': 1234 } })
+      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback){
+        callback(null,
+          {Item:
+            {
+              id: "1234",
+              created_at:	'2020-02-13T23:39:11.403Z',
+              updated_at:	'2020-02-13T23:39:11.403Z',
+              firstname: 'Testy',
+              lastname:	'Testerson',
+              email: 'test@example.com',
+              requestor: 'requestor@example.com',
+              amount:	'7500.00',
+              total: '7500.00',
+              paid: 'true',
+              paid_at: '2020-02-14T08:43:54.966Z',
+              description: 'DESCRIPTION GOES HERE',
+              expiration:	'2020-02-17T00:00:00.000Z',
+              payment: {
+                'foo':'bar'
+              }
+            }
+          });
       })
-      AWS.mock('DynamoDB.DocumentClient', 'update', function (params, callback) {
-        callback(null, { 'Item': {} })
+      AWS.mock('DynamoDB.DocumentClient', 'put', function (params, callback) {
+        callback(null, 'Success!')
       })
       AWS.mock('SES', 'sendEmail', function (params, callback) {
         callback(null, 'Success!')
@@ -48,11 +68,13 @@ describe('Payment Driver', function () {
 
       nock('https://api.stripe.com/v1')
         .post('/charges')
-        .reply(200, { success: true }, []);
-
+        .reply(200, { status: 'succeeded' },{});
+      
       const result = await payments.post(
         { 'requestContext': {'httpMethod': 'POST', 'path':''},
-          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+          'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
+          'queryStringParameters': {'id':'1234', 'created_at':'2020-02-13T23:39:11.403Z'}
+        }, {})
 
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');
@@ -64,11 +86,31 @@ describe('Payment Driver', function () {
 
     it('should return an error when there is an error response from Stripe', async() => {
 
-      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
-        callback(null, { 'Item': {} })
+      AWS.mock('DynamoDB.DocumentClient', 'get', function (params, callback){
+        callback(null,
+          {Item:
+            {
+              id: "1234",
+              created_at:	'2020-02-13T23:39:11.403Z',
+              updated_at:	'2020-02-13T23:39:11.403Z',
+              firstname: 'Testy',
+              lastname:	'Testerson',
+              email: 'test@example.com',
+              requestor: 'requestor@example.com',
+              amount:	'7500.00',
+              total: '7500.00',
+              paid: 'true',
+              paid_at: '2020-02-14T08:43:54.966Z',
+              description: 'DESCRIPTION GOES HERE',
+              expiration:	'2020-02-17T00:00:00.000Z',
+              payment: {
+                'foo':'bar'
+              }
+            }
+          });
       })
-      AWS.mock('DynamoDB.DocumentClient', 'update', function (params, callback) {
-        callback(null, { 'Item': {} })
+      AWS.mock('DynamoDB.DocumentClient', 'put', function (params, callback) {
+        callback(null, 'Success!')
       })
       AWS.mock('SES', 'sendEmail', function (params, callback) {
         callback(null, 'Success!')
@@ -79,7 +121,8 @@ describe('Payment Driver', function () {
         .reply(400, { "error": { "type": "invalid_request_error", "message": "Test error message." } }, []);
 
       const result = await payments.post({ 'requestContext': {'httpMethod': 'POST', 'path':''},
-        'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+        'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
+        'queryStringParameters': {'id':'1234', 'created_at':'2020-02-13T23:39:11.403Z'} }, {})
 
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html');

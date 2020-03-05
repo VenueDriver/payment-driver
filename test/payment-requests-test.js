@@ -93,12 +93,18 @@ describe('payment requests REST resource', function () {
   describe('an authorized admin user', function () {
 
     it('should see the payment request list when they request it', async() => {
+
+      AWS.mock('DynamoDB.DocumentClient', 'scan', function (params, callback) {
+        callback(null, { 'Items': [] })
+      })
+
+
       const result = await paymentRequests.index({
         'requestContext': {'httpMethod': 'GET', 'path':''},
         'headers': {
           'X-Forwarded-Proto':'https',
           'Host': 'example.com',
-          'Cookie': 'authentication_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
+          'Cookie': 'authentication_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')        
         }
       },{})
       expect(result.statusCode).to.equal(200)
@@ -113,9 +119,10 @@ describe('payment requests REST resource', function () {
         'requestContext': {'httpMethod': 'GET', 'path':''},
         'headers': {
           'X-Forwarded-Proto':'https',
-          'Host': 'example.com',
-          'Cookie': 'authentication_token=' + jwt.sign({ foo: 'bar' }, 'shhhhh')
-        }
+          'Host': 'example.com'
+        },
+        'queryStringParameters': {'payment-request-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFmZl9waG9uZSI6IjQxNS04MTAtNzM3NSIsImV2ZW50X29wZW4iOiIyMDIwLzAzLzEwIDIyOjMwOjAwICswMDAwIiwiZXZlbnRfdGl0bGUiOiJPTU5JQSBUdWVzZGF5IiwiZW1haWwiOiJmcmFuY29tYXJzaWxpQGJ5dGVyeS5jb20iLCJzdGFmZl9maXJzdCI6IlBlYXJsIiwiYW1vdW50IjoyMDAwLjAsInJlc2VydmF0aW9uX3JlY29yZF9sb2NhdG9yIjoiNjcySzciLCJyZXNlcnZhdGlvbl9pZCI6MTY3MzQzNywic3RhZmZfbGFzdCI6IlZlcnpvc2EiLCJ2ZW51ZSI6Ik9NTklBIExhcyBWZWdhcyAocykiLCJ2ZW51ZV90aW1lem9uZSI6IlVTL1BhY2lmaWMiLCJzdGFmZl9qb2JfdGl0bGUiOiIiLCJldmVudF9kYXRlIjoiMjAyMC8wMy8xMCIsInZlbnVlX3RpbWV6b25lX29mZnNldCI6LTI4ODAwLCJsYXN0IjoiVGVzdCIsImZpcnN0IjoiRnJhbmNvIiwic3RhZmZfZW1haWwiOiJwdmVyem9zYUBoYWtrYXNhbi5jb20iLCJ2ZW51ZV9jb2RlIjoib21uaWFsdiIsInJlcXVlc3RvciI6InB2ZXJ6b3NhQGhha2thc2FuLmNvbSIsImV4cCI6MTU4MjU1NzQwMiwiYWNjb3VudCI6bnVsbCwibWluaW11bSI6MjAwMC4wfQ.2GNWVOsRI-SfTx8dDSvXkSI2jBj3HQiQvj4zygLrbBA'}
+
       },{})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
@@ -135,7 +142,10 @@ describe('payment requests REST resource', function () {
       })
 
       const result = await paymentRequests.post(
-        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+        { 'requestContext': {'httpMethod': 'POST','path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
+        'body': 'amount=1000.00&expiration=2020%2F02%2F08+22%3A30%3A00+%2B0000&event_open=2020%2F02%2F08+22%3A30%3A00+%2B0000',
+        'queryStringParameters': {'payment-request-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFmZl9waG9uZSI6IjQxNS04MTAtNzM3NSIsImV2ZW50X29wZW4iOiIyMDIwLzAzLzEwIDIyOjMwOjAwICswMDAwIiwiZXZlbnRfdGl0bGUiOiJPTU5JQSBUdWVzZGF5IiwiZW1haWwiOiJmcmFuY29tYXJzaWxpQGJ5dGVyeS5jb20iLCJzdGFmZl9maXJzdCI6IlBlYXJsIiwiYW1vdW50IjoyMDAwLjAsInJlc2VydmF0aW9uX3JlY29yZF9sb2NhdG9yIjoiNjcySzciLCJyZXNlcnZhdGlvbl9pZCI6MTY3MzQzNywic3RhZmZfbGFzdCI6IlZlcnpvc2EiLCJ2ZW51ZSI6Ik9NTklBIExhcyBWZWdhcyAocykiLCJ2ZW51ZV90aW1lem9uZSI6IlVTL1BhY2lmaWMiLCJzdGFmZl9qb2JfdGl0bGUiOiIiLCJldmVudF9kYXRlIjoiMjAyMC8wMy8xMCIsInZlbnVlX3RpbWV6b25lX29mZnNldCI6LTI4ODAwLCJsYXN0IjoiVGVzdCIsImZpcnN0IjoiRnJhbmNvIiwic3RhZmZfZW1haWwiOiJwdmVyem9zYUBoYWtrYXNhbi5jb20iLCJ2ZW51ZV9jb2RlIjoib21uaWFsdiIsInJlcXVlc3RvciI6InB2ZXJ6b3NhQGhha2thc2FuLmNvbSIsImV4cCI6MTU4MjU1NzQwMiwiYWNjb3VudCI6bnVsbCwibWluaW11bSI6MjAwMC4wfQ.2GNWVOsRI-SfTx8dDSvXkSI2jBj3HQiQvj4zygLrbBA'}
+      }, {})
       expect(result.statusCode).to.equal(200)
       expect(result.headers['Content-Type']).to.equal('text/html')
 
@@ -150,7 +160,10 @@ describe('payment requests REST resource', function () {
         callback("The sprockets have caught on fire!");
       })
       const result = await paymentRequests.post(
-        { 'requestContext': {'httpMethod': 'POST', 'path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'} }, {})
+        { 'requestContext': {'httpMethod': 'POST','path':''}, 'headers': { 'X-Forwarded-Proto':'https', 'Host': 'example.com'},
+        'body': 'amount=1000.00&expiration=2020%2F02%2F08+22%3A30%3A00+%2B0000&event_open=2020%2F02%2F08+22%3A30%3A00+%2B0000',
+        'queryStringParameters': {'payment-request-token':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGFmZl9waG9uZSI6IjQxNS04MTAtNzM3NSIsImV2ZW50X29wZW4iOiIyMDIwLzAzLzEwIDIyOjMwOjAwICswMDAwIiwiZXZlbnRfdGl0bGUiOiJPTU5JQSBUdWVzZGF5IiwiZW1haWwiOiJmcmFuY29tYXJzaWxpQGJ5dGVyeS5jb20iLCJzdGFmZl9maXJzdCI6IlBlYXJsIiwiYW1vdW50IjoyMDAwLjAsInJlc2VydmF0aW9uX3JlY29yZF9sb2NhdG9yIjoiNjcySzciLCJyZXNlcnZhdGlvbl9pZCI6MTY3MzQzNywic3RhZmZfbGFzdCI6IlZlcnpvc2EiLCJ2ZW51ZSI6Ik9NTklBIExhcyBWZWdhcyAocykiLCJ2ZW51ZV90aW1lem9uZSI6IlVTL1BhY2lmaWMiLCJzdGFmZl9qb2JfdGl0bGUiOiIiLCJldmVudF9kYXRlIjoiMjAyMC8wMy8xMCIsInZlbnVlX3RpbWV6b25lX29mZnNldCI6LTI4ODAwLCJsYXN0IjoiVGVzdCIsImZpcnN0IjoiRnJhbmNvIiwic3RhZmZfZW1haWwiOiJwdmVyem9zYUBoYWtrYXNhbi5jb20iLCJ2ZW51ZV9jb2RlIjoib21uaWFsdiIsInJlcXVlc3RvciI6InB2ZXJ6b3NhQGhha2thc2FuLmNvbSIsImV4cCI6MTU4MjU1NzQwMiwiYWNjb3VudCI6bnVsbCwibWluaW11bSI6MjAwMC4wfQ.2GNWVOsRI-SfTx8dDSvXkSI2jBj3HQiQvj4zygLrbBA'}
+      }, {})
       expect(result.statusCode).to.equal(200);
       expect(result.headers['Content-Type']).to.equal('text/html')
 

@@ -17,16 +17,14 @@
       <input type="hidden" name="payment_request_created_at" id="payment_request_created_at" value="{{created_at}}" />
       <fieldset>
         <div class="d-flex w-100 justify-content-between">
-          {{^paid}}
-          <legend>Please provide payment</legend>
-          {{/paid}}
           {{#paid}}
           <legend>Payment request</legend>
-          {{/paid}}
-          {{#paid}}
             <div>
               <span class="badge badge-success badge-pill">PAID</span>
             </div>
+          {{/paid}}
+          {{^paid}}
+          <legend>Please provide payment</legend>
           {{/paid}}
         </div>
 
