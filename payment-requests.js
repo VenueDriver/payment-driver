@@ -409,6 +409,7 @@ postEditHandler.middleware(authenticatorMiddleware);
 
 let sendExpirationEmailHandler = new BaseHandler("Send Expiration Email").willDo(
   async function (event, context) {
+    var result;
     try {
       var paymentRequest =
         await PaymentRequest.get(
@@ -424,10 +425,13 @@ let sendExpirationEmailHandler = new BaseHandler("Send Expiration Email").willDo
       await Hook.execute('before-sending-payment-request-expired-email-to-customer');
       await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters);
       Logger.debug(['Expiration email sent to customer succesfully',templateParameters]);
+      result = new Response('200');
     }
     catch (error) {
       Logger.error(['error in post send expiration email handler', error]);
+      result = new Response('400');
     }
+    return result;
   }
 )
 
