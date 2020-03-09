@@ -192,6 +192,27 @@ Resources:
             Path: /payment-requests
             Method: post
 
+  SendExpirationEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: payment-requests.sendExpirationEmail
+      Runtime: nodejs10.x
+      Policies:
+       - AWSLambdaExecute
+       - AmazonDynamoDBFullAccess
+       - Version: '2012-10-17'
+         Statement:
+           - Effect: Allow
+             Action:
+               - ses:*
+             Resource: '*'
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /send-expiration-email
+            Method: post
+
   ResendPaymentRequest:
     Type: AWS::Serverless::Function
     Properties:

@@ -400,6 +400,37 @@ let postEditHandler = new BaseHandler("Post Edit Request").willDo(
 
 postEditHandler.middleware(authenticatorMiddleware);
 
+/*
+=================================================
+ [POST] SEND EXPIRATION EMAIL HANDLER
+=================================================
+*/
+
+
+let sendExpirationEmailHandler = new BaseHandler("Send Expiration Email").willDo(
+  async function (event, context) {
+    try {
+      var paymentRequest =
+        await PaymentRequest.get(
+          event.queryStringParameters.id,
+          event.queryStringParameters.created_at)
+      var templateParameters = paymentRequest
+
+      // This notification goes to the customer.
+      templateParameters.subject = "Payment request from " + company + " has expired";
+      templateParameters.to = paymentRequest.email;
+      var templateName = 'payment-request-expired-email-to-customer';
+      global.handler.emailToCustomerParameters = templateParameters;
+      await Hook.execute('before-sending-payment-request-expired-email-to-customer');
+      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters);
+      Logger.debug(['Expiration email sent to customer succesfully',templateParameters]);
+    }
+    catch (error) {
+      Logger.error(['error in post send expiration email handler', error]);
+    }
+  }
+)
+
 
 //complementary functions
 
@@ -451,3 +482,4 @@ exports.post   = postHandler.do
 exports.resend = resendHandler.do
 exports.edit   = editHandler.do
 exports.postEdit = postEditHandler.do
+exports.sendExpirationEmail = sendExpirationEmailHandler.do
