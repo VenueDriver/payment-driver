@@ -128,7 +128,8 @@ describe('payment requests REST resource', function () {
       expect(result.headers['Content-Type']).to.equal('text/html')
 
       const $ = cheerio.load(result.body)
-      expect($('legend').text()).to.have.string('New payment request')
+      expect(result.statusCode).to.equal(200)
+      expect($('#loginForm')).to.exist
     })
 
     it('should be able to create a new DB record when the payment request form is posted', async() => {
