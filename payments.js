@@ -206,7 +206,7 @@ let postHandler = new BaseHandler("post").willDo(
     catch (error) {
       Logger.error(['Error starting the process of stripe payment: ',error]);
       return new Response('200').send(
-        await template.render('error', { 'error': error }))
+        await template.render('payment-error', { 'error': error }))
     }
 
   }
