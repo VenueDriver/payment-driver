@@ -417,14 +417,30 @@ let sendExpirationEmailHandler = new BaseHandler("Send Expiration Email").willDo
           event.queryStringParameters.created_at)
       var templateParameters = paymentRequest
 
+      var today = parseInt(new Date().getTime());
+      var expirationDate = parseInt(new Date(paymentRequest.expiration).getTime());
+      var templateName;
+
+      if(expirationDate <= today){
+        templateParameters.subject = "Payment request from " + company + " has expired";
+        templateName = 'payment-request-expired-email-to-customer';
+      } else {
+        templateParameters.subject = "Payment request from " + company + " is about to expire";
+        templateName = 'payment-request-about-to-expire-email-to-customer';
+      }
+
       // This notification goes to the customer.
-      templateParameters.subject = "Payment request from " + company + " has expired";
       templateParameters.to = paymentRequest.email;
-      var templateName = 'payment-request-expired-email-to-customer';
-      global.handler.emailToCustomerParameters = templateParameters;
-      await Hook.execute('before-sending-payment-request-expired-email-to-customer');
-      await EmailNotification.sendEmail(templateName, global.handler.emailToCustomerParameters);
-      Logger.debug(['Expiration email sent to customer succesfully',templateParameters]);
+      global.handler.expiredEmailTemplateParameters = {...templateParameters};
+
+      if(expirationDate >= today){
+        await Hook.execute('before-sending-payment-request-expired-email-to-customer');
+      } else {
+        await Hook.execute('before-sending-payment-request-about-to-expire-email-to-customer');
+      }
+      
+      await EmailNotification.sendEmail(templateName, global.handler.expiredEmailTemplateParameters);
+      Logger.debug(['Expiration email sent to customer succesfully',global.handler.expiredEmailTemplateParameters]);
       result = new Response('200');
     }
     catch (error) {
@@ -434,7 +450,6 @@ let sendExpirationEmailHandler = new BaseHandler("Send Expiration Email").willDo
     return result;
   }
 )
-
 
 //complementary functions
 
