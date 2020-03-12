@@ -7,6 +7,10 @@ module.exports = {
   "single_project": true,
   "base_path": join( __dirname ),
   "template_parameters": {
+    "PlaidClientId":process.env.PLAID_CLIENT_ID || "local",
+    "PlaidPublicKey":process.env.PLAID_PUBLIC_KEY || "local",
+    "PlaidDevelopmentSecret":process.env.PLAID_DEVELOPMENT_SECRET || "local",
+    "PlaidSandboxSecret":process.env.PLAID_SANDBOX_SECRET || "local",
     "ProjectId": "1234abc",
     "CompanyName": process.env.COMPANY_NAME || "local",
     "SenderEmail": process.env.SENDER_EMAIL || "local",
