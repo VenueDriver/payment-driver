@@ -24,12 +24,24 @@ Parameters:
     Type: String
   AwsPaymentQueueName:
     Type: String
+  PlaidClientId:
+    Type: String
+  PlaidPublicKey:
+    Type: String
+  PlaidDevelopmentSecret:
+    Type: String
+  PlaidSandboxSecret:
+    Type: String
 
 Globals:
   Function:
     Timeout: 10
     Environment:
       Variables:
+        PLAID_CLIENT_ID: !Ref 'PlaidClientId'
+        PLAID_PUBLIC_KEY: !Ref 'PlaidPublicKey'
+        PLAID_DEVELOPMENT_SECRET: !Ref 'PlaidDevelopmentSecret'
+        PLAID_SANDBOX_SECRET: !Ref 'PlaidSandboxSecret'
         PAYMENT_REQUESTS_TABLE_NAME: !Ref PaymentRequestsTable
         COMPANY_NAME: !Ref 'CompanyName'
         SENDER_EMAIL: !Ref 'SenderEmail'
@@ -261,6 +273,9 @@ Resources:
     Properties:
       Handler: payments.get
       Runtime: nodejs10.x
+      Environment:
+        Variables:
+          TEST_SARASA: "test"
       Policies:
        - AWSLambdaExecute
        - AmazonDynamoDBFullAccess
