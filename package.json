@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/VenueDriver/payment-driver#readme",
   "dependencies": {
-    "aws-sdk": "^2.530.0",
+    "aws-sdk": "^2.1354.0",
     "bignumber.js": "^6.0.0",
     "bootstrap-validator": "^0.11.9",
     "cheerio": "^1.0.0-rc.3",
